@@ -27,6 +27,14 @@ React + TypeScript + Vite frontend that consumes the backend API contract from t
    npm run dev
    ```
 
+5. Verify the frontend locally:
+
+   ```bash
+   npm test
+   npm run typecheck
+   npm run build
+   ```
+
 ## Contract Ownership
 
 - Backend repo: `topilov/spring-playground-backend`
@@ -47,6 +55,7 @@ https://topilov.github.io/spring-playground-backend/openapi/openapi.json
 - Generated files live in `src/shared/api/generated/`.
 - Generated files must not be edited manually.
 - Transport stays handwritten in `src/shared/api/apiClient.ts` and feature API modules.
+- Regenerate types before auth/profile work so the frontend reflects the real backend contract.
 
 The generation script prefers `VITE_API_SCHEMA_URL`. If the published Pages artifact is temporarily unavailable, it falls back to the backend repository's raw `openapi/openapi.yaml` so frontend bootstrap stays unblocked without inventing any shapes.
 
@@ -67,6 +76,24 @@ The generation script prefers `VITE_API_SCHEMA_URL`. If the published Pages arti
    npm run typecheck
    npm run build
    ```
+
+## Auth Flow Notes
+
+- Auth is session and cookie based, not token based.
+- The frontend always sends requests with `credentials: "include"` so the backend-managed `JSESSIONID` cookie is included automatically.
+- `POST /api/auth/register` creates the account and default profile, but it does not auto-login the browser session.
+- `POST /api/auth/login` establishes the session cookie.
+- `GET /api/profile/me` is the frontend's source of truth for the current authenticated profile.
+- `POST /api/auth/logout` invalidates the backend session and the frontend clears local session state after a successful response.
+- `POST /api/auth/forgot-password` should always be presented with a generic acceptance message so the UI does not reveal whether an email exists.
+
+## Current Screens
+
+- `/` home page with contract context and navigation
+- `/register` account creation form
+- `/login` session login form
+- `/forgot-password` reset request form
+- `/profile` current authenticated profile
 
 ## Docs
 
