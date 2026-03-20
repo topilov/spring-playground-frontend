@@ -7,6 +7,7 @@ import { NotFoundPage } from '../pages/not-found/NotFoundPage';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import { RegisterPage } from '../pages/register/RegisterPage';
 import { ResetPasswordPage } from '../pages/reset-password/ResetPasswordPage';
+import { VerifyEmailPage } from '../pages/verify-email/VerifyEmailPage';
 import { routePaths } from '../shared/routing/paths';
 import { AppLayout } from './layout/AppLayout';
 import { AnonymousOnlyRoute } from './routes/AnonymousOnlyRoute';
@@ -20,6 +21,10 @@ export const routes: RouteObject[] = [
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: routePaths.verifyEmail.slice(1),
+        element: <VerifyEmailPage />,
       },
       {
         element: <AnonymousOnlyRoute />,

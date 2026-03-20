@@ -4,6 +4,8 @@ import type {
   ForgotPasswordInput,
   ResetPasswordInput,
   RegisterInput,
+  ResendVerificationEmailInput,
+  VerifyEmailInput,
 } from '../../entities/auth/model';
 import type { LoginCredentials } from '../../entities/session/model';
 import {
@@ -12,6 +14,8 @@ import {
   logout,
   resetPassword,
   register,
+  resendVerificationEmail,
+  verifyEmail,
 } from './api';
 import { authSessionQueryKey, fetchAuthSession } from './session/query';
 
@@ -30,6 +34,19 @@ export function useForgotPasswordMutation() {
 export function useResetPasswordMutation() {
   return useMutation({
     mutationFn: (payload: ResetPasswordInput) => resetPassword(payload),
+  });
+}
+
+export function useVerifyEmailMutation() {
+  return useMutation({
+    mutationFn: (payload: VerifyEmailInput) => verifyEmail(payload),
+  });
+}
+
+export function useResendVerificationEmailMutation() {
+  return useMutation({
+    mutationFn: (payload: ResendVerificationEmailInput) =>
+      resendVerificationEmail(payload),
   });
 }
 

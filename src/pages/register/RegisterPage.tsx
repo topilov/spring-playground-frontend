@@ -10,7 +10,7 @@ export function RegisterPage() {
         <h1>Create an account</h1>
         <p className="section-copy">
           Registration creates the auth user and the default profile, but it does
-          not sign you in.
+          not sign you in. New accounts must confirm email before login succeeds.
         </p>
 
         <RegisterForm />

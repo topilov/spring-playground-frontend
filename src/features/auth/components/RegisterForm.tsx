@@ -3,10 +3,13 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { getApiErrorMessage } from '../../../shared/api/errorMessage';
+import { AppLink } from '../../../shared/routing/AppLink';
+import { routePaths } from '../../../shared/routing/paths';
 import { useRegisterMutation } from '../mutations';
 import { registerFormSchema, type RegisterFormValues } from '../forms';
 
 export function RegisterForm() {
+  const [successEmail, setSuccessEmail] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const registerMutation = useRegisterMutation();
   const form = useForm<RegisterFormValues>({
@@ -20,11 +23,15 @@ export function RegisterForm() {
 
   const onSubmit = form.handleSubmit(async (values) => {
     form.clearErrors('root');
+    setSuccessEmail('');
     setSuccessMessage('');
 
     try {
       const result = await registerMutation.mutateAsync(values);
-      setSuccessMessage(`Account created for ${result.username}. You can log in now.`);
+      setSuccessEmail(result.email);
+      setSuccessMessage(
+        `Account created for ${result.username}. Check ${result.email} for a verification link before signing in.`
+      );
       form.reset();
     } catch (error) {
       form.setError('root', {
@@ -88,7 +95,15 @@ export function RegisterForm() {
       </form>
 
       {successMessage ? (
-        <p className="status-message status-success">{successMessage}</p>
+        <div className="stack">
+          <p className="status-message status-success">{successMessage}</p>
+          <AppLink
+            className="secondary-button link-button"
+            to={`${routePaths.verifyEmail}?email=${encodeURIComponent(successEmail)}`}
+          >
+            Open verification page
+          </AppLink>
+        </div>
       ) : null}
     </>
   );

@@ -5,6 +5,7 @@ export const routePaths = {
   profile: '/profile',
   register: '/register',
   resetPassword: '/reset-password',
+  verifyEmail: '/verify-email',
 } as const;
 
 export function isAppPath(value: unknown): value is (typeof routePaths)[keyof typeof routePaths] {

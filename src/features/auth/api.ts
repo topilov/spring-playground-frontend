@@ -2,15 +2,23 @@ import {
   mapForgotPasswordResponse,
   mapResetPasswordResponse,
   mapRegisterResponse,
+  mapResendVerificationEmailResponse,
+  mapVerifyEmailResponse,
   type ForgotPasswordInput,
   type ForgotPasswordResult,
   type ResetPasswordInput,
   type ResetPasswordResult,
   type RegisterInput,
   type RegisterResult,
+  type ResendVerificationEmailInput,
+  type ResendVerificationEmailResult,
   toForgotPasswordRequest,
   toResetPasswordRequest,
   toRegisterRequest,
+  toResendVerificationEmailRequest,
+  toVerifyEmailRequest,
+  type VerifyEmailInput,
+  type VerifyEmailResult,
 } from '../../entities/auth/model';
 import {
   mapLoginResponse,
@@ -43,6 +51,25 @@ export function resetPassword(
     method: 'POST',
     body: toResetPasswordRequest(payload),
   }).then(mapResetPasswordResponse);
+}
+
+export function verifyEmail(payload: VerifyEmailInput): Promise<VerifyEmailResult> {
+  return request<VerifyEmailResult>('/api/auth/verify-email', {
+    method: 'POST',
+    body: toVerifyEmailRequest(payload),
+  }).then(mapVerifyEmailResponse);
+}
+
+export function resendVerificationEmail(
+  payload: ResendVerificationEmailInput
+): Promise<ResendVerificationEmailResult> {
+  return request<ResendVerificationEmailResult>(
+    '/api/auth/resend-verification-email',
+    {
+      method: 'POST',
+      body: toResendVerificationEmailRequest(payload),
+    }
+  ).then(mapResendVerificationEmailResponse);
 }
 
 export function login(payload: LoginCredentials): Promise<SessionUser> {

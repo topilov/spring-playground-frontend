@@ -28,6 +28,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify email
+         * @description Confirms a user email using a token that was previously sent by email.
+         */
+        post: operations["verifyEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/reset-password": {
         parameters: {
             query?: never;
@@ -48,6 +68,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/resend-verification-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resend verification email
+         * @description Accepts an email address and sends a fresh verification link when the account exists and is not yet verified. The response is still accepted when the account is missing or already verified.
+         */
+        post: operations["resendVerificationEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/register": {
         parameters: {
             query?: never;
@@ -59,7 +99,7 @@ export interface paths {
         put?: never;
         /**
          * Register
-         * @description Creates a new user account and default profile, then sends a welcome email when mail delivery succeeds.
+         * @description Creates a new user account and default profile, then sends an email verification link when mail delivery succeeds.
          */
         post: operations["register"];
         delete?: never;
@@ -99,7 +139,7 @@ export interface paths {
         put?: never;
         /**
          * Login
-         * @description Authenticates by username or email and creates a server-side session backed by the JSESSIONID cookie.
+         * @description Authenticates by username or email and creates a server-side session backed by the JSESSIONID cookie. Browser-based cross-origin clients must send the request with credentials enabled.
          */
         post: operations["login"];
         delete?: never;
@@ -152,9 +192,6 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        ErrorResponse: {
-            error: string;
-        };
         /** @description Payload used to update the current authenticated user's profile. */
         UpdateProfileRequest: {
             /**
@@ -205,12 +242,30 @@ export interface components {
             /** @example /api/profile/me */
             path: string;
         };
+        VerifyEmailRequest: {
+            token: string;
+        };
+        VerifyEmailResponse: {
+            verified: boolean;
+        };
         ResetPasswordRequest: {
             token: string;
             newPassword: string;
         };
         ResetPasswordResponse: {
             reset: boolean;
+        };
+        /** @description Simple application-defined error response body. */
+        SimpleErrorResponse: {
+            /** @example Username 'demo' is already in use */
+            error: string;
+        };
+        ResendVerificationEmailRequest: {
+            /** Format: email */
+            email: string;
+        };
+        ResendVerificationEmailResponse: {
+            accepted: boolean;
         };
         RegisterRequest: {
             username: string;
@@ -292,15 +347,6 @@ export interface operations {
                     "application/json": components["schemas"]["ProfileResponse"];
                 };
             };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
-                };
-            };
             /** @description Missing or invalid JSESSIONID session cookie. */
             401: {
                 headers: {
@@ -314,15 +360,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
-                };
             };
         };
     };
@@ -371,13 +408,37 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Conflict */
-            409: {
+        };
+    };
+    verifyEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Email verification completed. */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["VerifyEmailResponse"];
+                };
+            };
+            /** @description Verification token is invalid or expired. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["VerifyEmailResponse"];
                 };
             };
         };
@@ -404,22 +465,37 @@ export interface operations {
                     "application/json": components["schemas"]["ResetPasswordResponse"];
                 };
             };
-            /** @description Reset token is invalid or expired. */
+            /** @description Validation failed or the reset token is invalid or expired. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["ApiErrorResponse"] | components["schemas"]["SimpleErrorResponse"];
                 };
             };
-            /** @description Conflict */
-            409: {
+        };
+    };
+    resendVerificationEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendVerificationEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Request accepted. */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["ResendVerificationEmailResponse"];
                 };
             };
         };
@@ -446,13 +522,13 @@ export interface operations {
                     "application/json": components["schemas"]["RegisterResponse"];
                 };
             };
-            /** @description Bad Request */
+            /** @description Validation failed for the submitted registration payload. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
             /** @description Username or email is already in use. */
@@ -461,7 +537,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["SimpleErrorResponse"];
                 };
             };
         };
@@ -482,24 +558,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
-                };
-            };
         };
     };
     login: {
@@ -518,36 +576,31 @@ export interface operations {
             /** @description Successful login. The response body describes the authenticated user and the response sets JSESSIONID. */
             200: {
                 headers: {
+                    /** @description Returned for allowed browser origins on cross-origin requests. */
+                    "Access-Control-Allow-Origin"?: string;
+                    /** @description Returned as true for allowed browser origins so the session cookie can be stored by the client. */
+                    "Access-Control-Allow-Credentials"?: string;
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["LoginResponse"];
                 };
             };
-            /** @description Bad Request */
+            /** @description Validation failed for the submitted login payload. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
-            /** @description Invalid credentials or rejected login request. */
+            /** @description Invalid credentials, rejected login request, or email is not yet verified. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
-                };
             };
         };
     };
@@ -573,22 +626,13 @@ export interface operations {
                     "application/json": components["schemas"]["ForgotPasswordResponse"];
                 };
             };
-            /** @description Bad Request */
+            /** @description Validation failed for the submitted email payload. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["ApiErrorResponse"];
                 };
             };
         };
@@ -609,24 +653,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicPingResponse"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Conflict */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ErrorResponse"];
                 };
             };
         };
