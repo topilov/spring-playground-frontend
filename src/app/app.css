@@ -252,6 +252,20 @@ a {
   border-radius: 16px;
 }
 
+.status-inline,
+.field-error {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.status-inline {
+  color: #4f5f70;
+}
+
+.field-error {
+  color: #8a1f2b;
+}
+
 .status-error {
   background: rgba(196, 51, 65, 0.1);
   color: #8a1f2b;

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
 import { AppLink } from '../../shared/routing/AppLink';
+import { routePaths } from '../../shared/routing/paths';
 
 export function ProfilePage() {
   const { errorMessage, profile, refreshSession, status } = useAuthSession();
@@ -48,7 +49,7 @@ export function ProfilePage() {
             This page uses `GET /api/profile/me`, so it needs an authenticated
             session cookie first.
           </p>
-          <AppLink className="primary-button link-button" to="/login">
+          <AppLink className="primary-button link-button" to={routePaths.login}>
             Go to login
           </AppLink>
         </article>
