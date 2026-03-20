@@ -15,19 +15,22 @@ export function RegisterPage() {
   const [form, setForm] = useState<RegisterInput>(initialForm);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successEmail, setSuccessEmail] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
     setErrorMessage('');
+    setSuccessEmail('');
     setSuccessMessage('');
 
     try {
       const result = await register(form);
       setSuccessMessage(
-        `Account created for ${result.username}. You can log in now.`
+        `Account created for ${result.username}. Check ${result.email} for a verification link before signing in.`
       );
+      setSuccessEmail(result.email);
       setForm(initialForm);
     } catch (error) {
       setErrorMessage(
@@ -45,7 +48,7 @@ export function RegisterPage() {
         <h1>Create an account</h1>
         <p className="section-copy">
           Registration creates the auth user and the default profile, but it does
-          not sign you in.
+          not sign you in. New accounts must confirm email before login succeeds.
         </p>
 
         <form className="stack" onSubmit={handleSubmit}>
@@ -112,7 +115,15 @@ export function RegisterPage() {
         ) : null}
 
         {successMessage ? (
-          <p className="status-message status-success">{successMessage}</p>
+          <div className="stack">
+            <p className="status-message status-success">{successMessage}</p>
+            <AppLink
+              className="secondary-button link-button"
+              to={`/verify-email?email=${encodeURIComponent(successEmail)}`}
+            >
+              Open verification page
+            </AppLink>
+          </div>
         ) : null}
 
         <p className="helper-links">

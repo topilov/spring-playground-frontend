@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from 'react';
 
 import type { LoginCredentials } from '../../entities/session/model';
+import { isEmailNotVerifiedError } from '../../features/auth/errors';
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
 import { ApiClientError } from '../../shared/api/apiClient';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
@@ -16,18 +17,25 @@ export function LoginPage() {
   const { isAuthenticated, login, profile } = useAuthSession();
   const [form, setForm] = useState<LoginCredentials>(initialForm);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showVerificationCta, setShowVerificationCta] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
     setErrorMessage('');
+    setShowVerificationCta(false);
 
     try {
       await login(form);
       navigateTo('/profile');
     } catch (error) {
-      if (error instanceof ApiClientError && error.status === 401) {
+      if (isEmailNotVerifiedError(error)) {
+        setErrorMessage(
+          'Your email is not verified yet. Confirm it from your inbox or request a new verification link.'
+        );
+        setShowVerificationCta(true);
+      } else if (error instanceof ApiClientError && error.status === 401) {
         setErrorMessage('Invalid username/email or password.');
       } else {
         setErrorMessage(getApiErrorMessage(error, 'We could not sign you in.'));
@@ -105,9 +113,23 @@ export function LoginPage() {
         </form>
 
         {errorMessage ? (
-          <p className="status-message status-error" role="alert">
-            {errorMessage}
-          </p>
+          <div className="stack">
+            <p className="status-message status-error" role="alert">
+              {errorMessage}
+            </p>
+            {showVerificationCta ? (
+              <AppLink
+                className="secondary-button link-button"
+                to={
+                  form.usernameOrEmail.includes('@')
+                    ? `/verify-email?email=${encodeURIComponent(form.usernameOrEmail)}`
+                    : '/verify-email'
+                }
+              >
+                Open email verification
+              </AppLink>
+            ) : null}
+          </div>
         ) : null}
 
         <p className="helper-links">

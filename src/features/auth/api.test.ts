@@ -5,6 +5,8 @@ import {
   login,
   logout,
   register,
+  resendVerificationEmail,
+  verifyEmail,
 } from './api';
 
 describe('auth api', () => {
@@ -76,6 +78,56 @@ describe('auth api', () => {
 
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe('http://localhost:8080/api/auth/forgot-password');
+    expect(init?.method).toBe('POST');
+    expect(init?.credentials).toBe('include');
+    expect(init?.body).toBe(JSON.stringify({ email: 'demo@example.com' }));
+  });
+
+  it('submits verify-email requests to the backend', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response(JSON.stringify({ verified: true }), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+
+    const result = await verifyEmail({
+      token: 'verification-token',
+    });
+
+    expect(result).toEqual({ verified: true });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('http://localhost:8080/api/auth/verify-email');
+    expect(init?.method).toBe('POST');
+    expect(init?.credentials).toBe('include');
+    expect(init?.body).toBe(JSON.stringify({ token: 'verification-token' }));
+  });
+
+  it('submits resend-verification-email requests to the backend', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response(JSON.stringify({ accepted: true }), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+
+    const result = await resendVerificationEmail({
+      email: 'demo@example.com',
+    });
+
+    expect(result).toEqual({ accepted: true });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('http://localhost:8080/api/auth/resend-verification-email');
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ email: 'demo@example.com' }));

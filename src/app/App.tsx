@@ -7,6 +7,7 @@ import { HomePage } from '../pages/home/HomePage';
 import { LoginPage } from '../pages/login/LoginPage';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import { RegisterPage } from '../pages/register/RegisterPage';
+import { VerifyEmailPage } from '../pages/verify-email/VerifyEmailPage';
 import { getApiErrorMessage } from '../shared/api/errorMessage';
 import { AppLink } from '../shared/routing/AppLink';
 import { navigateTo, useCurrentPath } from '../shared/routing/navigation';
@@ -20,6 +21,8 @@ function renderPage(path: string) {
       return <LoginPage />;
     case '/forgot-password':
       return <ForgotPasswordPage />;
+    case '/verify-email':
+      return <VerifyEmailPage />;
     case '/profile':
       return <ProfilePage />;
     default:
