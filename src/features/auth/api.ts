@@ -1,21 +1,34 @@
-import type {
-  ForgotPasswordInput,
-  ForgotPasswordResult,
-  ResendVerificationEmailInput,
-  ResendVerificationEmailResult,
-  RegisterInput,
-  RegisterResult,
-  VerifyEmailInput,
-  VerifyEmailResult,
+import {
+  mapForgotPasswordResponse,
+  mapRegisterResponse,
+  mapResendVerificationEmailResponse,
+  mapVerifyEmailResponse,
+  type ForgotPasswordInput,
+  type ForgotPasswordResult,
+  type RegisterInput,
+  type RegisterResult,
+  type ResendVerificationEmailInput,
+  type ResendVerificationEmailResult,
+  toForgotPasswordRequest,
+  toRegisterRequest,
+  toResendVerificationEmailRequest,
+  toVerifyEmailRequest,
+  type VerifyEmailInput,
+  type VerifyEmailResult,
 } from '../../entities/auth/model';
-import type { LoginCredentials, SessionUser } from '../../entities/session/model';
+import {
+  mapLoginResponse,
+  type LoginCredentials,
+  type SessionUser,
+  toLoginRequest,
+} from '../../entities/session/model';
 import { request } from '../../shared/api/apiClient';
 
 export function register(payload: RegisterInput): Promise<RegisterResult> {
   return request<RegisterResult>('/api/auth/register', {
     method: 'POST',
-    body: payload,
-  });
+    body: toRegisterRequest(payload),
+  }).then(mapRegisterResponse);
 }
 
 export function forgotPassword(
@@ -23,15 +36,15 @@ export function forgotPassword(
 ): Promise<ForgotPasswordResult> {
   return request<ForgotPasswordResult>('/api/auth/forgot-password', {
     method: 'POST',
-    body: payload,
-  });
+    body: toForgotPasswordRequest(payload),
+  }).then(mapForgotPasswordResponse);
 }
 
 export function verifyEmail(payload: VerifyEmailInput): Promise<VerifyEmailResult> {
   return request<VerifyEmailResult>('/api/auth/verify-email', {
     method: 'POST',
-    body: payload,
-  });
+    body: toVerifyEmailRequest(payload),
+  }).then(mapVerifyEmailResponse);
 }
 
 export function resendVerificationEmail(
@@ -41,16 +54,16 @@ export function resendVerificationEmail(
     '/api/auth/resend-verification-email',
     {
       method: 'POST',
-      body: payload,
+      body: toResendVerificationEmailRequest(payload),
     }
-  );
+  ).then(mapResendVerificationEmailResponse);
 }
 
 export function login(payload: LoginCredentials): Promise<SessionUser> {
   return request<SessionUser>('/api/auth/login', {
     method: 'POST',
-    body: payload,
-  });
+    body: toLoginRequest(payload),
+  }).then(mapLoginResponse);
 }
 
 export function logout(): Promise<void> {

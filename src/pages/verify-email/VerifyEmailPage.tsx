@@ -1,33 +1,36 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
 
-import type { ResendVerificationEmailInput } from '../../entities/auth/model';
-import { resendVerificationEmail, verifyEmail } from '../../features/auth/api';
+import { verifyEmail } from '../../features/auth/api';
+import { useResendVerificationEmailMutation } from '../../features/auth/mutations';
+import {
+  resendVerificationEmailFormSchema,
+  type ResendVerificationEmailFormValues,
+} from '../../features/auth/forms';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
 import { AppLink } from '../../shared/routing/AppLink';
+import { routePaths } from '../../shared/routing/paths';
 
 const resendSuccessMessage =
   'If that email belongs to an unverified account, a fresh verification link will be sent.';
 
-function readTokenFromSearch(search: string): string {
-  return new URLSearchParams(search).get('token')?.trim() ?? '';
-}
-
-function readEmailFromSearch(search: string): string {
-  return new URLSearchParams(search).get('email')?.trim() ?? '';
-}
-
 export function VerifyEmailPage() {
-  const [token] = useState(() => readTokenFromSearch(window.location.search));
-  const [emailForm, setEmailForm] = useState<ResendVerificationEmailInput>(() => ({
-    email: readEmailFromSearch(window.location.search),
-  }));
+  const [searchParams] = useSearchParams();
+  const [token] = useState(() => searchParams.get('token')?.trim() ?? '');
   const [verificationError, setVerificationError] = useState('');
   const [verificationStatus, setVerificationStatus] = useState<
     'idle' | 'verifying' | 'verified' | 'failed'
   >(token ? 'verifying' : 'idle');
-  const [isResending, setIsResending] = useState(false);
-  const [resendError, setResendError] = useState('');
   const [resendMessage, setResendMessage] = useState('');
+  const resendVerificationEmailMutation = useResendVerificationEmailMutation();
+  const form = useForm<ResendVerificationEmailFormValues>({
+    defaultValues: {
+      email: searchParams.get('email')?.trim() ?? '',
+    },
+    resolver: zodResolver(resendVerificationEmailFormSchema),
+  });
 
   useEffect(() => {
     if (!token) {
@@ -60,23 +63,18 @@ export function VerifyEmailPage() {
     };
   }, [token]);
 
-  const handleResend = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsResending(true);
-    setResendError('');
+  const handleResend = form.handleSubmit(async (values) => {
+    form.clearErrors('root');
     setResendMessage('');
-
     try {
-      await resendVerificationEmail(emailForm);
+      await resendVerificationEmailMutation.mutateAsync(values);
       setResendMessage(resendSuccessMessage);
     } catch (error) {
-      setResendError(
-        getApiErrorMessage(error, 'We could not send another verification email.')
-      );
-    } finally {
-      setIsResending(false);
+      form.setError('root', {
+        message: getApiErrorMessage(error, 'We could not send another verification email.'),
+      });
     }
-  };
+  });
 
   return (
     <section className="auth-layout">
@@ -112,10 +110,10 @@ export function VerifyEmailPage() {
         ) : null}
 
         <div className="action-row">
-          <AppLink className="primary-button link-button" to="/login">
+          <AppLink className="primary-button link-button" to={routePaths.login}>
             Go to login
           </AppLink>
-          <AppLink className="secondary-button link-button" to="/register">
+          <AppLink className="secondary-button link-button" to={routePaths.register}>
             Back to register
           </AppLink>
         </div>
@@ -125,28 +123,34 @@ export function VerifyEmailPage() {
             <span>Email</span>
             <input
               autoComplete="email"
-              name="email"
-              onChange={(event) =>
-                setEmailForm({
-                  email: event.target.value,
-                })
-              }
-              required
               type="email"
-              value={emailForm.email}
+              {...form.register('email')}
             />
+            {form.formState.errors.email ? (
+              <span className="field-error" role="alert">
+                {form.formState.errors.email.message}
+              </span>
+            ) : null}
           </label>
 
-          <button className="secondary-button" disabled={isResending} type="submit">
-            {isResending ? 'Sending verification email...' : 'Resend verification email'}
+          <button
+            className="secondary-button"
+            disabled={
+              form.formState.isSubmitting || resendVerificationEmailMutation.isPending
+            }
+            type="submit"
+          >
+            {form.formState.isSubmitting || resendVerificationEmailMutation.isPending
+              ? 'Sending verification email...'
+              : 'Resend verification email'}
           </button>
-        </form>
 
-        {resendError ? (
-          <p className="status-message status-error" role="alert">
-            {resendError}
-          </p>
-        ) : null}
+          {form.formState.errors.root ? (
+            <p className="status-message status-error" role="alert">
+              {form.formState.errors.root.message}
+            </p>
+          ) : null}
+        </form>
 
         {resendMessage ? (
           <p className="status-message status-success">{resendMessage}</p>
