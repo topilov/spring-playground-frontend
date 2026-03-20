@@ -19,6 +19,21 @@ export const forgotPasswordFormSchema = z.object({
   email: z.email('Enter a valid email address.'),
 });
 
+export const resetPasswordFormSchema = z
+  .object({
+    newPassword: z
+      .string()
+      .min(8, 'Password must be at least 8 characters.'),
+    confirmPassword: z.string().min(1, 'Confirm your new password.'),
+  })
+  .refine(
+    (values) => values.newPassword === values.confirmPassword,
+    {
+      message: 'Passwords must match.',
+      path: ['confirmPassword'],
+    }
+  );
+
 export const resendVerificationEmailFormSchema = z.object({
   email: z.email('Enter a valid email address.'),
 });
@@ -26,6 +41,7 @@ export const resendVerificationEmailFormSchema = z.object({
 export type LoginFormValues = z.infer<typeof loginFormSchema>;
 export type RegisterFormValues = z.infer<typeof registerFormSchema>;
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordFormSchema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordFormSchema>;
 export type ResendVerificationEmailFormValues = z.infer<
   typeof resendVerificationEmailFormSchema
 >;

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type {
   ForgotPasswordInput,
+  ResetPasswordInput,
   RegisterInput,
   ResendVerificationEmailInput,
   VerifyEmailInput,
@@ -11,6 +12,7 @@ import {
   forgotPassword,
   login,
   logout,
+  resetPassword,
   register,
   resendVerificationEmail,
   verifyEmail,
@@ -26,6 +28,12 @@ export function useRegisterMutation() {
 export function useForgotPasswordMutation() {
   return useMutation({
     mutationFn: (payload: ForgotPasswordInput) => forgotPassword(payload),
+  });
+}
+
+export function useResetPasswordMutation() {
+  return useMutation({
+    mutationFn: (payload: ResetPasswordInput) => resetPassword(payload),
   });
 }
 

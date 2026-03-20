@@ -1,15 +1,19 @@
 import {
   mapForgotPasswordResponse,
+  mapResetPasswordResponse,
   mapRegisterResponse,
   mapResendVerificationEmailResponse,
   mapVerifyEmailResponse,
   type ForgotPasswordInput,
   type ForgotPasswordResult,
+  type ResetPasswordInput,
+  type ResetPasswordResult,
   type RegisterInput,
   type RegisterResult,
   type ResendVerificationEmailInput,
   type ResendVerificationEmailResult,
   toForgotPasswordRequest,
+  toResetPasswordRequest,
   toRegisterRequest,
   toResendVerificationEmailRequest,
   toVerifyEmailRequest,
@@ -38,6 +42,15 @@ export function forgotPassword(
     method: 'POST',
     body: toForgotPasswordRequest(payload),
   }).then(mapForgotPasswordResponse);
+}
+
+export function resetPassword(
+  payload: ResetPasswordInput
+): Promise<ResetPasswordResult> {
+  return request<ResetPasswordResult>('/api/auth/reset-password', {
+    method: 'POST',
+    body: toResetPasswordRequest(payload),
+  }).then(mapResetPasswordResponse);
 }
 
 export function verifyEmail(payload: VerifyEmailInput): Promise<VerifyEmailResult> {
