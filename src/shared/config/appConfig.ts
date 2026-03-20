@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE_URL = 'http://127.0.0.1:8080';
+const DEFAULT_API_BASE_URL = 'http://localhost:8080';
 const DEFAULT_API_SCHEMA_URL =
   'https://topilov.github.io/spring-playground-backend/openapi/openapi.json';
 const DEFAULT_RAW_SCHEMA_URL =
