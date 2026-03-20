@@ -81,4 +81,32 @@ describe('app routes', () => {
 
     expect(screen.getByText('Demo User')).toBeTruthy();
   });
+
+  it('keeps the verify-email route public', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/verify-email');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/verify-email');
+    });
+
+    expect(
+      screen.getByRole('heading', { name: 'Confirm your email address' })
+    ).toBeTruthy();
+  });
 });

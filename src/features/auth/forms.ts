@@ -19,6 +19,13 @@ export const forgotPasswordFormSchema = z.object({
   email: z.email('Enter a valid email address.'),
 });
 
+export const resendVerificationEmailFormSchema = z.object({
+  email: z.email('Enter a valid email address.'),
+});
+
 export type LoginFormValues = z.infer<typeof loginFormSchema>;
 export type RegisterFormValues = z.infer<typeof registerFormSchema>;
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordFormSchema>;
+export type ResendVerificationEmailFormValues = z.infer<
+  typeof resendVerificationEmailFormSchema
+>;
