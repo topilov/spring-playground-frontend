@@ -1,0 +1,152 @@
+:root {
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  color: #102033;
+  background:
+    radial-gradient(circle at top left, rgba(69, 152, 255, 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(255, 202, 87, 0.22), transparent 24%),
+    linear-gradient(180deg, #f6f9fc 0%, #eef4fb 100%);
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+code,
+pre {
+  font-family: 'SFMono-Regular', 'SF Mono', 'Cascadia Code', monospace;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.page-shell {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.hero {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.75rem;
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 18px 50px rgba(28, 57, 94, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  color: #466789;
+}
+
+.hero h1,
+.section-title {
+  margin: 0;
+  font-family: 'Helvetica Neue', 'Avenir Next', sans-serif;
+  font-weight: 700;
+}
+
+.hero-copy {
+  margin: 0;
+  max-width: 60ch;
+  color: #42566d;
+}
+
+.card-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.info-card,
+.example-card,
+.endpoint-list {
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 12px 32px rgba(26, 50, 80, 0.06);
+}
+
+.info-card {
+  padding: 1rem;
+}
+
+.info-card h2,
+.example-card h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.muted {
+  margin: 0;
+  color: #55708d;
+}
+
+.info-value {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.section {
+  display: grid;
+  gap: 1rem;
+}
+
+.endpoint-list {
+  margin: 0;
+  padding: 1rem 1rem 1rem 1.25rem;
+}
+
+.endpoint-list li + li {
+  margin-top: 0.75rem;
+}
+
+.example-card {
+  padding: 1rem;
+}
+
+.example-card pre {
+  margin: 0;
+  overflow-x: auto;
+  padding: 1rem;
+  border-radius: 16px;
+  background: #102033;
+  color: #e8f2ff;
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .hero {
+    padding: 1.25rem;
+  }
+}
