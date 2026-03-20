@@ -7,6 +7,7 @@ import { ApiClientError } from '../../../shared/api/apiClient';
 import { getApiErrorMessage } from '../../../shared/api/errorMessage';
 import { isAppPath, routePaths } from '../../../shared/routing/paths';
 import { AppLink } from '../../../shared/routing/AppLink';
+import { usePasskeyLoginMutation } from '../../passkeys/hooks';
 import { isEmailNotVerifiedError } from '../errors';
 import { useLoginMutation } from '../mutations';
 import { loginFormSchema, type LoginFormValues } from '../forms';
@@ -19,6 +20,7 @@ export function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const loginMutation = useLoginMutation();
+  const passkeyLoginMutation = usePasskeyLoginMutation();
   const [showVerificationCta, setShowVerificationCta] = useState(false);
   const form = useForm<LoginFormValues>({
     defaultValues: {
@@ -60,6 +62,31 @@ export function LoginForm() {
     }
   });
 
+  const handlePasskeyLogin = async () => {
+    form.clearErrors('root');
+    setShowVerificationCta(false);
+
+    try {
+      const usernameOrEmail = form.getValues('usernameOrEmail').trim();
+
+      await passkeyLoginMutation.mutateAsync(
+        usernameOrEmail ? { usernameOrEmail } : {}
+      );
+      navigate(getRedirectTarget(location.state?.from), {
+        replace: true,
+      });
+    } catch (error) {
+      form.setError('root', {
+        message: getApiErrorMessage(error, 'We could not sign you in with a passkey.'),
+      });
+    }
+  };
+
+  const isSubmitting =
+    form.formState.isSubmitting ||
+    loginMutation.isPending ||
+    passkeyLoginMutation.isPending;
+
   return (
     <form className="stack" onSubmit={onSubmit}>
       <label className="field">
@@ -88,12 +115,21 @@ export function LoginForm() {
 
       <button
         className="primary-button"
-        disabled={form.formState.isSubmitting || loginMutation.isPending}
+        disabled={isSubmitting}
         type="submit"
       >
-        {form.formState.isSubmitting || loginMutation.isPending
-          ? 'Signing in...'
-          : 'Sign in'}
+        {form.formState.isSubmitting || loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+      </button>
+
+      <button
+        className="secondary-button"
+        disabled={isSubmitting}
+        onClick={handlePasskeyLogin}
+        type="button"
+      >
+        {passkeyLoginMutation.isPending
+          ? 'Checking passkeys...'
+          : 'Sign in with passkey'}
       </button>
 
       {form.formState.errors.root ? (

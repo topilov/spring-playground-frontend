@@ -55,12 +55,20 @@ export function AppLayout() {
         </NavLink>
 
         {isAuthenticated ? (
-          <NavLink
-            className={({ isActive }) => getNavLinkClassName(isActive)}
-            to={routePaths.profile}
-          >
-            Profile
-          </NavLink>
+          <>
+            <NavLink
+              className={({ isActive }) => getNavLinkClassName(isActive)}
+              to={routePaths.profile}
+            >
+              Profile
+            </NavLink>
+            <NavLink
+              className={({ isActive }) => getNavLinkClassName(isActive)}
+              to={routePaths.settingsSecurity}
+            >
+              Security
+            </NavLink>
+          </>
         ) : null}
 
         {!isAuthenticated && status !== 'loading' ? (

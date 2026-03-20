@@ -162,7 +162,12 @@ a {
 .section,
 .stack,
 .profile-grid,
-.summary-grid {
+.summary-grid,
+.passkey-list,
+.passkey-meta-grid,
+.passkey-inline-form,
+.passkey-add-form,
+.profile-actions {
   display: grid;
   gap: 1rem;
 }
@@ -213,6 +218,10 @@ a {
   color: #4f5f70;
 }
 
+.profile-actions {
+  margin-top: 0.5rem;
+}
+
 .summary-card-strong {
   align-content: start;
 }
@@ -256,6 +265,54 @@ a {
 .field-error {
   margin: 0;
   font-size: 0.9rem;
+}
+
+.passkey-list {
+  padding: 0;
+  list-style: none;
+}
+
+.passkey-card,
+.passkey-empty-state {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(22, 33, 45, 0.08);
+  border-radius: 16px;
+  background: #fbfcfd;
+}
+
+.passkey-card-header {
+  display: flex;
+  gap: 1rem;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.passkey-card h3 {
+  margin: 0;
+}
+
+.passkey-meta-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.passkey-add-form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.passkey-inline-form {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(22, 33, 45, 0.08);
+}
+
+@media (max-width: 720px) {
+  .passkey-card-header,
+  .passkey-add-form {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
 }
 
 .status-inline {

@@ -9,6 +9,7 @@ This repository now uses a production-oriented baseline that keeps the app small
 - `src/app/routes/ProtectedRoute.tsx` redirects anonymous users away from protected routes.
 - `src/app/routes/AnonymousOnlyRoute.tsx` redirects authenticated users away from login/register/reset flows.
 - Route paths live in `src/shared/routing/paths.ts` so feature code does not scatter raw strings.
+- Dedicated account security UX lives at `/settings/security` so security features can expand without bloating `/profile`.
 
 ## Server State
 
@@ -16,6 +17,7 @@ This repository now uses a production-oriented baseline that keeps the app small
 - `src/features/auth/session/query.ts` owns the session query key and query function.
 - `src/features/auth/session/useAuthSession.ts` exposes the app-facing session state used by routes and pages.
 - `src/features/auth/mutations.ts` owns auth-related mutations and session cache updates.
+- `src/features/passkeys/hooks.ts` follows the same query/mutation pattern for passkey listing, registration, rename, delete, and passkey login.
 - `src/features/public/usePublicPing.ts` is the pattern for simple feature queries.
 
 ## API Boundary
@@ -24,6 +26,7 @@ This repository now uses a production-oriented baseline that keeps the app small
 - `src/shared/api/contract.ts` provides route-aware request/response helper types.
 - Entity models in `src/entities/*/model.ts` are app-owned types plus DTO mapping helpers.
 - Feature API modules in `src/features/*/api.ts` stay handwritten and explicit, but they no longer leak generated schema internals into pages.
+- Browser WebAuthn protocol work belongs in `src/features/passkeys/webauthn.ts`, not in route components.
 
 ## Forms
 
@@ -37,3 +40,4 @@ This repository now uses a production-oriented baseline that keeps the app small
 - Auth-only and protected-route decisions happen at route boundaries, not inside every page.
 - Login redirects back to the intended app path when available.
 - Session failures distinguish anonymous state from authenticated-but-broken state so the UI can react differently.
+- Passkey login refreshes the same authenticated session cache as password login, so the rest of the app continues to rely on `GET /api/profile/me` as the source of truth.

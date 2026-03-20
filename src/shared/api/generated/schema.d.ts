@@ -108,6 +108,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/passkeys/register/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["finishRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/passkeys/register/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["startRegistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/passkey-login/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["finishPasskeyLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/passkey-login/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["startPasskeyLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/logout": {
         parameters: {
             query?: never;
@@ -168,6 +232,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/passkeys/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deletePasskey"];
+        options?: never;
+        head?: never;
+        patch: operations["renamePasskey"];
+        trace?: never;
+    };
     "/api/public/ping": {
         parameters: {
             query?: never;
@@ -180,6 +260,22 @@ export interface paths {
          * @description Returns a simple public status response so callers can verify that the backend is reachable.
          */
         get: operations["ping"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/passkeys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listPasskeys"];
         put?: never;
         post?: never;
         delete?: never;
@@ -279,18 +375,59 @@ export interface components {
             username: string;
             email: string;
         };
-        /** @description Credentials used for session-based login. */
-        LoginRequest: {
+        /** @description Browser passkey registration result forwarded to the backend. */
+        PasskeyRegistrationVerifyRequest: {
+            /** @example ceremony-id */
+            ceremonyId: string;
+            credential: {
+                [key: string]: unknown;
+            };
+            /** @example MacBook Touch ID */
+            nickname?: string;
+        };
+        /** @description User-facing passkey summary. */
+        PasskeySummaryResponse: {
             /**
-             * @description Username or email address of the user.
-             * @example demo
+             * Format: int64
+             * @example 10
              */
-            usernameOrEmail: string;
+            id: number;
+            /** @example Work Laptop */
+            name: string;
             /**
-             * @description Plain-text password submitted to the backend for authentication.
-             * @example demo-password
+             * Format: date-time
+             * @example 2026-03-21T10:15:30Z
              */
-            password: string;
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @example 2026-03-21T12:05:00Z
+             */
+            lastUsedAt?: string;
+            /** @example platform */
+            deviceHint?: string;
+            transports: string[];
+        };
+        /** @description Authenticated passkey registration request. */
+        PasskeyRegistrationOptionsRequest: {
+            /** @example MacBook Touch ID */
+            nickname?: string;
+        };
+        /** @description Public key credential creation options for authenticated passkey registration. */
+        PasskeyRegistrationOptionsResponse: {
+            /** @example ceremony-id */
+            ceremonyId: string;
+            publicKey: {
+                [key: string]: unknown;
+            };
+        };
+        /** @description Browser passkey assertion forwarded to the backend for login. */
+        PasskeyLoginVerifyRequest: {
+            /** @example ceremony-id */
+            ceremonyId: string;
+            credential: {
+                [key: string]: unknown;
+            };
         };
         /** @description Session login result returned after successful authentication. */
         LoginResponse: {
@@ -308,12 +445,43 @@ export interface components {
             /** @example USER */
             role: string;
         };
+        /** @description Passkey login options request. */
+        PasskeyLoginOptionsRequest: {
+            /** @description Reserved for future login hints. */
+            usernameOrEmail?: string;
+        };
+        /** @description Public key credential request options for passkey login. */
+        PasskeyLoginOptionsResponse: {
+            /** @example ceremony-id */
+            ceremonyId: string;
+            publicKey: {
+                [key: string]: unknown;
+            };
+        };
+        /** @description Credentials used for session-based login. */
+        LoginRequest: {
+            /**
+             * @description Username or email address of the user.
+             * @example demo
+             */
+            usernameOrEmail: string;
+            /**
+             * @description Plain-text password submitted to the backend for authentication.
+             * @example demo-password
+             */
+            password: string;
+        };
         ForgotPasswordRequest: {
             /** Format: email */
             email: string;
         };
         ForgotPasswordResponse: {
             accepted: boolean;
+        };
+        /** @description Passkey rename request. */
+        RenamePasskeyRequest: {
+            /** @example Work Laptop */
+            name: string;
         };
         /** @description Simple public reachability response. */
         PublicPingResponse: {
@@ -542,6 +710,102 @@ export interface operations {
             };
         };
     };
+    finishRegistration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyRegistrationVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PasskeySummaryResponse"];
+                };
+            };
+        };
+    };
+    startRegistration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyRegistrationOptionsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PasskeyRegistrationOptionsResponse"];
+                };
+            };
+        };
+    };
+    finishPasskeyLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyLoginVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LoginResponse"];
+                };
+            };
+        };
+    };
+    startPasskeyLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasskeyLoginOptionsRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PasskeyLoginOptionsResponse"];
+                };
+            };
+        };
+    };
     logout: {
         parameters: {
             query?: never;
@@ -637,6 +901,52 @@ export interface operations {
             };
         };
     };
+    deletePasskey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    renamePasskey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenamePasskeyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PasskeySummaryResponse"];
+                };
+            };
+        };
+    };
     ping: {
         parameters: {
             query?: never;
@@ -653,6 +963,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicPingResponse"];
+                };
+            };
+        };
+    };
+    listPasskeys: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PasskeySummaryResponse"][];
                 };
             };
         };

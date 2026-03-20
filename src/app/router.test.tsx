@@ -98,6 +98,34 @@ describe('app routes', () => {
     ).toBeTruthy();
   });
 
+  it('renders the protected security settings route for authenticated users', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/settings/security');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/settings/security');
+    });
+
+    expect(
+      screen.getByRole('heading', { name: 'Security settings' })
+    ).toBeTruthy();
+  });
+
   it('keeps the verify-email route public', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'authenticated',
