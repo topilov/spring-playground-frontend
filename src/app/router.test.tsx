@@ -81,4 +81,20 @@ describe('app routes', () => {
 
     expect(screen.getByText('Demo User')).toBeTruthy();
   });
+
+  it('renders the reset-password route for anonymous visitors', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'anonymous',
+      errorMessage: null,
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/reset-password');
+
+    expect(
+      await screen.findByRole('heading', { name: 'Set a new password' })
+    ).toBeTruthy();
+  });
 });

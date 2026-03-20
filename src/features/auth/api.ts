@@ -1,11 +1,15 @@
 import {
   mapForgotPasswordResponse,
+  mapResetPasswordResponse,
   mapRegisterResponse,
   type ForgotPasswordInput,
   type ForgotPasswordResult,
+  type ResetPasswordInput,
+  type ResetPasswordResult,
   type RegisterInput,
   type RegisterResult,
   toForgotPasswordRequest,
+  toResetPasswordRequest,
   toRegisterRequest,
 } from '../../entities/auth/model';
 import {
@@ -30,6 +34,15 @@ export function forgotPassword(
     method: 'POST',
     body: toForgotPasswordRequest(payload),
   }).then(mapForgotPasswordResponse);
+}
+
+export function resetPassword(
+  payload: ResetPasswordInput
+): Promise<ResetPasswordResult> {
+  return request<ResetPasswordResult>('/api/auth/reset-password', {
+    method: 'POST',
+    body: toResetPasswordRequest(payload),
+  }).then(mapResetPasswordResponse);
 }
 
 export function login(payload: LoginCredentials): Promise<SessionUser> {

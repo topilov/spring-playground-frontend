@@ -4,6 +4,7 @@ import {
   forgotPassword,
   login,
   logout,
+  resetPassword,
   register,
 } from './api';
 
@@ -79,6 +80,37 @@ describe('auth api', () => {
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ email: 'demo@example.com' }));
+  });
+
+  it('submits reset-password requests to the backend', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response(JSON.stringify({ reset: true }), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      );
+
+    const result = await resetPassword({
+      token: 'reset-token',
+      newPassword: 'new-very-secret-password',
+    });
+
+    expect(result).toEqual({ reset: true });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('http://localhost:8080/api/auth/reset-password');
+    expect(init?.method).toBe('POST');
+    expect(init?.credentials).toBe('include');
+    expect(init?.body).toBe(
+      JSON.stringify({
+        token: 'reset-token',
+        newPassword: 'new-very-secret-password',
+      })
+    );
   });
 
   it('submits login requests to the backend', async () => {

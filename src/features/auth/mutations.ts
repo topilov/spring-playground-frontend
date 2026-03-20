@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type {
   ForgotPasswordInput,
+  ResetPasswordInput,
   RegisterInput,
 } from '../../entities/auth/model';
 import type { LoginCredentials } from '../../entities/session/model';
@@ -9,6 +10,7 @@ import {
   forgotPassword,
   login,
   logout,
+  resetPassword,
   register,
 } from './api';
 import { authSessionQueryKey, fetchAuthSession } from './session/query';
@@ -22,6 +24,12 @@ export function useRegisterMutation() {
 export function useForgotPasswordMutation() {
   return useMutation({
     mutationFn: (payload: ForgotPasswordInput) => forgotPassword(payload),
+  });
+}
+
+export function useResetPasswordMutation() {
+  return useMutation({
+    mutationFn: (payload: ResetPasswordInput) => resetPassword(payload),
   });
 }
 
