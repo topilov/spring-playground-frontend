@@ -25,6 +25,14 @@ Frontend rules:
 - Keep the HTTP transport handwritten and explicit.
 - Preserve `credentials: "include"` because the backend uses a session cookie.
 - Leave room for CSRF support, but follow backend docs before adding a token flow.
+- For passkeys, treat the backend `publicKey` payload as WebAuthn protocol data: decode Base64URL binary members before calling `navigator.credentials.create()` or `navigator.credentials.get()`, then send JSON-serialized credentials back to the backend verify endpoints.
+
+Current frontend passkey touchpoints:
+
+- `/login` starts unauthenticated passkey sign-in through the backend ceremony endpoints.
+- `/settings/security` lists, adds, renames, and deletes the authenticated user's passkeys.
+- `src/features/passkeys/api.ts` owns the handwritten passkey HTTP layer.
+- `src/features/passkeys/webauthn.ts` owns browser-side WebAuthn adaptation and serialization.
 
 When backend changes:
 

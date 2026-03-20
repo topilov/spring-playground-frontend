@@ -7,6 +7,7 @@ import { NotFoundPage } from '../pages/not-found/NotFoundPage';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import { RegisterPage } from '../pages/register/RegisterPage';
 import { ResetPasswordPage } from '../pages/reset-password/ResetPasswordPage';
+import { SecuritySettingsPage } from '../pages/settings/SecuritySettingsPage';
 import { VerifyEmailPage } from '../pages/verify-email/VerifyEmailPage';
 import { routePaths } from '../shared/routing/paths';
 import { AppLayout } from './layout/AppLayout';
@@ -53,6 +54,10 @@ export const routes: RouteObject[] = [
           {
             path: routePaths.profile.slice(1),
             element: <ProfilePage />,
+          },
+          {
+            path: routePaths.settingsSecurity.slice(1),
+            element: <SecuritySettingsPage />,
           },
         ],
       },

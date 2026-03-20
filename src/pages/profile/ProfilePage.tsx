@@ -128,6 +128,15 @@ export function ProfilePage() {
             <dd>{profile.bio || 'No bio set yet.'}</dd>
           </div>
         </dl>
+
+        <div className="profile-actions">
+          <AppLink
+            className="secondary-button link-button"
+            to={routePaths.settingsSecurity}
+          >
+            Manage security settings
+          </AppLink>
+        </div>
       </article>
     </section>
   );

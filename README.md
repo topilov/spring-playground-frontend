@@ -83,9 +83,11 @@ The generation script prefers `VITE_API_SCHEMA_URL`. If the published Pages arti
 - The frontend always sends requests with `credentials: "include"` so the backend-managed `JSESSIONID` cookie is included automatically.
 - `POST /api/auth/register` creates the account and default profile, but it does not auto-login the browser session.
 - `POST /api/auth/login` establishes the session cookie.
+- `POST /api/auth/passkey-login/options` plus `POST /api/auth/passkey-login/verify` establish the same authenticated session through WebAuthn.
 - `GET /api/profile/me` is the frontend's source of truth for the current authenticated profile.
 - `POST /api/auth/logout` invalidates the backend session and the frontend clears local session state after a successful response.
 - `POST /api/auth/forgot-password` should always be presented with a generic acceptance message so the UI does not reveal whether an email exists.
+- Authenticated passkey management lives at `/settings/security` and uses the backend passkey registration and management endpoints without inventing local shapes.
 
 ## Current Screens
 
@@ -94,6 +96,7 @@ The generation script prefers `VITE_API_SCHEMA_URL`. If the published Pages arti
 - `/login` session login form
 - `/forgot-password` reset request form
 - `/profile` current authenticated profile
+- `/settings/security` authenticated security settings with passkey management
 
 ## Docs
 
