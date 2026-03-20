@@ -1,26 +1,28 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { useLogoutMutation } from '../../features/auth/mutations';
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
+import { usePublicPing } from '../../features/public/usePublicPing';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
 import { AppLink } from '../../shared/routing/AppLink';
-import { navigateTo } from '../../shared/routing/navigation';
+import { routePaths } from '../../shared/routing/paths';
 
 export function HomePage() {
-  const { logout, profile, status } = useAuthSession();
+  const navigate = useNavigate();
+  const { errorMessage, profile, status } = useAuthSession();
+  const pingQuery = usePublicPing();
+  const logoutMutation = useLogoutMutation();
   const [logoutError, setLogoutError] = useState('');
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
-    setIsLoggingOut(true);
     setLogoutError('');
 
     try {
-      await logout();
-      navigateTo('/login');
+      await logoutMutation.mutateAsync();
+      navigate(routePaths.login);
     } catch (error) {
       setLogoutError(getApiErrorMessage(error, 'We could not log you out.'));
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 
@@ -36,16 +38,16 @@ export function HomePage() {
               from your personal workspace.
             </p>
             <div className="action-row action-row-tight">
-              <AppLink className="primary-button link-button" to="/profile">
+              <AppLink className="primary-button link-button" to={routePaths.profile}>
                 Open profile
               </AppLink>
               <button
                 className="secondary-button"
-                disabled={isLoggingOut}
+                disabled={logoutMutation.isPending}
                 onClick={handleLogout}
                 type="button"
               >
-                {isLoggingOut ? 'Logging out...' : 'Logout'}
+                {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
               </button>
             </div>
           </div>
@@ -80,6 +82,14 @@ export function HomePage() {
               {logoutError}
             </p>
           ) : null}
+
+          <p className="status-inline">
+            {pingQuery.isPending
+              ? 'Checking backend reachability...'
+              : pingQuery.isError
+                ? 'Backend reachability check failed.'
+                : `Backend status: ${pingQuery.data.status}`}
+          </p>
         </article>
       </section>
     );
@@ -96,15 +106,16 @@ export function HomePage() {
             your account details in one clean workspace.
           </p>
           <div className="action-row action-row-tight">
-            <AppLink className="primary-button link-button" to="/login">
+            <AppLink className="primary-button link-button" to={routePaths.login}>
               Login
             </AppLink>
-            <AppLink className="secondary-button link-button" to="/register">
+            <AppLink className="secondary-button link-button" to={routePaths.register}>
               Create account
             </AppLink>
           </div>
           <p className="helper-links">
-            Forgot your password? <AppLink to="/forgot-password">Reset it here</AppLink>
+            Forgot your password?{' '}
+            <AppLink to={routePaths.forgotPassword}>Reset it here</AppLink>
           </p>
         </div>
       </section>
@@ -116,14 +127,31 @@ export function HomePage() {
           Create an account, sign in, recover access if needed, and review your
           current profile without extra dashboard clutter.
         </p>
+
+        {status === 'error' && errorMessage ? (
+          <p className="status-message status-error" role="alert">
+            {errorMessage}
+          </p>
+        ) : null}
+
         <dl className="summary-grid">
+          <div className="summary-item">
+            <dt>Backend</dt>
+            <dd>
+              {pingQuery.isPending
+                ? 'Checking availability...'
+                : pingQuery.isError
+                  ? 'Unavailable right now.'
+                  : pingQuery.data.status}
+            </dd>
+          </div>
           <div className="summary-item">
             <dt>Focused</dt>
             <dd>Only the actions you need, no developer-facing noise.</dd>
           </div>
           <div className="summary-item">
             <dt>Private</dt>
-            <dd>Session-backed access to your current profile.</dd>
+            <dd>Protected routes redirect through login when the session is missing.</dd>
           </div>
           <div className="summary-item">
             <dt>Recoverable</dt>

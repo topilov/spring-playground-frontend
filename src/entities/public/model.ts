@@ -1,3 +1,11 @@
-import type { components } from '../../shared/api/generated/schema';
+import type { ApiResponse } from '../../shared/api/contract';
 
-export type PublicPing = components['schemas']['PublicPingResponse'];
+export interface PublicPing {
+  status: string;
+}
+
+export type PublicPingResponseDto = ApiResponse<'/api/public/ping', 'get'>;
+
+export function mapPublicPingResponse(payload: PublicPingResponseDto): PublicPing {
+  return { ...payload };
+}
