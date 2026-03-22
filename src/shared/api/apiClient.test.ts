@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createRequestUrl, request } from './apiClient';
+import { buildApiUrl, request } from './apiClient';
 
 describe('request', () => {
   beforeEach(() => {
@@ -9,6 +9,10 @@ describe('request', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it('returns a relative API path when no base URL is configured', () => {
+    expect(buildApiUrl('/api/public/ping', '')).toBe('/api/public/ping');
   });
 
   it('sends JSON with credentials and parses JSON responses', async () => {
@@ -29,7 +33,7 @@ describe('request', () => {
     expect(result).toEqual({ status: 'ok' });
 
     const [url, init] = vi.mocked(fetch).mock.calls[0];
-    expect(url).toBe(createRequestUrl('/api/public/ping'));
+    expect(url).toBe(buildApiUrl('/api/public/ping'));
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ probe: true }));
 
@@ -73,7 +77,7 @@ describe('request', () => {
       message: 'Request failed with status 400',
       status: 400,
       responseBody: { error: 'Bad Request' },
-      url: createRequestUrl('/api/profile/me'),
+      url: buildApiUrl('/api/profile/me'),
     });
   });
 

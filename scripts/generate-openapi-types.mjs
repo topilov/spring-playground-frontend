@@ -5,24 +5,20 @@ import process from 'node:process';
 import openapiTS, { astToString } from 'openapi-typescript';
 import { loadEnv } from 'vite';
 
-const DEFAULT_SCHEMA_URL =
-  'https://topilov.github.io/spring-playground-backend/openapi/openapi.json';
-const DEFAULT_FALLBACK_SCHEMA_URL =
-  'https://raw.githubusercontent.com/topilov/spring-playground-backend/main/openapi/openapi.yaml';
 const OUTPUT_FILE = path.resolve(process.cwd(), 'src/shared/api/generated/schema.d.ts');
 
 function readSchemaUrls() {
   const env = loadEnv(process.env.MODE ?? 'development', process.cwd(), '');
+  const primary = process.env.VITE_API_SCHEMA_URL || env.VITE_API_SCHEMA_URL || '';
+  const fallback = process.env.OPENAPI_FALLBACK_SCHEMA_URL || env.OPENAPI_FALLBACK_SCHEMA_URL || '';
+
+  if (!primary) {
+    throw new Error('VITE_API_SCHEMA_URL is required for openapi:generate.');
+  }
 
   return {
-    primary:
-      process.env.VITE_API_SCHEMA_URL ||
-      env.VITE_API_SCHEMA_URL ||
-      DEFAULT_SCHEMA_URL,
-    fallback:
-      process.env.OPENAPI_FALLBACK_SCHEMA_URL ||
-      env.OPENAPI_FALLBACK_SCHEMA_URL ||
-      DEFAULT_FALLBACK_SCHEMA_URL,
+    primary,
+    fallback,
   };
 }
 
@@ -39,7 +35,7 @@ async function main() {
   try {
     output = await generateTypes(primary);
   } catch (primaryError) {
-    if (primary === fallback) {
+    if (!fallback || primary === fallback) {
       throw primaryError;
     }
 
