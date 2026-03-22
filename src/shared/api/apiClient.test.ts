@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { request } from './apiClient';
+import { createRequestUrl, request } from './apiClient';
 
 describe('request', () => {
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('request', () => {
     expect(result).toEqual({ status: 'ok' });
 
     const [url, init] = vi.mocked(fetch).mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/public/ping');
+    expect(url).toBe(createRequestUrl('/api/public/ping'));
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ probe: true }));
 
@@ -73,7 +73,7 @@ describe('request', () => {
       message: 'Request failed with status 400',
       status: 400,
       responseBody: { error: 'Bad Request' },
-      url: 'http://localhost:8080/api/profile/me',
+      url: createRequestUrl('/api/profile/me'),
     });
   });
 
