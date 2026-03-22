@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { createRequestUrl } from '../../shared/api/apiClient';
 import {
   forgotPassword,
   login,
@@ -47,7 +48,7 @@ describe('auth api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/register');
+    expect(url).toBe(createRequestUrl('/api/auth/register'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(
@@ -78,7 +79,7 @@ describe('auth api', () => {
     expect(result).toEqual({ accepted: true });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/forgot-password');
+    expect(url).toBe(createRequestUrl('/api/auth/forgot-password'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ email: 'demo@example.com' }));
@@ -104,7 +105,7 @@ describe('auth api', () => {
     expect(result).toEqual({ reset: true });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/reset-password');
+    expect(url).toBe(createRequestUrl('/api/auth/reset-password'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(
@@ -134,7 +135,7 @@ describe('auth api', () => {
     expect(result).toEqual({ verified: true });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/verify-email');
+    expect(url).toBe(createRequestUrl('/api/auth/verify-email'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ token: 'verification-token' }));
@@ -159,7 +160,7 @@ describe('auth api', () => {
     expect(result).toEqual({ accepted: true });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/resend-verification-email');
+    expect(url).toBe(createRequestUrl('/api/auth/resend-verification-email'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ email: 'demo@example.com' }));
@@ -198,7 +199,7 @@ describe('auth api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/login');
+    expect(url).toBe(createRequestUrl('/api/auth/login'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
   });
@@ -211,7 +212,7 @@ describe('auth api', () => {
     await logout();
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/logout');
+    expect(url).toBe(createRequestUrl('/api/auth/logout'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBeUndefined();

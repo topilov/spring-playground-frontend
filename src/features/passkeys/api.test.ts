@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { createRequestUrl } from '../../shared/api/apiClient';
 import {
   deletePasskey,
   finishPasskeyLogin,
@@ -51,7 +52,7 @@ describe('passkeys api', () => {
     ]);
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/passkeys');
+    expect(url).toBe(createRequestUrl('/api/auth/passkeys'));
     expect(init?.method).toBe('GET');
     expect(init?.credentials).toBe('include');
   });
@@ -86,7 +87,7 @@ describe('passkeys api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/passkeys/register/options');
+    expect(url).toBe(createRequestUrl('/api/auth/passkeys/register/options'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ nickname: 'Work Laptop' }));
@@ -129,7 +130,7 @@ describe('passkeys api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/passkeys/register/verify');
+    expect(url).toBe(createRequestUrl('/api/auth/passkeys/register/verify'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(
@@ -173,7 +174,7 @@ describe('passkeys api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/passkeys/10');
+    expect(url).toBe(createRequestUrl('/api/auth/passkeys/10'));
     expect(init?.method).toBe('PATCH');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ name: 'Desk Mac' }));
@@ -187,7 +188,7 @@ describe('passkeys api', () => {
     await deletePasskey(10);
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/passkeys/10');
+    expect(url).toBe(createRequestUrl('/api/auth/passkeys/10'));
     expect(init?.method).toBe('DELETE');
     expect(init?.credentials).toBe('include');
   });
@@ -222,7 +223,7 @@ describe('passkeys api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/passkey-login/options');
+    expect(url).toBe(createRequestUrl('/api/auth/passkey-login/options'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(JSON.stringify({ usernameOrEmail: 'demo@example.com' }));
@@ -261,7 +262,7 @@ describe('passkeys api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:8080/api/auth/passkey-login/verify');
+    expect(url).toBe(createRequestUrl('/api/auth/passkey-login/verify'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
     expect(init?.body).toBe(

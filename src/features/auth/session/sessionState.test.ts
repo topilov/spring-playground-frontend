@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ApiClientError } from '../../../shared/api/apiClient';
+import { ApiClientError, createRequestUrl } from '../../../shared/api/apiClient';
 import { getSessionStateFromError } from './sessionState';
 
 describe('getSessionStateFromError', () => {
@@ -10,7 +10,7 @@ describe('getSessionStateFromError', () => {
         new ApiClientError({
           status: 401,
           statusText: 'Unauthorized',
-          url: 'http://localhost:8080/api/profile/me',
+          url: createRequestUrl('/api/profile/me'),
         })
       )
     ).toEqual({
@@ -25,7 +25,7 @@ describe('getSessionStateFromError', () => {
         new ApiClientError({
           status: 404,
           statusText: 'Not Found',
-          url: 'http://localhost:8080/api/profile/me',
+          url: createRequestUrl('/api/profile/me'),
         })
       )
     ).toEqual({
@@ -41,7 +41,7 @@ describe('getSessionStateFromError', () => {
         new ApiClientError({
           status: 500,
           statusText: 'Internal Server Error',
-          url: 'http://localhost:8080/api/profile/me',
+          url: createRequestUrl('/api/profile/me'),
         })
       )
     ).toBeNull();

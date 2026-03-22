@@ -13,8 +13,8 @@ function isBodyInit(value: unknown): value is BodyInit {
   );
 }
 
-function createRequestUrl(path: string): string {
-  return new URL(path, `${appConfig.apiBaseUrl}/`).toString();
+export function createRequestUrl(path: string, apiBaseUrl: string = appConfig.apiBaseUrl): string {
+  return new URL(path, `${apiBaseUrl}/`).toString();
 }
 
 function buildHeaders(headers: HeadersInit | undefined, csrfToken: string | undefined): Headers {
