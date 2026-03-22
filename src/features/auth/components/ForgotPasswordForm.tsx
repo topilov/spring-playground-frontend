@@ -10,7 +10,7 @@ import {
 } from '../forms';
 
 const genericSuccessMessage =
-  'If that email belongs to an account, a reset link will be sent.';
+  'If that address exists, you will receive a reset link.';
 
 export function ForgotPasswordForm() {
   const [successMessage, setSuccessMessage] = useState('');
@@ -42,7 +42,12 @@ export function ForgotPasswordForm() {
       <form className="stack" onSubmit={onSubmit}>
         <label className="field">
           <span>Email</span>
-          <input autoComplete="email" type="email" {...form.register('email')} />
+          <input
+            autoComplete="email"
+            placeholder="name@example.com"
+            type="email"
+            {...form.register('email')}
+          />
           {form.formState.errors.email ? (
             <span className="field-error" role="alert">
               {form.formState.errors.email.message}
@@ -51,7 +56,7 @@ export function ForgotPasswordForm() {
         </label>
 
         <button
-          className="primary-button"
+          className="button button-primary button-full"
           disabled={form.formState.isSubmitting || forgotPasswordMutation.isPending}
           type="submit"
         >
@@ -61,14 +66,14 @@ export function ForgotPasswordForm() {
         </button>
 
         {form.formState.errors.root ? (
-          <p className="status-message status-error" role="alert">
+          <p className="status-banner status-error" role="alert">
             {form.formState.errors.root.message}
           </p>
         ) : null}
       </form>
 
       {successMessage ? (
-        <p className="status-message status-success">{successMessage}</p>
+        <p className="status-banner status-success">{successMessage}</p>
       ) : null}
     </>
   );

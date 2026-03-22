@@ -66,9 +66,7 @@ describe('PasskeySection', () => {
     renderSection();
 
     expect(screen.getByRole('heading', { name: 'Passkeys' })).toBeTruthy();
-    expect(
-      screen.getByText('No passkeys added yet. Add one to sign in faster on supported devices.')
-    ).toBeTruthy();
+    expect(screen.getByText('No passkeys yet.')).toBeTruthy();
   });
 
   it('renders the current passkeys with metadata', () => {
@@ -150,9 +148,9 @@ describe('PasskeySection', () => {
     renderSection();
 
     await user.click(screen.getByRole('button', { name: 'Rename Work Laptop' }));
-    await user.clear(screen.getByLabelText('New passkey name'));
-    await user.type(screen.getByLabelText('New passkey name'), 'Desk Mac');
-    await user.click(screen.getByRole('button', { name: 'Save name' }));
+    await user.clear(screen.getByLabelText('New name'));
+    await user.type(screen.getByLabelText('New name'), 'Desk Mac');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledWith({
@@ -189,7 +187,7 @@ describe('PasskeySection', () => {
     renderSection();
 
     await user.click(screen.getByRole('button', { name: 'Delete Work Laptop' }));
-    await user.click(screen.getByRole('button', { name: 'Confirm delete' }));
+    await user.click(screen.getByRole('button', { name: 'Delete passkey' }));
 
     await waitFor(() => {
       expect(mutateAsync).toHaveBeenCalledWith(10);

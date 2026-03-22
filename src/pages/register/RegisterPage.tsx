@@ -1,24 +1,22 @@
 import { RegisterForm } from '../../features/auth/components/RegisterForm';
 import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
+import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 export function RegisterPage() {
   return (
-    <section className="auth-layout">
-      <article className="form-card">
-        <p className="eyebrow">Register</p>
-        <h1>Create an account</h1>
-        <p className="section-copy">
-          Registration creates the auth user and the default profile, but it does
-          not sign you in. New accounts must confirm email before login succeeds.
-        </p>
-
-        <RegisterForm />
-
-        <p className="helper-links">
-          Already registered? <AppLink to={routePaths.login}>Go to login</AppLink>
-        </p>
-      </article>
-    </section>
+    <AuthPageShell
+      footer={
+        <div className="auth-links">
+          <AppLink className="text-link" to={routePaths.login}>
+            Sign in
+          </AppLink>
+        </div>
+      }
+      subtitle="Create a new account."
+      title="Create account"
+    >
+      <RegisterForm />
+    </AuthPageShell>
   );
 }

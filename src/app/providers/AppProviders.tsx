@@ -11,11 +11,16 @@ const queryClient = new QueryClient({
   },
 });
 
+const shouldShowQueryDevtools =
+  import.meta.env.DEV && import.meta.env.VITE_ENABLE_QUERY_DEVTOOLS === 'true';
+
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+      {shouldShowQueryDevtools ? (
+        <ReactQueryDevtools initialIsOpen={false} />
+      ) : null}
     </QueryClientProvider>
   );
 }

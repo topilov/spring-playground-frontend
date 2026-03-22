@@ -74,6 +74,26 @@ async function parseResponseBody(response: Response): Promise<unknown> {
   return text;
 }
 
+function assertExpectedSuccessPayload(
+  path: string,
+  response: Response,
+  responseBody: unknown
+): void {
+  if (response.status === 204 || responseBody === undefined) {
+    return;
+  }
+
+  const contentType = response.headers.get('Content-Type');
+
+  if (isJsonContentType(contentType)) {
+    return;
+  }
+
+  throw new Error(
+    `Expected a JSON API response from ${path}. Check VITE_API_BASE_URL or your dev proxy.`
+  );
+}
+
 export class ApiClientError extends Error {
   readonly status: number;
   readonly statusText: string;
@@ -110,6 +130,8 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
       responseBody,
     });
   }
+
+  assertExpectedSuccessPayload(path, response, responseBody);
 
   return responseBody as T;
 }

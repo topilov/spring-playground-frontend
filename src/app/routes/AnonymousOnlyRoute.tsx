@@ -2,21 +2,17 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
 import { routePaths } from '../../shared/routing/paths';
+import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 export function AnonymousOnlyRoute() {
   const { status } = useAuthSession();
 
   if (status === 'loading') {
     return (
-      <section className="auth-layout">
-        <article className="form-card">
-          <p className="eyebrow">Session</p>
-          <h1>Preparing your account flow</h1>
-          <p className="section-copy">
-            Checking whether you already have an active session.
-          </p>
-        </article>
-      </section>
+      <AuthPageShell
+        subtitle="One moment while we check your session."
+        title="Checking session"
+      />
     );
   }
 

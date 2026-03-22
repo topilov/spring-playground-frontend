@@ -4,10 +4,11 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useLogoutMutation } from '../../features/auth/mutations';
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
+import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
 
-function getNavLinkClassName(isActive: boolean) {
-  return isActive ? 'nav-link nav-link-active' : 'nav-link';
+function getHeaderLinkClassName(isActive: boolean) {
+  return isActive ? 'header-link header-link-active' : 'header-link';
 }
 
 export function AppLayout() {
@@ -28,85 +29,66 @@ export function AppLayout() {
   };
 
   return (
-    <main className="page-shell">
-      <header className="app-toolbar">
-        <div className="brand-block">
-          <p className="eyebrow">Spring Playground</p>
-          <p className="brand-title">Account</p>
-        </div>
+    <div className="app-shell">
+      <header className="app-header">
+        <AppLink className="brand" to={routePaths.home}>
+          <span aria-hidden="true" className="brand-mark">
+            SP
+          </span>
+          <span className="brand-name">Spring Playground</span>
+        </AppLink>
 
-        <div className="toolbar-status">
-          {status === 'authenticated' && profile
-            ? `Signed in as ${profile.username}`
-            : status === 'loading'
-              ? 'Checking session...'
-              : status === 'error'
-                ? 'Session unavailable'
-              : 'Signed out'}
-        </div>
-      </header>
+        <nav aria-label="Primary" className="header-actions">
+          {status === 'loading' ? (
+            <span className="header-meta">Checking session</span>
+          ) : null}
 
-      <nav className="nav-bar" aria-label="Primary">
-        <NavLink
-          className={({ isActive }) => getNavLinkClassName(isActive)}
-          to={routePaths.home}
-        >
-          Home
-        </NavLink>
+          {isAuthenticated ? (
+            <>
+              <span className="header-meta">{profile?.username ?? 'Account'}</span>
+              <NavLink
+                className={({ isActive }) => getHeaderLinkClassName(isActive)}
+                to={routePaths.profile}
+              >
+                Profile
+              </NavLink>
+              <NavLink
+                className={({ isActive }) => getHeaderLinkClassName(isActive)}
+                to={routePaths.settingsSecurity}
+              >
+                Settings
+              </NavLink>
+              <button
+                className="button button-secondary"
+                disabled={logoutMutation.isPending}
+                onClick={handleLogout}
+                type="button"
+              >
+                {logoutMutation.isPending ? 'Signing out...' : 'Sign out'}
+              </button>
+            </>
+          ) : null}
 
-        {isAuthenticated ? (
-          <>
+          {!isAuthenticated && status !== 'loading' ? (
             <NavLink
-              className={({ isActive }) => getNavLinkClassName(isActive)}
-              to={routePaths.profile}
-            >
-              Profile
-            </NavLink>
-            <NavLink
-              className={({ isActive }) => getNavLinkClassName(isActive)}
-              to={routePaths.settingsSecurity}
-            >
-              Security
-            </NavLink>
-          </>
-        ) : null}
-
-        {!isAuthenticated && status !== 'loading' ? (
-          <>
-            <NavLink
-              className={({ isActive }) => getNavLinkClassName(isActive)}
+              className={({ isActive }) => getHeaderLinkClassName(isActive)}
               to={routePaths.login}
             >
-              Login
+              Sign in
             </NavLink>
-            <NavLink
-              className={({ isActive }) => getNavLinkClassName(isActive)}
-              to={routePaths.register}
-            >
-              Register
-            </NavLink>
-          </>
+          ) : null}
+        </nav>
+      </header>
+
+      <main className="app-main">
+        {logoutError ? (
+          <p className="status-banner status-error" role="alert">
+            {logoutError}
+          </p>
         ) : null}
 
-        {isAuthenticated ? (
-          <button
-            className="nav-button"
-            disabled={logoutMutation.isPending}
-            onClick={handleLogout}
-            type="button"
-          >
-            {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
-          </button>
-        ) : null}
-      </nav>
-
-      {logoutError ? (
-        <p className="status-message status-error" role="alert">
-          {logoutError}
-        </p>
-      ) : null}
-
-      <Outlet />
-    </main>
+        <Outlet />
+      </main>
+    </div>
   );
 }

@@ -90,8 +90,12 @@ export function LoginForm() {
   return (
     <form className="stack" onSubmit={onSubmit}>
       <label className="field">
-        <span>Username or Email</span>
-        <input autoComplete="username" {...form.register('usernameOrEmail')} />
+        <span>Email or username</span>
+        <input
+          autoComplete="username"
+          placeholder="name@example.com"
+          {...form.register('usernameOrEmail')}
+        />
         {form.formState.errors.usernameOrEmail ? (
           <span className="field-error" role="alert">
             {form.formState.errors.usernameOrEmail.message}
@@ -103,6 +107,7 @@ export function LoginForm() {
         <span>Password</span>
         <input
           autoComplete="current-password"
+          placeholder="Enter your password"
           type="password"
           {...form.register('password')}
         />
@@ -114,7 +119,7 @@ export function LoginForm() {
       </label>
 
       <button
-        className="primary-button"
+        className="button button-primary button-full"
         disabled={isSubmitting}
         type="submit"
       >
@@ -122,7 +127,7 @@ export function LoginForm() {
       </button>
 
       <button
-        className="secondary-button"
+        className="button button-secondary button-full"
         disabled={isSubmitting}
         onClick={handlePasskeyLogin}
         type="button"
@@ -134,12 +139,12 @@ export function LoginForm() {
 
       {form.formState.errors.root ? (
         <div className="stack">
-          <p className="status-message status-error" role="alert">
+          <p className="status-banner status-error" role="alert">
             {form.formState.errors.root.message}
           </p>
           {showVerificationCta ? (
             <AppLink
-              className="secondary-button link-button"
+              className="button button-secondary button-full"
               to={
                 form.getValues('usernameOrEmail').includes('@')
                   ? `${routePaths.verifyEmail}?email=${encodeURIComponent(

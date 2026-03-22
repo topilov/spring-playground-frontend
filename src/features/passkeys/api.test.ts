@@ -57,6 +57,12 @@ describe('passkeys api', () => {
     expect(init?.credentials).toBe('include');
   });
 
+  it('treats an empty passkey list response as no passkeys', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 204 }));
+
+    await expect(listPasskeys()).resolves.toEqual([]);
+  });
+
   it('starts authenticated passkey registration', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(

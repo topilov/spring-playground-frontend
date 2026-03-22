@@ -131,7 +131,13 @@ export function mapPasskeyRegistrationVerifyResponse(
   return mapPasskeyResponse(payload);
 }
 
-export function mapPasskeysResponse(payload: PasskeysResponseDto): Passkey[] {
+export function mapPasskeysResponse(
+  payload: PasskeysResponseDto | undefined
+): Passkey[] {
+  if (payload === undefined) {
+    return [];
+  }
+
   return payload.map((item) => mapPasskeyResponse(item));
 }
 
