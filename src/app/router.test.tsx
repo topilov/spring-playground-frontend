@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -36,6 +36,50 @@ describe('app routes', () => {
     vi.restoreAllMocks();
   });
 
+  it('redirects anonymous visitors from the root route to login', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'anonymous',
+      errorMessage: null,
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/login');
+    });
+
+    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+  });
+
+  it('redirects authenticated visitors from the root route to profile', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/profile');
+    });
+
+    expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
+  });
+
   it('redirects anonymous visitors from the protected profile route to login', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'anonymous',
@@ -51,9 +95,7 @@ describe('app routes', () => {
       expect(router.state.location.pathname).toBe('/login');
     });
 
-    expect(
-      screen.getByRole('heading', { name: 'Sign in with your session account' })
-    ).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy();
   });
 
   it('redirects authenticated visitors away from auth-only routes', async () => {
@@ -79,7 +121,25 @@ describe('app routes', () => {
       expect(router.state.location.pathname).toBe('/profile');
     });
 
-    expect(screen.getByText('Demo User')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
+  });
+
+  it('shows a minimal anonymous header on auth routes', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'anonymous',
+      errorMessage: null,
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/register');
+
+    const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
+
+    expect(within(primaryNav).getByRole('link', { name: 'Sign in' })).toBeTruthy();
+    expect(within(primaryNav).queryByRole('link', { name: 'Home' })).toBeNull();
+    expect(within(primaryNav).queryByRole('link', { name: 'Register' })).toBeNull();
   });
 
   it('renders the reset-password route for anonymous visitors', async () => {
@@ -94,7 +154,7 @@ describe('app routes', () => {
     renderRoute('/reset-password');
 
     expect(
-      await screen.findByRole('heading', { name: 'Set a new password' })
+      await screen.findByRole('heading', { name: 'Reset password' })
     ).toBeTruthy();
   });
 
@@ -121,9 +181,26 @@ describe('app routes', () => {
       expect(router.state.location.pathname).toBe('/settings/security');
     });
 
-    expect(
-      screen.getByRole('heading', { name: 'Security settings' })
-    ).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Security' })).toBeTruthy();
+  });
+
+  it('blocks protected routes when the session state cannot be verified', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'error',
+      errorMessage: 'Expected a JSON API response from /api/profile/me.',
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/settings/security');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/settings/security');
+    });
+
+    expect(screen.getByRole('heading', { name: 'Session unavailable' })).toBeTruthy();
+    expect(screen.queryByRole('heading', { name: 'Security' })).toBeNull();
   });
 
   it('keeps the verify-email route public', async () => {
@@ -149,8 +226,6 @@ describe('app routes', () => {
       expect(router.state.location.pathname).toBe('/verify-email');
     });
 
-    expect(
-      screen.getByRole('heading', { name: 'Confirm your email address' })
-    ).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Verify email' })).toBeTruthy();
   });
 });

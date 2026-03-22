@@ -1,7 +1,20 @@
 import { useState } from 'react';
 
 import { getApiErrorMessage } from '../../../shared/api/errorMessage';
-import { useDeletePasskeyMutation, usePasskeysQuery, useRegisterPasskeyMutation, useRenamePasskeyMutation } from '../hooks';
+import {
+  useDeletePasskeyMutation,
+  usePasskeysQuery,
+  useRegisterPasskeyMutation,
+  useRenamePasskeyMutation,
+} from '../hooks';
+
+function formatDeviceHint(value: string | null) {
+  if (!value) {
+    return 'Unknown';
+  }
+
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
 function formatDateTime(value: string | null) {
   if (!value) {
@@ -82,10 +95,10 @@ export function PasskeySection() {
 
   return (
     <section className="stack">
-      <div className="stack">
-        <h2 className="section-title">Passkeys</h2>
-        <p className="section-copy">
-          Add a passkey for faster sign-in on supported browsers and devices.
+      <div className="section-heading">
+        <h2>Passkeys</h2>
+        <p className="page-description">
+          Use passkeys for faster sign-in on trusted devices.
         </p>
       </div>
 
@@ -101,7 +114,7 @@ export function PasskeySection() {
         </label>
 
         <button
-          className="primary-button"
+          className="button button-primary"
           disabled={registerPasskeyMutation.isPending}
           type="submit"
         >
@@ -110,17 +123,17 @@ export function PasskeySection() {
       </form>
 
       {actionError ? (
-        <p className="status-message status-error" role="alert">
+        <p className="status-banner status-error" role="alert">
           {actionError}
         </p>
       ) : null}
 
       {passkeysQuery.isLoading ? (
-        <p className="section-copy">Loading passkeys...</p>
+        <p className="page-description">Loading passkeys...</p>
       ) : null}
 
       {passkeysQuery.isError ? (
-        <p className="status-message status-error" role="alert">
+        <p className="status-banner status-error" role="alert">
           {getApiErrorMessage(
             passkeysQuery.error,
             'We could not load your passkeys.'
@@ -130,9 +143,7 @@ export function PasskeySection() {
 
       {!passkeysQuery.isLoading && !passkeysQuery.isError && passkeys.length === 0 ? (
         <article className="passkey-empty-state">
-          <p className="section-copy">
-            No passkeys added yet. Add one to sign in faster on supported devices.
-          </p>
+          <p className="page-description">No passkeys yet.</p>
         </article>
       ) : null}
 
@@ -147,14 +158,15 @@ export function PasskeySection() {
                 <div className="passkey-card-header">
                   <div className="stack">
                     <h3>{passkey.name}</h3>
-                    <p className="section-copy">
-                      {passkey.deviceHint ? `Device: ${passkey.deviceHint}` : 'Device type unavailable'}
+                    <p className="page-description">
+                      Device: {formatDeviceHint(passkey.deviceHint)}
                     </p>
                   </div>
 
-                  <div className="action-row">
+                  <div className="inline-actions">
                     <button
-                      className="secondary-button"
+                      aria-label={`Rename ${passkey.name}`}
+                      className="button button-secondary"
                       onClick={() => {
                         setEditingId(passkey.id);
                         setEditingName(passkey.name);
@@ -162,31 +174,32 @@ export function PasskeySection() {
                       }}
                       type="button"
                     >
-                      Rename {passkey.name}
+                      Rename
                     </button>
                     <button
-                      className="secondary-button"
+                      aria-label={`Delete ${passkey.name}`}
+                      className="button button-secondary button-danger"
                       onClick={() => {
                         setConfirmDeleteId(passkey.id);
                         setEditingId(null);
                       }}
                       type="button"
                     >
-                      Delete {passkey.name}
+                      Delete
                     </button>
                   </div>
                 </div>
 
                 <dl className="passkey-meta-grid">
-                  <div className="profile-item">
+                  <div className="detail-item">
                     <dt>Created</dt>
                     <dd>{formatDateTime(passkey.createdAt)}</dd>
                   </div>
-                  <div className="profile-item">
+                  <div className="detail-item">
                     <dt>Last used</dt>
                     <dd>{formatDateTime(passkey.lastUsedAt)}</dd>
                   </div>
-                  <div className="profile-item profile-item-wide">
+                  <div className="detail-item detail-item-wide">
                     <dt>Transports</dt>
                     <dd>
                       {passkey.transports.length > 0
@@ -199,24 +212,24 @@ export function PasskeySection() {
                 {isEditing ? (
                   <div className="passkey-inline-form">
                     <label className="field">
-                      <span>New passkey name</span>
+                      <span>New name</span>
                       <input
                         maxLength={100}
                         onChange={(event) => setEditingName(event.target.value)}
                         value={editingName}
                       />
                     </label>
-                    <div className="action-row">
+                    <div className="inline-actions">
                       <button
-                        className="primary-button"
+                        className="button button-primary"
                         disabled={renamePasskeyMutation.isPending}
                         onClick={() => handleRenamePasskey(passkey.id)}
                         type="button"
                       >
-                        Save name
+                        Save
                       </button>
                       <button
-                        className="secondary-button"
+                        className="button button-secondary"
                         onClick={() => {
                           setEditingId(null);
                           setEditingName('');
@@ -231,24 +244,24 @@ export function PasskeySection() {
 
                 {isDeleting ? (
                   <div className="passkey-inline-form">
-                    <p className="section-copy">
-                      Deleting this passkey removes it from future sign-ins on this account.
+                    <p className="page-description">
+                      This passkey will no longer work for this account.
                     </p>
-                    <div className="action-row">
+                    <div className="inline-actions">
                       <button
-                        className="primary-button"
+                        className="button button-danger"
                         disabled={deletePasskeyMutation.isPending}
                         onClick={() => handleDeletePasskey(passkey.id)}
                         type="button"
                       >
-                        Confirm delete
+                        Delete passkey
                       </button>
                       <button
-                        className="secondary-button"
+                        className="button button-secondary"
                         onClick={() => setConfirmDeleteId(null)}
                         type="button"
                       >
-                        Keep passkey
+                        Cancel
                       </button>
                     </div>
                   </div>

@@ -40,7 +40,7 @@ describe('ResetPasswordForm', () => {
     expect(
       screen.getByText('This reset link is invalid or incomplete.')
     ).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Back to login' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Back to sign in' })).toBeTruthy();
   });
 
   it('blocks submit when the confirmation password does not match', async () => {
@@ -87,8 +87,8 @@ describe('ResetPasswordForm', () => {
     });
 
     expect(
-      await screen.findByText('Your password has been reset.')
+      await screen.findByText('Password updated.')
     ).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Back to login' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Back to sign in' })).toBeTruthy();
   });
 });

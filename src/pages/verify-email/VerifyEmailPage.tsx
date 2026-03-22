@@ -12,9 +12,10 @@ import {
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
 import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
+import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 const resendSuccessMessage =
-  'If that email belongs to an unverified account, a fresh verification link will be sent.';
+  'If that email is still unverified, a new link has been sent.';
 
 export function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
@@ -77,85 +78,80 @@ export function VerifyEmailPage() {
   });
 
   return (
-    <section className="auth-layout">
-      <article className="form-card">
-        <p className="eyebrow">Email Verification</p>
-        <h1>Confirm your email address</h1>
-        <p className="section-copy">
-          New accounts stay signed out until the backend accepts the verification
-          token from your email link.
-        </p>
-
-        {verificationStatus === 'verifying' ? (
-          <p className="status-message">Checking your verification link...</p>
-        ) : null}
-
-        {verificationStatus === 'verified' ? (
-          <p className="status-message status-success">
-            Your email is verified. You can sign in now.
-          </p>
-        ) : null}
-
-        {verificationStatus === 'failed' ? (
-          <p className="status-message status-error" role="alert">
-            {verificationError}
-          </p>
-        ) : null}
-
-        {verificationStatus === 'idle' ? (
-          <p className="status-message">
-            Open the verification link from your email, or request a fresh one
-            below.
-          </p>
-        ) : null}
-
-        <div className="action-row">
-          <AppLink className="primary-button link-button" to={routePaths.login}>
-            Go to login
+    <AuthPageShell
+      footer={
+        <div className="auth-links">
+          <AppLink className="text-link" to={routePaths.login}>
+            Sign in
           </AppLink>
-          <AppLink className="secondary-button link-button" to={routePaths.register}>
-            Back to register
+          <AppLink className="text-link" to={routePaths.register}>
+            Create account
           </AppLink>
         </div>
+      }
+      subtitle={
+        token ? 'Finish setting up your account.' : 'Open your link or request a new one.'
+      }
+      title="Verify email"
+    >
+      {verificationStatus === 'verifying' ? (
+        <p className="status-banner">Checking your verification link...</p>
+      ) : null}
 
-        <form className="stack" onSubmit={handleResend}>
-          <label className="field">
-            <span>Email</span>
-            <input
-              autoComplete="email"
-              type="email"
-              {...form.register('email')}
-            />
-            {form.formState.errors.email ? (
-              <span className="field-error" role="alert">
-                {form.formState.errors.email.message}
-              </span>
-            ) : null}
-          </label>
+      {verificationStatus === 'verified' ? (
+        <p className="status-banner status-success">
+          Email verified. You can sign in now.
+        </p>
+      ) : null}
 
-          <button
-            className="secondary-button"
-            disabled={
-              form.formState.isSubmitting || resendVerificationEmailMutation.isPending
-            }
-            type="submit"
-          >
-            {form.formState.isSubmitting || resendVerificationEmailMutation.isPending
-              ? 'Sending verification email...'
-              : 'Resend verification email'}
-          </button>
+      {verificationStatus === 'failed' ? (
+        <p className="status-banner status-error" role="alert">
+          {verificationError}
+        </p>
+      ) : null}
 
-          {form.formState.errors.root ? (
-            <p className="status-message status-error" role="alert">
-              {form.formState.errors.root.message}
-            </p>
+      {verificationStatus === 'idle' ? (
+        <p className="status-banner">Open the email link, or request a new one below.</p>
+      ) : null}
+
+      <form className="stack" onSubmit={handleResend}>
+        <label className="field">
+          <span>Email</span>
+          <input
+            autoComplete="email"
+            placeholder="name@example.com"
+            type="email"
+            {...form.register('email')}
+          />
+          {form.formState.errors.email ? (
+            <span className="field-error" role="alert">
+              {form.formState.errors.email.message}
+            </span>
           ) : null}
-        </form>
+        </label>
 
-        {resendMessage ? (
-          <p className="status-message status-success">{resendMessage}</p>
+        <button
+          className="button button-secondary button-full"
+          disabled={
+            form.formState.isSubmitting || resendVerificationEmailMutation.isPending
+          }
+          type="submit"
+        >
+          {form.formState.isSubmitting || resendVerificationEmailMutation.isPending
+            ? 'Sending verification email...'
+            : 'Resend verification email'}
+        </button>
+
+        {form.formState.errors.root ? (
+          <p className="status-banner status-error" role="alert">
+            {form.formState.errors.root.message}
+          </p>
         ) : null}
-      </article>
-    </section>
+      </form>
+
+      {resendMessage ? (
+        <p className="status-banner status-success">{resendMessage}</p>
+      ) : null}
+    </AuthPageShell>
   );
 }

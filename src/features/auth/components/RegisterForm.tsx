@@ -11,8 +11,8 @@ import { registerFormSchema, type RegisterFormValues } from '../forms';
 export function RegisterForm() {
   const [successEmail, setSuccessEmail] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const registerMutation = useRegisterMutation();
-  const form = useForm<RegisterFormValues>({
+const registerMutation = useRegisterMutation();
+const form = useForm<RegisterFormValues>({
     defaultValues: {
       username: '',
       email: '',
@@ -29,9 +29,7 @@ export function RegisterForm() {
     try {
       const result = await registerMutation.mutateAsync(values);
       setSuccessEmail(result.email);
-      setSuccessMessage(
-        `Account created for ${result.username}. Check ${result.email} for a verification link before signing in.`
-      );
+      setSuccessMessage(`Account created. Verify ${result.email} before signing in.`);
       form.reset();
     } catch (error) {
       form.setError('root', {
@@ -45,7 +43,11 @@ export function RegisterForm() {
       <form className="stack" onSubmit={onSubmit}>
         <label className="field">
           <span>Username</span>
-          <input autoComplete="username" {...form.register('username')} />
+          <input
+            autoComplete="username"
+            placeholder="Choose a username"
+            {...form.register('username')}
+          />
           {form.formState.errors.username ? (
             <span className="field-error" role="alert">
               {form.formState.errors.username.message}
@@ -55,7 +57,12 @@ export function RegisterForm() {
 
         <label className="field">
           <span>Email</span>
-          <input autoComplete="email" type="email" {...form.register('email')} />
+          <input
+            autoComplete="email"
+            placeholder="name@example.com"
+            type="email"
+            {...form.register('email')}
+          />
           {form.formState.errors.email ? (
             <span className="field-error" role="alert">
               {form.formState.errors.email.message}
@@ -67,6 +74,7 @@ export function RegisterForm() {
           <span>Password</span>
           <input
             autoComplete="new-password"
+            placeholder="Create a password"
             type="password"
             {...form.register('password')}
           />
@@ -78,7 +86,7 @@ export function RegisterForm() {
         </label>
 
         <button
-          className="primary-button"
+          className="button button-primary button-full"
           disabled={form.formState.isSubmitting || registerMutation.isPending}
           type="submit"
         >
@@ -88,7 +96,7 @@ export function RegisterForm() {
         </button>
 
         {form.formState.errors.root ? (
-          <p className="status-message status-error" role="alert">
+          <p className="status-banner status-error" role="alert">
             {form.formState.errors.root.message}
           </p>
         ) : null}
@@ -96,9 +104,9 @@ export function RegisterForm() {
 
       {successMessage ? (
         <div className="stack">
-          <p className="status-message status-success">{successMessage}</p>
+          <p className="status-banner status-success">{successMessage}</p>
           <AppLink
-            className="secondary-button link-button"
+            className="button button-secondary button-full"
             to={`${routePaths.verifyEmail}?email=${encodeURIComponent(successEmail)}`}
           >
             Open verification page

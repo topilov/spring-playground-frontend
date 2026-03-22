@@ -56,6 +56,21 @@ describe('request', () => {
     expect(result).toBeUndefined();
   });
 
+  it('rejects successful non-json API responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response('<!doctype html><html><body>frontend fallback</body></html>', {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+        },
+      })
+    );
+
+    await expect(request('/api/profile/me')).rejects.toThrow(
+      'Expected a JSON API response from /api/profile/me. Check VITE_API_BASE_URL or your dev proxy.'
+    );
+  });
+
   it('throws a structured error for non-ok responses', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({ error: 'Bad Request' }), {

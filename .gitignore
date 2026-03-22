@@ -4,6 +4,7 @@ dist
 .DS_Store
 .env.development
 .env.production
+.env
 coverage
 .codex/
 .superpowers/

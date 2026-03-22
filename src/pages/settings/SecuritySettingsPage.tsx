@@ -1,15 +1,27 @@
 import { PasskeySection } from '../../features/passkeys/components/PasskeySection';
+import { AppLink } from '../../shared/routing/AppLink';
+import { routePaths } from '../../shared/routing/paths';
+import { PageHeader } from '../../shared/ui/PageHeader';
 
 export function SecuritySettingsPage() {
   return (
-    <section className="auth-layout">
-      <article className="form-card stack">
-        <p className="eyebrow">Settings</p>
-        <h1>Security settings</h1>
-        <p className="section-copy">
-          Manage sign-in methods that protect your account and make access easier on trusted devices.
-        </p>
+    <section className="page-grid">
+      <PageHeader
+        description="Manage sign-in methods."
+        eyebrow="Settings"
+        title="Security"
+      />
 
+      <nav aria-label="Settings sections" className="section-tabs">
+        <AppLink
+          className="section-tab section-tab-active"
+          to={routePaths.settingsSecurity}
+        >
+          Security
+        </AppLink>
+      </nav>
+
+      <article className="page-card stack">
         <PasskeySection />
       </article>
     </section>

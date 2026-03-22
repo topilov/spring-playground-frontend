@@ -1,23 +1,20 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
+import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
+import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 export function ProtectedRoute() {
   const location = useLocation();
-  const { status } = useAuthSession();
+  const { errorMessage, status } = useAuthSession();
 
   if (status === 'loading') {
     return (
-      <section className="auth-layout">
-        <article className="form-card">
-          <p className="eyebrow">Session</p>
-          <h1>Checking your session</h1>
-          <p className="section-copy">
-            Verifying the current backend session before opening this page.
-          </p>
-        </article>
-      </section>
+      <AuthPageShell
+        subtitle="One moment while we confirm access."
+        title="Checking session"
+      />
     );
   }
 
@@ -28,6 +25,19 @@ export function ProtectedRoute() {
         state={{ from: location.pathname }}
         to={routePaths.login}
       />
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <AuthPageShell
+        subtitle={errorMessage ?? 'We could not verify your session.'}
+        title="Session unavailable"
+      >
+        <AppLink className="button button-primary button-full" to={routePaths.login}>
+          Sign in
+        </AppLink>
+      </AuthPageShell>
     );
   }
 

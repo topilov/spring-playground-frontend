@@ -4,6 +4,8 @@ import { useAuthSession } from '../../features/auth/session/useAuthSession';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
 import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
+import { AuthPageShell } from '../../shared/ui/AuthPageShell';
+import { PageHeader } from '../../shared/ui/PageHeader';
 
 export function ProfilePage() {
   const { errorMessage, profile, refreshSession, status } = useAuthSession();
@@ -27,116 +29,120 @@ export function ProfilePage() {
 
   if (status === 'loading') {
     return (
-      <section className="auth-layout">
-        <article className="form-card">
-          <p className="eyebrow">My Profile</p>
-          <h1>Loading your session</h1>
-          <p className="section-copy">
-            Checking the current `JSESSIONID`-backed session with the backend.
-          </p>
-        </article>
-      </section>
+      <AuthPageShell
+        subtitle="Loading your account details."
+        title="Profile"
+      />
     );
   }
 
   if (status === 'anonymous') {
     return (
-      <section className="auth-layout">
-        <article className="form-card">
-          <p className="eyebrow">My Profile</p>
-          <h1>You are not signed in</h1>
-          <p className="section-copy">
-            This page uses `GET /api/profile/me`, so it needs an authenticated
-            session cookie first.
-          </p>
-          <AppLink className="primary-button link-button" to={routePaths.login}>
-            Go to login
-          </AppLink>
-        </article>
-      </section>
+      <AuthPageShell
+        subtitle="Sign in to view your profile."
+        title="Profile"
+      >
+        <AppLink className="button button-primary button-full" to={routePaths.login}>
+          Sign in
+        </AppLink>
+      </AuthPageShell>
     );
   }
 
   if (status === 'error' || !profile) {
     return (
-      <section className="auth-layout">
-        <article className="form-card">
-          <p className="eyebrow">My Profile</p>
-          <h1>Profile unavailable</h1>
-          <p className="status-message status-error" role="alert">
-            {refreshError || errorMessage || 'We could not load your profile.'}
-          </p>
-          <button
-            className="secondary-button"
-            disabled={isRefreshing}
-            onClick={handleRefresh}
-            type="button"
-          >
-            {isRefreshing ? 'Refreshing...' : 'Try again'}
-          </button>
-        </article>
-      </section>
+      <AuthPageShell
+        subtitle="We could not load your account details."
+        title="Profile"
+      >
+        <p className="status-banner status-error" role="alert">
+          {refreshError || errorMessage || 'We could not load your profile.'}
+        </p>
+        <button
+          className="button button-secondary button-full"
+          disabled={isRefreshing}
+          onClick={handleRefresh}
+          type="button"
+        >
+          {isRefreshing ? 'Refreshing...' : 'Try again'}
+        </button>
+      </AuthPageShell>
     );
   }
 
   return (
-    <section className="auth-layout">
-      <article className="form-card">
-        <div className="profile-header">
-          <div>
-            <p className="eyebrow">My Profile</p>
-            <h1>{profile.displayName}</h1>
-            <p className="section-copy">
-              Signed in as {profile.username} with role {profile.role}.
-            </p>
+    <section className="page-grid">
+      <PageHeader
+        actions={
+          <div className="inline-actions">
+            <AppLink className="button button-secondary" to={routePaths.settingsSecurity}>
+              Security
+            </AppLink>
+            <button
+              className="button button-secondary"
+              disabled={isRefreshing}
+              onClick={handleRefresh}
+              type="button"
+            >
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
           </div>
-          <button
-            className="secondary-button"
-            disabled={isRefreshing}
-            onClick={handleRefresh}
-            type="button"
-          >
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
+        }
+        description={profile.displayName}
+        eyebrow="Account"
+        title="Profile"
+      />
+
+      {refreshError ? (
+        <p className="status-banner status-error" role="alert">
+          {refreshError}
+        </p>
+      ) : null}
+
+      <article className="page-card stack">
+        <div className="section-heading">
+          <h2>Identity</h2>
         </div>
 
-        {refreshError ? (
-          <p className="status-message status-error" role="alert">
-            {refreshError}
-          </p>
-        ) : null}
-
-        <dl className="profile-grid">
-          <div className="profile-item">
+        <dl className="detail-grid">
+          <div className="detail-item">
+            <dt>Display name</dt>
+            <dd>{profile.displayName}</dd>
+          </div>
+          <div className="detail-item">
             <dt>Username</dt>
             <dd>{profile.username}</dd>
           </div>
-          <div className="profile-item">
+          <div className="detail-item">
             <dt>Email</dt>
             <dd>{profile.email}</dd>
           </div>
-          <div className="profile-item">
+          <div className="detail-item">
+            <dt>Role</dt>
+            <dd>{profile.role}</dd>
+          </div>
+        </dl>
+      </article>
+
+      <article className="page-card stack">
+        <div className="section-heading">
+          <h2>Details</h2>
+        </div>
+
+        <dl className="detail-grid">
+          <div className="detail-item">
             <dt>User ID</dt>
             <dd>{profile.userId}</dd>
           </div>
-          <div className="profile-item">
+          <div className="detail-item">
             <dt>Profile ID</dt>
             <dd>{profile.id}</dd>
           </div>
-          <div className="profile-item profile-item-wide">
+          <div className="detail-item detail-item-wide">
             <dt>Bio</dt>
-            <dd>{profile.bio || 'No bio set yet.'}</dd>
+            <dd>{profile.bio || 'No bio added.'}</dd>
           </div>
         </dl>
-
-        <div className="profile-actions">
-          <AppLink
-            className="secondary-button link-button"
-            to={routePaths.settingsSecurity}
-          >
-            Manage security settings
-          </AppLink>
-        </div>
       </article>
     </section>
   );

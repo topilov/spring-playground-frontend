@@ -29,12 +29,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   if (!token) {
     return (
       <div className="stack">
-        <p className="status-message status-error" role="alert">
+        <p className="status-banner status-error" role="alert">
           This reset link is invalid or incomplete.
         </p>
-        <p className="helper-links">
-          <AppLink to={routePaths.login}>Back to login</AppLink>
-        </p>
+        <AppLink className="text-link" to={routePaths.login}>
+          Back to sign in
+        </AppLink>
       </div>
     );
   }
@@ -42,12 +42,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   if (isSuccess) {
     return (
       <div className="stack">
-        <p className="status-message status-success">
-          Your password has been reset.
+        <p className="status-banner status-success">
+          Password updated.
         </p>
-        <p className="helper-links">
-          <AppLink to={routePaths.login}>Back to login</AppLink>
-        </p>
+        <AppLink className="text-link" to={routePaths.login}>
+          Back to sign in
+        </AppLink>
       </div>
     );
   }
@@ -75,6 +75,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <span>New password</span>
         <input
           autoComplete="new-password"
+          placeholder="Create a new password"
           type="password"
           {...form.register('newPassword')}
         />
@@ -89,6 +90,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <span>Confirm new password</span>
         <input
           autoComplete="new-password"
+          placeholder="Repeat your new password"
           type="password"
           {...form.register('confirmPassword')}
         />
@@ -100,7 +102,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       </label>
 
       <button
-        className="primary-button"
+        className="button button-primary button-full"
         disabled={form.formState.isSubmitting || resetPasswordMutation.isPending}
         type="submit"
       >
@@ -110,7 +112,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       </button>
 
       {form.formState.errors.root ? (
-        <p className="status-message status-error" role="alert">
+        <p className="status-banner status-error" role="alert">
           {form.formState.errors.root.message}
         </p>
       ) : null}
