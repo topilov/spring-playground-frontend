@@ -1,7 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
-import { cloudflare } from "@cloudflare/vite-plugin";
+import { cloudflare } from '@cloudflare/vite-plugin';
 
 export default defineConfig({
   plugins: [react(), cloudflare()],
@@ -10,8 +10,5 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
-    env: {
-      VITE_API_BASE_URL: 'http://localhost:8080',
-    },
   },
 });

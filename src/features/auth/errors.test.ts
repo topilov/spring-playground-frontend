@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ApiClientError, createRequestUrl } from '../../shared/api/apiClient';
+import { ApiClientError, buildApiUrl } from '../../shared/api/apiClient';
 import { getAuthErrorCode, isEmailNotVerifiedError } from './errors';
 
 describe('auth error helpers', () => {
@@ -8,7 +8,7 @@ describe('auth error helpers', () => {
     const error = new ApiClientError({
       status: 401,
       statusText: 'Unauthorized',
-      url: createRequestUrl('/api/auth/login'),
+      url: buildApiUrl('/api/auth/login'),
       responseBody: {
         error: 'Email is not verified',
         code: 'EMAIL_NOT_VERIFIED',
@@ -22,7 +22,7 @@ describe('auth error helpers', () => {
     const error = new ApiClientError({
       status: 401,
       statusText: 'Unauthorized',
-      url: createRequestUrl('/api/auth/login'),
+      url: buildApiUrl('/api/auth/login'),
       responseBody: {
         error: 'Email is not verified',
         code: 'EMAIL_NOT_VERIFIED',
@@ -36,7 +36,7 @@ describe('auth error helpers', () => {
     const error = new ApiClientError({
       status: 401,
       statusText: 'Unauthorized',
-      url: createRequestUrl('/api/auth/login'),
+      url: buildApiUrl('/api/auth/login'),
       responseBody: {
         error: 'Bad credentials',
       },

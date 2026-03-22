@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createRequestUrl } from '../../shared/api/apiClient';
+import { buildApiUrl } from '../../shared/api/apiClient';
 import { getCurrentProfile } from './api';
 
 describe('profile api', () => {
@@ -40,7 +40,7 @@ describe('profile api', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe(createRequestUrl('/api/profile/me'));
+    expect(url).toBe(buildApiUrl('/api/profile/me'));
     expect(init?.method).toBe('GET');
     expect(init?.credentials).toBe('include');
   });

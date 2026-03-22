@@ -13,7 +13,11 @@ function isBodyInit(value: unknown): value is BodyInit {
   );
 }
 
-export function createRequestUrl(path: string, apiBaseUrl: string = appConfig.apiBaseUrl): string {
+export function buildApiUrl(path: string, apiBaseUrl: string = appConfig.apiBaseUrl): string {
+  if (!apiBaseUrl) {
+    return path;
+  }
+
   return new URL(path, `${apiBaseUrl}/`).toString();
 }
 
@@ -87,7 +91,7 @@ export class ApiClientError extends Error {
 }
 
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const url = createRequestUrl(path);
+  const url = buildApiUrl(path);
   const headers = buildHeaders(options.headers, options.csrfToken);
   const response = await fetch(url, {
     method: options.method ?? 'GET',
