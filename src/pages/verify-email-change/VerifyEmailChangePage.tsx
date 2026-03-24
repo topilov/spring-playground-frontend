@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
@@ -10,6 +10,30 @@ import { getQueryParamValue } from '../../shared/routing/queryParams';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 type VerificationStatus = 'idle' | 'verifying' | 'verified' | 'failed';
+
+const pendingEmailChangeVerificationRequests = new Map<string, Promise<void>>();
+
+function verifyEmailChangeOnce(
+  token: string,
+  refreshSession: () => Promise<unknown>
+): Promise<void> {
+  const existingRequest = pendingEmailChangeVerificationRequests.get(token);
+
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const request = (async () => {
+    await verifyCurrentEmailChange({ token });
+    await refreshSession();
+  })().finally(() => {
+    pendingEmailChangeVerificationRequests.delete(token);
+  });
+
+  pendingEmailChangeVerificationRequests.set(token, request);
+
+  return request;
+}
 
 function getShellSubtitle(status: VerificationStatus, hasToken: boolean) {
   if (status === 'verified') {
@@ -31,6 +55,8 @@ export function VerifyEmailChangePage() {
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(
     token ? 'verifying' : 'idle'
   );
+  const refreshSessionRef = useRef(refreshSession);
+  refreshSessionRef.current = refreshSession;
 
   useEffect(() => {
     if (!token) {
@@ -41,8 +67,7 @@ export function VerifyEmailChangePage() {
 
     const runVerification = async () => {
       try {
-        await verifyCurrentEmailChange({ token });
-        await refreshSession();
+        await verifyEmailChangeOnce(token, () => refreshSessionRef.current());
 
         if (!cancelled) {
           setVerificationStatus('verified');
@@ -62,7 +87,7 @@ export function VerifyEmailChangePage() {
     return () => {
       cancelled = true;
     };
-  }, [refreshSession, token]);
+  }, [token]);
 
   return (
     <AuthPageShell
