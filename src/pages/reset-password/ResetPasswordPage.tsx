@@ -1,11 +1,12 @@
-import { useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { ResetPasswordForm } from '../../features/auth/components/ResetPasswordForm';
+import { getQueryParamValue } from '../../shared/routing/queryParams';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 export function ResetPasswordPage() {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const location = useLocation();
+  const token = getQueryParamValue(location.search, 'token');
 
   return (
     <AuthPageShell

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 import { verifyEmail } from '../../features/auth/api';
 import { useResendVerificationEmailMutation } from '../../features/auth/mutations';
@@ -12,6 +12,7 @@ import {
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
 import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
+import { getQueryParamValue } from '../../shared/routing/queryParams';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 const resendSuccessMessage =
@@ -33,8 +34,9 @@ function getShellSubtitle(
 }
 
 export function VerifyEmailPage() {
+  const location = useLocation();
   const [searchParams] = useSearchParams();
-  const [token] = useState(() => searchParams.get('token')?.trim() ?? '');
+  const [token] = useState(() => getQueryParamValue(location.search, 'token')?.trim() ?? '');
   const [verificationError, setVerificationError] = useState('');
   const [verificationStatus, setVerificationStatus] = useState<
     'idle' | 'verifying' | 'verified' | 'failed'
