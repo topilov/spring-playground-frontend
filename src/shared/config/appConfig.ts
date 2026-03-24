@@ -18,4 +18,5 @@ export const appConfig = {
   apiBaseUrl,
   apiSchemaUrl: readEnvValue(import.meta.env.VITE_API_SCHEMA_URL),
   rawSchemaUrl: readEnvValue(import.meta.env.VITE_RAW_SCHEMA_URL),
+  turnstileSiteKey: readEnvValue(import.meta.env.VITE_TURNSTILE_SITE_KEY),
 } as const;

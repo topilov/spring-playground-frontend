@@ -12,11 +12,29 @@ const useVerifyTwoFactorLoginMutationMock = vi.fn();
 const useVerifyTwoFactorBackupCodeMutationMock = vi.fn();
 const loadPendingTwoFactorLoginChallengeMock = vi.fn();
 const clearPendingTwoFactorLoginChallengeMock = vi.fn();
+const turnstileController = {
+  acquireToken: vi.fn(),
+  reset: vi.fn(),
+  isReady: true,
+  attach: vi.fn(),
+  detach: vi.fn(),
+  handleError: vi.fn(),
+  handleExpired: vi.fn(),
+  handleToken: vi.fn(),
+};
 
 vi.mock('../../features/two-factor/hooks', () => ({
   useVerifyTwoFactorLoginMutation: () => useVerifyTwoFactorLoginMutationMock(),
   useVerifyTwoFactorBackupCodeMutation: () =>
     useVerifyTwoFactorBackupCodeMutationMock(),
+}));
+
+vi.mock('../../shared/protection/turnstile/useTurnstileController', () => ({
+  useTurnstileController: () => turnstileController,
+}));
+
+vi.mock('../../shared/protection/turnstile/TurnstileWidget', () => ({
+  TurnstileWidget: () => <div data-testid="turnstile-widget">Turnstile widget</div>,
 }));
 
 vi.mock('../../features/two-factor/challengeStorage', () => ({
@@ -40,6 +58,8 @@ function renderPage() {
 
 describe('TwoFactorLoginPage', () => {
   beforeEach(() => {
+    turnstileController.acquireToken.mockResolvedValue('captcha-token');
+    turnstileController.reset.mockClear();
     loadPendingTwoFactorLoginChallengeMock.mockReturnValue({
       loginChallengeId: 'login-challenge-id',
       methods: ['TOTP', 'BACKUP_CODE'],
@@ -87,6 +107,8 @@ describe('TwoFactorLoginPage', () => {
 
     renderPage();
 
+    expect(screen.getByTestId('turnstile-widget')).toBeTruthy();
+
     await user.type(screen.getByLabelText('Authenticator code'), '123456');
     await user.click(screen.getByRole('button', { name: 'Verify code' }));
 
@@ -94,6 +116,7 @@ describe('TwoFactorLoginPage', () => {
       expect(mutateAsync).toHaveBeenCalledWith({
         loginChallengeId: 'login-challenge-id',
         code: '123456',
+        captchaToken: 'captcha-token',
       });
     });
 
@@ -126,8 +149,68 @@ describe('TwoFactorLoginPage', () => {
       expect(mutateAsync).toHaveBeenCalledWith({
         loginChallengeId: 'login-challenge-id',
         backupCode: 'ABCD-EFGH-JKLM',
+        captchaToken: 'captcha-token',
       });
     });
+  });
+
+  it('shows the shared protection message when totp captcha verification fails', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi.fn().mockRejectedValue(
+      new ApiClientError({
+        status: 400,
+        statusText: 'Bad Request',
+        url: buildApiUrl('/api/auth/2fa/login/verify'),
+        responseBody: {
+          error: 'Captcha validation failed.',
+          code: 'CAPTCHA_INVALID',
+        },
+      })
+    );
+
+    useVerifyTwoFactorLoginMutationMock.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    });
+
+    renderPage();
+
+    await user.type(screen.getByLabelText('Authenticator code'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Verify code' }));
+
+    expect(
+      await screen.findByText('Please try the verification again before submitting.')
+    ).toBeTruthy();
+  });
+
+  it('shows the shared protection message when backup-code captcha verification fails', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi.fn().mockRejectedValue(
+      new ApiClientError({
+        status: 400,
+        statusText: 'Bad Request',
+        url: buildApiUrl('/api/auth/2fa/login/verify-backup-code'),
+        responseBody: {
+          error: 'Captcha validation failed.',
+          code: 'CAPTCHA_INVALID',
+        },
+      })
+    );
+
+    useVerifyTwoFactorBackupCodeMutationMock.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    });
+
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: 'Use backup code' }));
+    await user.type(screen.getByLabelText('Backup code'), 'ABCD-EFGH-JKLM');
+    await user.click(screen.getByRole('button', { name: 'Verify backup code' }));
+
+    expect(
+      await screen.findByText('Please try the verification again before submitting.')
+    ).toBeTruthy();
   });
 
   it('redirects back to sign in when the challenge is invalid or expired', async () => {

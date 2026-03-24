@@ -82,13 +82,14 @@ export function usePasskeyLoginMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: StartPasskeyLoginInput = {}) => {
+    mutationFn: async (payload: StartPasskeyLoginInput) => {
       const ceremony = await startPasskeyLogin(payload);
       const credential = await getAuthenticationCredential(ceremony.publicKey);
 
       return finishPasskeyLogin({
         ceremonyId: ceremony.ceremonyId,
         credential,
+        captchaToken: payload.captchaToken,
       });
     },
     onSuccess: async () => {

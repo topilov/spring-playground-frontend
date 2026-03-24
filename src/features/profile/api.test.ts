@@ -162,13 +162,21 @@ describe('profile api', () => {
         )
       );
 
-    const result = await verifyCurrentEmailChange({ token: 'email-change-token' });
+    const result = await verifyCurrentEmailChange({
+      token: 'email-change-token',
+      captchaToken: 'captcha-token',
+    });
 
     expect(result.email).toBe('next@example.com');
 
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe(buildApiUrl('/api/profile/me/email/verify'));
     expect(init?.method).toBe('POST');
-    expect(init?.body).toBe(JSON.stringify({ token: 'email-change-token' }));
+    expect(init?.body).toBe(
+      JSON.stringify({
+        token: 'email-change-token',
+        captchaToken: 'captcha-token',
+      })
+    );
   });
 });

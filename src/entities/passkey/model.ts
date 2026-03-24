@@ -30,11 +30,13 @@ export interface PasskeyRegistrationCeremony {
 
 export interface StartPasskeyLoginInput {
   usernameOrEmail?: string;
+  captchaToken: string;
 }
 
 export interface FinishPasskeyLoginInput {
   ceremonyId: string;
   credential: Record<string, unknown>;
+  captchaToken: string;
 }
 
 export interface RenamePasskeyInput {
@@ -156,7 +158,10 @@ export function toPasskeyLoginOptionsRequest(
   payload: StartPasskeyLoginInput
 ): PasskeyLoginOptionsRequestDto {
   const usernameOrEmail = normalizeOptionalString(payload.usernameOrEmail);
-  return usernameOrEmail ? { usernameOrEmail } : {};
+  return {
+    ...(usernameOrEmail ? { usernameOrEmail } : {}),
+    captchaToken: payload.captchaToken,
+  };
 }
 
 export function mapPasskeyLoginOptionsResponse(
@@ -174,6 +179,7 @@ export function toPasskeyLoginVerifyRequest(
   return {
     ceremonyId: payload.ceremonyId,
     credential: payload.credential,
+    captchaToken: payload.captchaToken,
   };
 }
 

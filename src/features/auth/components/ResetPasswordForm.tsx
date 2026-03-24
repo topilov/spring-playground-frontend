@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { getApiErrorMessage } from '../../../shared/api/errorMessage';
+import { ProtectedStatusBanner } from '../../../shared/protection/ProtectedStatusBanner';
+import { TurnstileWidget } from '../../../shared/protection/turnstile/TurnstileWidget';
+import { useTurnstileController } from '../../../shared/protection/turnstile/useTurnstileController';
+import { useProtectedAction } from '../../../shared/protection/useProtectedAction';
 import { AppLink } from '../../../shared/routing/AppLink';
 import { routePaths } from '../../../shared/routing/paths';
 import { useResetPasswordMutation } from '../mutations';
@@ -18,6 +22,11 @@ interface ResetPasswordFormProps {
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const resetPasswordMutation = useResetPasswordMutation();
+  const turnstileController = useTurnstileController();
+  const protectedAction = useProtectedAction({
+    acquireToken: () => turnstileController.acquireToken(),
+    reset: () => turnstileController.reset(),
+  });
   const form = useForm<ResetPasswordFormValues>({
     defaultValues: {
       newPassword: '',
@@ -54,15 +63,24 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   const onSubmit = form.handleSubmit(async (values) => {
     form.clearErrors('root');
+    protectedAction.resetStatus();
 
     try {
-      await resetPasswordMutation.mutateAsync({
-        token,
-        newPassword: values.newPassword,
+      await protectedAction.execute({
+        execute: (captchaToken) =>
+          resetPasswordMutation.mutateAsync({
+            token,
+            newPassword: values.newPassword,
+            captchaToken,
+          }),
       });
       setIsSuccess(true);
       form.reset();
     } catch (error) {
+      if (protectedAction.wasHandledError(error)) {
+        return;
+      }
+
       form.setError('root', {
         message: getApiErrorMessage(error, 'We could not reset your password.'),
       });
@@ -100,6 +118,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           </span>
         ) : null}
       </label>
+
+      <TurnstileWidget controller={turnstileController} />
+      <ProtectedStatusBanner
+        errorMessage={protectedAction.errorMessage}
+        protection={protectedAction.protection}
+      />
 
       <button
         className="button button-primary button-full"

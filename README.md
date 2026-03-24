@@ -14,6 +14,7 @@ React + TypeScript + Vite frontend that consumes the backend API contract from t
 
    - `VITE_API_BASE_URL` is the runtime backend origin for local development.
    - `VITE_API_SCHEMA_URL` is the contract source for type generation and should point at the backend GitHub Pages OpenAPI export.
+   - `VITE_TURNSTILE_SITE_KEY` is required for protected auth and email-verification flows that now use Cloudflare Turnstile.
 
 3. Generate OpenAPI types:
 
@@ -83,6 +84,7 @@ The generation script prefers `VITE_API_SCHEMA_URL`. If the published Pages arti
 - The frontend always sends requests with `credentials: "include"` so the backend-managed `JSESSIONID` cookie is included automatically.
 - `POST /api/auth/register` creates the account and default profile, but it does not auto-login the browser session.
 - `POST /api/auth/login` establishes the session cookie for accounts without 2FA, or returns a short-lived second-step challenge for accounts with TOTP enabled.
+- `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/forgot-password`, `POST /api/auth/resend-verification-email`, `POST /api/auth/reset-password`, `POST /api/auth/2fa/login/verify`, `POST /api/auth/2fa/login/verify-backup-code`, `POST /api/auth/passkey-login/options`, `POST /api/auth/passkey-login/verify`, and `POST /api/profile/me/email/verify` are protected by backend abuse controls and require frontend Turnstile/cooldown handling that stays aligned with the backend contract.
 - `POST /api/auth/2fa/login/verify` and `POST /api/auth/2fa/login/verify-backup-code` finish that short-lived password-login challenge and create the same authenticated session.
 - `POST /api/auth/passkey-login/options` plus `POST /api/auth/passkey-login/verify` establish the same authenticated session through WebAuthn.
 - `GET /api/profile/me` is the frontend's source of truth for the current authenticated profile.

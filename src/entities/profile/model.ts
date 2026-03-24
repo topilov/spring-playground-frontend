@@ -30,6 +30,7 @@ export interface RequestEmailChangeInput {
 
 export interface VerifyEmailChangeInput {
   token: string;
+  captchaToken: string;
 }
 
 export type ProfileResponseDto = ApiResponse<'/api/profile/me', 'get'>;
@@ -87,5 +88,8 @@ export function toRequestEmailChangeRequest(
 export function toVerifyEmailChangeRequest(
   payload: VerifyEmailChangeInput
 ): VerifyEmailChangeRequestDto {
-  return { ...payload };
+  return {
+    token: payload.token,
+    captchaToken: payload.captchaToken,
+  };
 }

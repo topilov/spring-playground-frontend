@@ -5,6 +5,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { ApiClientError } from '../../../shared/api/apiClient';
 import { getApiErrorMessage } from '../../../shared/api/errorMessage';
+import { ProtectedStatusBanner } from '../../../shared/protection/ProtectedStatusBanner';
+import { TurnstileWidget } from '../../../shared/protection/turnstile/TurnstileWidget';
+import { useTurnstileController } from '../../../shared/protection/turnstile/useTurnstileController';
+import { useProtectedAction } from '../../../shared/protection/useProtectedAction';
 import { isAppPath, routePaths } from '../../../shared/routing/paths';
 import { AppLink } from '../../../shared/routing/AppLink';
 import { isTwoFactorLoginChallenge } from '../../../entities/session/model';
@@ -25,6 +29,11 @@ export function LoginForm() {
   const location = useLocation();
   const loginMutation = useLoginMutation();
   const passkeyLoginMutation = usePasskeyLoginMutation();
+  const turnstileController = useTurnstileController();
+  const protectedAction = useProtectedAction({
+    acquireToken: () => turnstileController.acquireToken(),
+    reset: () => turnstileController.reset(),
+  });
   const [showVerificationCta, setShowVerificationCta] = useState(false);
   const form = useForm<LoginFormValues>({
     defaultValues: {
@@ -37,9 +46,16 @@ export function LoginForm() {
   const onSubmit = form.handleSubmit(async (values) => {
     form.clearErrors('root');
     setShowVerificationCta(false);
+    protectedAction.resetStatus();
 
     try {
-      const result = await loginMutation.mutateAsync(values);
+      const result = await protectedAction.execute({
+        execute: (captchaToken) =>
+          loginMutation.mutateAsync({
+            ...values,
+            captchaToken,
+          }),
+      });
 
       if (isTwoFactorLoginChallenge(result)) {
         savePendingTwoFactorLoginChallenge({
@@ -74,6 +90,10 @@ export function LoginForm() {
         return;
       }
 
+      if (protectedAction.wasHandledError(error)) {
+        return;
+      }
+
       form.setError('root', {
         message: getApiErrorMessage(error, 'We could not sign you in.'),
       });
@@ -83,17 +103,25 @@ export function LoginForm() {
   const handlePasskeyLogin = async () => {
     form.clearErrors('root');
     setShowVerificationCta(false);
+    protectedAction.resetStatus();
 
     try {
       const usernameOrEmail = form.getValues('usernameOrEmail').trim();
 
-      await passkeyLoginMutation.mutateAsync(
-        usernameOrEmail ? { usernameOrEmail } : {}
-      );
+      await protectedAction.execute({
+        execute: (captchaToken) =>
+          passkeyLoginMutation.mutateAsync(
+            usernameOrEmail ? { usernameOrEmail, captchaToken } : { captchaToken }
+          ),
+      });
       navigate(getRedirectTarget(location.state?.from), {
         replace: true,
       });
     } catch (error) {
+      if (protectedAction.wasHandledError(error)) {
+        return;
+      }
+
       form.setError('root', {
         message: getApiErrorMessage(error, 'We could not sign you in with a passkey.'),
       });
@@ -135,6 +163,12 @@ export function LoginForm() {
           </span>
         ) : null}
       </label>
+
+      <TurnstileWidget controller={turnstileController} />
+      <ProtectedStatusBanner
+        errorMessage={protectedAction.errorMessage}
+        protection={protectedAction.protection}
+      />
 
       <button
         className="button button-primary button-full"

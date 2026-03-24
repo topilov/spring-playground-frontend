@@ -68,7 +68,7 @@ export function deletePasskey(id: number): Promise<void> {
 }
 
 export function startPasskeyLogin(
-  payload: StartPasskeyLoginInput = {}
+  payload: StartPasskeyLoginInput
 ): Promise<PasskeyRegistrationCeremony> {
   return request<PasskeyLoginOptionsResponseDto>(
     '/api/auth/passkey-login/options',
