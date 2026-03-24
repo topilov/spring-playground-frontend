@@ -66,6 +66,16 @@ describe('VerifyEmailPage', () => {
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeTruthy();
   });
 
+  it('preserves plus signs in the token from the email link', async () => {
+    verifyEmailMock.mockResolvedValue({ verified: true });
+
+    renderPage('/verify-email?token=verify+token');
+
+    await waitFor(() => {
+      expect(verifyEmailMock).toHaveBeenCalledWith({ token: 'verify+token' });
+    });
+  });
+
   it('shows a failed state when verification does not succeed', async () => {
     verifyEmailMock.mockRejectedValue(new Error('Verification link expired.'));
 

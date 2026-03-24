@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { useAuthSession } from '../../features/auth/session/useAuthSession';
 import { verifyCurrentEmailChange } from '../../features/profile/api';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
 import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
+import { getQueryParamValue } from '../../shared/routing/queryParams';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 type VerificationStatus = 'idle' | 'verifying' | 'verified' | 'failed';
@@ -23,9 +24,9 @@ function getShellSubtitle(status: VerificationStatus, hasToken: boolean) {
 }
 
 export function VerifyEmailChangePage() {
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { refreshSession } = useAuthSession();
-  const [token] = useState(() => searchParams.get('token')?.trim() ?? '');
+  const [token] = useState(() => getQueryParamValue(location.search, 'token')?.trim() ?? '');
   const [verificationError, setVerificationError] = useState('');
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(
     token ? 'verifying' : 'idle'

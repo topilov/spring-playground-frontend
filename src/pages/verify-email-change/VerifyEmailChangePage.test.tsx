@@ -85,6 +85,26 @@ describe('VerifyEmailChangePage', () => {
     ).toBeTruthy();
   });
 
+  it('preserves plus signs in the token from the email link', async () => {
+    verifyCurrentEmailChangeMock.mockResolvedValue({
+      id: 1,
+      userId: 1,
+      username: 'demo',
+      email: 'next@example.com',
+      role: 'USER',
+      displayName: 'Demo User',
+      bio: 'Hello',
+    });
+
+    renderPage('/verify-email-change?token=email+change+token');
+
+    await waitFor(() => {
+      expect(verifyCurrentEmailChangeMock).toHaveBeenCalledWith({
+        token: 'email+change+token',
+      });
+    });
+  });
+
   it('shows a failed state when verification does not succeed', async () => {
     verifyCurrentEmailChangeMock.mockRejectedValue(new Error('Email change token expired.'));
 
