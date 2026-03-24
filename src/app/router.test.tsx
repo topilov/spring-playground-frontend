@@ -136,10 +136,39 @@ describe('app routes', () => {
     renderRoute('/register');
 
     const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
+    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
 
     expect(within(primaryNav).getByRole('link', { name: 'Sign in' })).toBeTruthy();
-    expect(within(primaryNav).queryByRole('link', { name: 'Home' })).toBeNull();
-    expect(within(primaryNav).queryByRole('link', { name: 'Register' })).toBeNull();
+    expect(within(utilityNav).getByRole('link', { name: 'Create account' })).toBeTruthy();
+    expect(within(primaryNav).queryByRole('link', { name: 'Profile' })).toBeNull();
+    expect(within(utilityNav).queryByRole('button', { name: 'Sign out' })).toBeNull();
+  });
+
+  it('shows an authenticated header with account actions and a utility sign out action', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/profile');
+
+    const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
+    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
+
+    expect(within(primaryNav).getByRole('link', { name: 'Profile' })).toBeTruthy();
+    expect(within(primaryNav).queryByRole('link', { name: 'Sign in' })).toBeNull();
+    expect(within(utilityNav).getByRole('button', { name: 'Sign out' })).toBeTruthy();
   });
 
   it('renders the reset-password route for anonymous visitors', async () => {
