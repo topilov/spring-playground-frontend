@@ -1,8 +1,7 @@
 import type { ApiRequestBody, ApiResponse } from '../../shared/api/contract';
 import {
-  mapLoginResponse,
   type SessionUser,
-  type LoginResponseDto,
+  type LoginSuccessResponseDto,
 } from '../session/model';
 
 export interface Passkey {
@@ -179,7 +178,13 @@ export function toPasskeyLoginVerifyRequest(
 }
 
 export function mapPasskeyLoginVerifyResponse(
-  payload: LoginResponseDto | PasskeyLoginVerifyResponseDto
+  payload: LoginSuccessResponseDto | PasskeyLoginVerifyResponseDto
 ): SessionUser {
-  return mapLoginResponse(payload);
+  return {
+    authenticated: payload.authenticated,
+    userId: payload.userId,
+    username: payload.username,
+    email: payload.email,
+    role: payload.role,
+  };
 }

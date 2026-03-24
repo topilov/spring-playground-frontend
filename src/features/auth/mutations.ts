@@ -7,7 +7,10 @@ import type {
   ResendVerificationEmailInput,
   VerifyEmailInput,
 } from '../../entities/auth/model';
-import type { LoginCredentials } from '../../entities/session/model';
+import {
+  isTwoFactorLoginChallenge,
+  type LoginCredentials,
+} from '../../entities/session/model';
 import {
   forgotPassword,
   login,
@@ -55,7 +58,11 @@ export function useLoginMutation() {
 
   return useMutation({
     mutationFn: (payload: LoginCredentials) => login(payload),
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      if (isTwoFactorLoginChallenge(result)) {
+        return;
+      }
+
       await queryClient.fetchQuery({
         queryKey: authSessionQueryKey,
         queryFn: fetchAuthSession,

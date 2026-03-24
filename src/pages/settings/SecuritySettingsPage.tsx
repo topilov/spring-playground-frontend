@@ -1,4 +1,5 @@
 import { PasskeySection } from '../../features/passkeys/components/PasskeySection';
+import { TwoFactorSection } from '../../features/two-factor/components/TwoFactorSection';
 import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
 import { PageHeader } from '../../shared/ui/PageHeader';
@@ -11,7 +12,7 @@ export function SecuritySettingsPage() {
         eyebrow="Settings"
         status={
           <p className="status-banner" role="status">
-            Passkey changes apply to the current operator account immediately.
+            Passkey and two-factor changes apply to the current operator account immediately.
           </p>
         }
         title="Security"
@@ -28,33 +29,34 @@ export function SecuritySettingsPage() {
 
       <div className="workspace-shell workspace-shell-split">
         <section className="workspace-band workspace-band-primary stack">
+          <TwoFactorSection />
           <PasskeySection />
         </section>
 
         <aside className="workspace-column stack">
           <section className="workspace-band workspace-band-secondary stack">
             <div className="section-heading">
-              <h2>Passkey posture</h2>
+              <h2>Recovery posture</h2>
               <p className="page-description">
-                Keep at least one passkey on a device you control so account recovery stays
-                simple.
+                Keep at least one trusted second factor and a recovery path you can still reach
+                under pressure.
               </p>
             </div>
 
             <dl className="detail-rows">
               <div className="detail-row">
-                <dt>Preferred use</dt>
-                <dd>Trusted personal or work devices you use regularly.</dd>
+                <dt>Authenticator app</dt>
+                <dd>Use a device you control directly and keep time sync enabled.</dd>
               </div>
               <div className="detail-row">
-                <dt>Operator habit</dt>
-                <dd>Name each passkey clearly so you can retire older devices quickly.</dd>
+                <dt>Backup codes</dt>
+                <dd>Store them away from the primary device so one outage does not lock you out.</dd>
               </div>
               <div className="detail-row detail-row-wide">
-                <dt>Before you remove one</dt>
+                <dt>Before you remove anything</dt>
                 <dd>
-                  Confirm another sign-in method is available on a separate device before
-                  deleting the current key.
+                  Confirm another sign-in method still works on a separate device before
+                  deleting a passkey or disabling two-factor authentication.
                 </dd>
               </div>
             </dl>

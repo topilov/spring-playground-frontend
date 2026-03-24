@@ -23,7 +23,8 @@ import {
 import {
   mapLoginResponse,
   type LoginCredentials,
-  type SessionUser,
+  type LoginResponseDto,
+  type LoginResult,
   toLoginRequest,
 } from '../../entities/session/model';
 import { request } from '../../shared/api/apiClient';
@@ -72,8 +73,8 @@ export function resendVerificationEmail(
   ).then(mapResendVerificationEmailResponse);
 }
 
-export function login(payload: LoginCredentials): Promise<SessionUser> {
-  return request<SessionUser>('/api/auth/login', {
+export function login(payload: LoginCredentials): Promise<LoginResult> {
+  return request<LoginResponseDto>('/api/auth/login', {
     method: 'POST',
     body: toLoginRequest(payload),
   }).then(mapLoginResponse);

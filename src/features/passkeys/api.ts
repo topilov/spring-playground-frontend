@@ -24,7 +24,7 @@ import {
   type StartPasskeyLoginInput,
   type StartPasskeyRegistrationInput,
 } from '../../entities/passkey/model';
-import type { LoginResponseDto, SessionUser } from '../../entities/session/model';
+import type { LoginSuccessResponseDto, SessionUser } from '../../entities/session/model';
 
 export function listPasskeys(): Promise<Passkey[]> {
   return request<PasskeysResponseDto>('/api/auth/passkeys').then(mapPasskeysResponse);
@@ -82,7 +82,7 @@ export function startPasskeyLogin(
 export function finishPasskeyLogin(
   payload: FinishPasskeyLoginInput
 ): Promise<SessionUser> {
-  return request<LoginResponseDto>('/api/auth/passkey-login/verify', {
+  return request<LoginSuccessResponseDto>('/api/auth/passkey-login/verify', {
     method: 'POST',
     body: toPasskeyLoginVerifyRequest(payload),
   }).then(mapPasskeyLoginVerifyResponse);

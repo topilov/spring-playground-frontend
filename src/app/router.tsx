@@ -3,6 +3,7 @@ import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 import { ForgotPasswordPage } from '../pages/forgot-password/ForgotPasswordPage';
 import { HomePage } from '../pages/home/HomePage';
 import { LoginPage } from '../pages/login/LoginPage';
+import { TwoFactorLoginPage } from '../pages/login/TwoFactorLoginPage';
 import { NotFoundPage } from '../pages/not-found/NotFoundPage';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import { RegisterPage } from '../pages/register/RegisterPage';
@@ -33,6 +34,10 @@ export const routes: RouteObject[] = [
           {
             path: routePaths.login.slice(1),
             element: <LoginPage />,
+          },
+          {
+            path: routePaths.loginTwoFactor.slice(1),
+            element: <TwoFactorLoginPage />,
           },
           {
             path: routePaths.register.slice(1),
