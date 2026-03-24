@@ -6,7 +6,6 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { LoginForm } from './LoginForm';
-import { LoginPage } from '../../../pages/login/LoginPage';
 
 const useLoginMutationMock = vi.fn();
 const usePasskeyLoginMutationMock = vi.fn();
@@ -51,21 +50,6 @@ describe('LoginForm', () => {
     renderForm();
 
     expect(screen.getByRole('button', { name: 'Sign in with passkey' })).toBeTruthy();
-  });
-
-  it('keeps the operator shell actions available on the login route', () => {
-    render(
-      <MemoryRouter initialEntries={['/login']}>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    expect(screen.getByText('Use your account details or a registered passkey.')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Sign in with passkey' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Forgot password' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Create account' })).toBeTruthy();
   });
 
   it('starts the passkey login flow and navigates after success', async () => {

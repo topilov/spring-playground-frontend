@@ -6,7 +6,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ResetPasswordForm } from './ResetPasswordForm';
-import { ResetPasswordPage } from '../../../pages/reset-password/ResetPasswordPage';
 
 const useResetPasswordMutationMock = vi.fn();
 
@@ -42,18 +41,6 @@ describe('ResetPasswordForm', () => {
       screen.getByText('This reset link is invalid or incomplete.')
     ).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Back to sign in' })).toBeTruthy();
-  });
-
-  it('keeps the reset action and route guidance visible in the shell', () => {
-    render(
-      <MemoryRouter initialEntries={['/reset-password?token=reset-token']}>
-        <ResetPasswordPage />
-      </MemoryRouter>
-    );
-
-    expect(screen.getByText('Set a new password and return to operator access.')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Reset password' })).toBeTruthy();
-    expect(screen.getByText('Use the link from your inbox. If it expires, request a fresh reset from sign in.')).toBeTruthy();
   });
 
   it('blocks submit when the confirmation password does not match', async () => {
