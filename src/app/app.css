@@ -96,20 +96,15 @@ input {
 .app-shell {
   min-height: 100vh;
   padding: var(--space-4);
-  animation: shell-reveal 320ms var(--motion-ease);
+  animation: shell-reveal 240ms var(--motion-ease);
 }
 
 .app-header,
-.app-main,
+.app-main > *,
 .auth-card,
 .page-header,
-.page-card,
-.workspace-band,
-.passkey-card,
-.passkey-entry,
-.passkey-empty-state,
 .section-tabs {
-  animation: shell-reveal 420ms var(--motion-ease);
+  animation: shell-reveal 300ms var(--motion-ease);
 }
 
 .app-header {
@@ -372,6 +367,15 @@ input {
 
 .page-header-copy {
   gap: 0.45rem;
+}
+
+.page-header-aside {
+  justify-items: end;
+  min-width: min(100%, 22rem);
+}
+
+.page-header-status {
+  width: min(100%, 22rem);
 }
 
 .auth-intro h1,
@@ -761,7 +765,8 @@ input {
 
   .header-actions,
   .inline-actions,
-  .page-header-actions {
+  .page-header-actions,
+  .page-header-aside {
     justify-content: flex-start;
   }
 
@@ -785,7 +790,8 @@ input {
   }
 
   .auth-utility,
-  .page-header-actions {
+  .page-header-actions,
+  .page-header-aside {
     justify-content: flex-start;
   }
 
@@ -807,7 +813,9 @@ input {
   .header-actions,
   .inline-actions,
   .auth-links,
-  .page-header-actions {
+  .page-header-actions,
+  .page-header-aside,
+  .page-header-status {
     width: 100%;
   }
 

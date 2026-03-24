@@ -33,7 +33,11 @@ export function AuthPageShell({
               {subtitle ? <p id={subtitleId}>{subtitle}</p> : null}
             </div>
 
-            {utility ? <div className="auth-utility">{utility}</div> : null}
+            {utility ? (
+              <div aria-live="polite" className="auth-utility">
+                {utility}
+              </div>
+            ) : null}
           </section>
           {hasContent ? (
             <section aria-label="Authentication content" className="auth-content stack">

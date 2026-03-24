@@ -9,6 +9,11 @@ export function SecuritySettingsPage() {
       <PageHeader
         description="Manage sign-in methods and account access posture."
         eyebrow="Settings"
+        status={
+          <p className="status-banner" role="status">
+            Passkey changes apply to the current operator account immediately.
+          </p>
+        }
         title="Security"
       />
 

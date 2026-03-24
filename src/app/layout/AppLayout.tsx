@@ -30,7 +30,7 @@ export function AppLayout() {
 
   const sessionContext =
     status === 'loading'
-      ? 'Checking session'
+      ? 'Checking operator session'
       : isAuthenticated && profile
         ? `Signed in as ${profile.displayName}`
         : null;

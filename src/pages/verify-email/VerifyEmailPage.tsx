@@ -26,10 +26,10 @@ function getShellSubtitle(
   }
 
   if (hasToken) {
-    return 'Complete the verification check and recover access if needed.';
+    return 'Finish the link check, then recover operator access if needed.';
   }
 
-  return 'Use the original verification link or send another one to continue.';
+  return 'Use the original verification link or dispatch another one from here.';
 }
 
 export function VerifyEmailPage() {
@@ -108,12 +108,14 @@ export function VerifyEmailPage() {
       utility={
         <div className="stack">
           {verificationStatus === 'verifying' ? (
-            <p className="status-banner">Checking your verification link...</p>
+            <p className="status-banner" role="status">
+              Checking your verification link...
+            </p>
           ) : null}
 
           {verificationStatus === 'verified' ? (
-            <p className="status-banner status-success">
-              Email verified. You can sign in now.
+            <p className="status-banner status-success" role="status">
+              Email verified. Operator access is ready for sign-in.
             </p>
           ) : null}
 
@@ -123,14 +125,16 @@ export function VerifyEmailPage() {
             </p>
           ) : null}
 
-          {verificationStatus === 'idle' ? (
-            <p className="status-banner">
+          {verificationStatus === 'idle' && !resendMessage && !form.formState.errors.root ? (
+            <p className="status-banner" role="status">
               Open the email link, or request a new one below.
             </p>
           ) : null}
 
           {resendMessage ? (
-            <p className="status-banner status-success">{resendMessage}</p>
+            <p className="status-banner status-success" role="status">
+              {resendMessage}
+            </p>
           ) : null}
 
           {form.formState.errors.root ? (
@@ -142,9 +146,7 @@ export function VerifyEmailPage() {
       }
       title="Verify email"
     >
-      <p className="status-banner">
-        Need another link? Send it to the email address below.
-      </p>
+      <p className="page-description">Need another link? Send it to the address below.</p>
 
       <form className="stack" onSubmit={handleResend}>
         <label className="field">

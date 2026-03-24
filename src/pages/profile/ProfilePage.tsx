@@ -30,7 +30,12 @@ export function ProfilePage() {
   if (status === 'loading') {
     return (
       <AuthPageShell
-        subtitle="Loading your account details."
+        subtitle="Load the current operator profile before editing account details."
+        utility={
+          <p className="status-banner" role="status">
+            Pulling the latest account record from the active session.
+          </p>
+        }
         title="Profile"
       />
     );
@@ -39,7 +44,12 @@ export function ProfilePage() {
   if (status === 'anonymous') {
     return (
       <AuthPageShell
-        subtitle="Sign in to view your profile."
+        subtitle="Protected account details stay behind operator sign-in."
+        utility={
+          <p className="status-banner" role="status">
+            Return to sign in, then reopen the profile workspace from the active session.
+          </p>
+        }
         title="Profile"
       >
         <AppLink className="button button-primary button-full" to={routePaths.login}>
@@ -52,12 +62,14 @@ export function ProfilePage() {
   if (status === 'error' || !profile) {
     return (
       <AuthPageShell
-        subtitle="We could not load your account details."
+        subtitle="The operator record is unavailable right now."
+        utility={
+          <p className="status-banner status-error" role="alert">
+            {refreshError || errorMessage || 'We could not load your profile.'}
+          </p>
+        }
         title="Profile"
       >
-        <p className="status-banner status-error" role="alert">
-          {refreshError || errorMessage || 'We could not load your profile.'}
-        </p>
         <button
           className="button button-secondary button-full"
           disabled={isRefreshing}
@@ -90,14 +102,19 @@ export function ProfilePage() {
         }
         description={profile.displayName}
         eyebrow="Account"
+        status={
+          refreshError ? (
+            <p className="status-banner status-error" role="alert">
+              {refreshError}
+            </p>
+          ) : (
+            <p className="status-banner" role="status">
+              Session-backed operator details refresh on demand.
+            </p>
+          )
+        }
         title="Profile"
       />
-
-      {refreshError ? (
-        <p className="status-banner status-error" role="alert">
-          {refreshError}
-        </p>
-      ) : null}
 
       <div className="workspace-shell workspace-shell-split">
         <section className="workspace-band workspace-band-primary stack">

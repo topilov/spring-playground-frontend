@@ -70,7 +70,12 @@ describe('ProfilePage', () => {
     renderProfilePage();
 
     expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
-    expect(screen.getByText('Loading your account details.')).toBeTruthy();
+    expect(
+      screen.getByText('Load the current operator profile before editing account details.')
+    ).toBeTruthy();
+    expect(
+      screen.getByText('Pulling the latest account record from the active session.')
+    ).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Refresh' })).toBeNull();
   });
 
@@ -115,7 +120,14 @@ describe('ProfilePage', () => {
 
     renderProfilePage();
 
-    expect(screen.getByText('Sign in to view your profile.')).toBeTruthy();
+    expect(
+      screen.getByText('Protected account details stay behind operator sign-in.')
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Return to sign in, then reopen the profile workspace from the active session.'
+      )
+    ).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Sign in' }).getAttribute('href')).toBe('/login');
     expect(screen.queryByRole('button', { name: 'Refresh' })).toBeNull();
   });

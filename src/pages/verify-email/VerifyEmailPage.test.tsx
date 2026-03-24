@@ -49,7 +49,9 @@ describe('VerifyEmailPage', () => {
     renderPage('/verify-email?token=verify-token');
 
     expect(screen.getByText('Checking your verification link...')).toBeTruthy();
-    expect(screen.getByText('Complete the verification check and recover access if needed.')).toBeTruthy();
+    expect(
+      screen.getByText('Finish the link check, then recover operator access if needed.')
+    ).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Resend verification email' })).toBeTruthy();
   });
 
@@ -58,7 +60,9 @@ describe('VerifyEmailPage', () => {
 
     renderPage('/verify-email?token=verify-token');
 
-    expect(await screen.findByText('Email verified. You can sign in now.')).toBeTruthy();
+    expect(
+      await screen.findByText('Email verified. Operator access is ready for sign-in.')
+    ).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeTruthy();
   });
 
@@ -77,7 +81,9 @@ describe('VerifyEmailPage', () => {
     renderPage('/verify-email');
 
     expect(screen.getByText('Open the email link, or request a new one below.')).toBeTruthy();
-    expect(screen.getByText('Use the original verification link or send another one to continue.')).toBeTruthy();
+    expect(
+      screen.getByText('Use the original verification link or dispatch another one from here.')
+    ).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Resend verification email' })).toBeTruthy();
   });
 
@@ -101,6 +107,9 @@ describe('VerifyEmailPage', () => {
     expect(
       await screen.findByText('If that email is still unverified, a new link has been sent.')
     ).toBeTruthy();
+    expect(
+      screen.queryByText('Open the email link, or request a new one below.')
+    ).toBeNull();
   });
 
   it('shows a resend error message in the shared shell status area', async () => {
