@@ -28,6 +28,13 @@ export function AppLayout() {
     }
   };
 
+  const sessionContext =
+    status === 'loading'
+      ? 'Checking operator session'
+      : isAuthenticated && profile
+        ? `Signed in as ${profile.displayName}`
+        : null;
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -38,26 +45,59 @@ export function AppLayout() {
           <span className="brand-name">Spring Playground</span>
         </AppLink>
 
-        <nav aria-label="Primary" className="header-actions">
-          {status === 'loading' ? (
-            <span className="header-meta">Checking session</span>
-          ) : null}
+        {sessionContext ? (
+          <p
+            aria-label="Session context"
+            className="header-meta"
+            role="status"
+            title={sessionContext}
+          >
+            {sessionContext}
+          </p>
+        ) : (
+          <div className="header-meta-spacer" aria-hidden="true" />
+        )}
 
-          {isAuthenticated ? (
-            <>
-              <span className="header-meta">{profile?.username ?? 'Account'}</span>
+        <div className="header-actions">
+          <nav aria-label="Primary" className="inline-actions">
+            {isAuthenticated ? (
+              <>
+                <NavLink
+                  className={({ isActive }) => getHeaderLinkClassName(isActive)}
+                  to={routePaths.profile}
+                >
+                  Profile
+                </NavLink>
+                <NavLink
+                  className={({ isActive }) => getHeaderLinkClassName(isActive)}
+                  to={routePaths.settingsSecurity}
+                >
+                  Settings
+                </NavLink>
+              </>
+            ) : null}
+
+            {!isAuthenticated && status !== 'loading' ? (
               <NavLink
                 className={({ isActive }) => getHeaderLinkClassName(isActive)}
-                to={routePaths.profile}
+                to={routePaths.login}
               >
-                Profile
+                Sign in
               </NavLink>
+            ) : null}
+          </nav>
+
+          <nav aria-label="Utility" className="inline-actions">
+            {!isAuthenticated && status !== 'loading' ? (
               <NavLink
                 className={({ isActive }) => getHeaderLinkClassName(isActive)}
-                to={routePaths.settingsSecurity}
+                to={routePaths.register}
               >
-                Settings
+                Create account
               </NavLink>
+            ) : null}
+
+            {isAuthenticated ? (
               <button
                 className="button button-secondary"
                 disabled={logoutMutation.isPending}
@@ -66,18 +106,9 @@ export function AppLayout() {
               >
                 {logoutMutation.isPending ? 'Signing out...' : 'Sign out'}
               </button>
-            </>
-          ) : null}
-
-          {!isAuthenticated && status !== 'loading' ? (
-            <NavLink
-              className={({ isActive }) => getHeaderLinkClassName(isActive)}
-              to={routePaths.login}
-            >
-              Sign in
-            </NavLink>
-          ) : null}
-        </nav>
+            ) : null}
+          </nav>
+        </div>
       </header>
 
       <main className="app-main">

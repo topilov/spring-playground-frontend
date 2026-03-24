@@ -9,14 +9,19 @@ export function LoginPage() {
       footer={
         <div className="auth-links">
           <AppLink className="text-link" to={routePaths.forgotPassword}>
-            Forgot password?
+            Forgot password
           </AppLink>
           <AppLink className="text-link" to={routePaths.register}>
             Create account
           </AppLink>
         </div>
       }
-      subtitle="Use your account details or a passkey."
+      subtitle="Use your account details or a registered passkey."
+      utility={
+        <p className="status-banner">
+          Password sign-in and passkey sign-in use the same operator account.
+        </p>
+      }
       title="Sign in"
     >
       <LoginForm />

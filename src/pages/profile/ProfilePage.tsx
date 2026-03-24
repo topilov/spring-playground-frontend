@@ -30,7 +30,12 @@ export function ProfilePage() {
   if (status === 'loading') {
     return (
       <AuthPageShell
-        subtitle="Loading your account details."
+        subtitle="Load the current operator profile before editing account details."
+        utility={
+          <p className="status-banner" role="status">
+            Pulling the latest account record from the active session.
+          </p>
+        }
         title="Profile"
       />
     );
@@ -39,7 +44,12 @@ export function ProfilePage() {
   if (status === 'anonymous') {
     return (
       <AuthPageShell
-        subtitle="Sign in to view your profile."
+        subtitle="Protected account details stay behind operator sign-in."
+        utility={
+          <p className="status-banner" role="status">
+            Return to sign in, then reopen the profile workspace from the active session.
+          </p>
+        }
         title="Profile"
       >
         <AppLink className="button button-primary button-full" to={routePaths.login}>
@@ -52,12 +62,14 @@ export function ProfilePage() {
   if (status === 'error' || !profile) {
     return (
       <AuthPageShell
-        subtitle="We could not load your account details."
+        subtitle="The operator record is unavailable right now."
+        utility={
+          <p className="status-banner status-error" role="alert">
+            {refreshError || errorMessage || 'We could not load your profile.'}
+          </p>
+        }
         title="Profile"
       >
-        <p className="status-banner status-error" role="alert">
-          {refreshError || errorMessage || 'We could not load your profile.'}
-        </p>
         <button
           className="button button-secondary button-full"
           disabled={isRefreshing}
@@ -90,60 +102,80 @@ export function ProfilePage() {
         }
         description={profile.displayName}
         eyebrow="Account"
+        status={
+          refreshError ? (
+            <p className="status-banner status-error" role="alert">
+              {refreshError}
+            </p>
+          ) : (
+            <p className="status-banner" role="status">
+              Session-backed operator details refresh on demand.
+            </p>
+          )
+        }
         title="Profile"
       />
 
-      {refreshError ? (
-        <p className="status-banner status-error" role="alert">
-          {refreshError}
-        </p>
-      ) : null}
+      <div className="workspace-shell workspace-shell-split">
+        <section className="workspace-band workspace-band-primary stack">
+          <div className="workspace-band-header">
+            <div className="section-heading">
+              <h2>Identity</h2>
+              <p className="page-description">
+                Primary account identity and operator-facing contact details.
+              </p>
+            </div>
+            <p className="workspace-note">
+              Signed in as <strong>{profile.displayName}</strong>
+            </p>
+          </div>
 
-      <article className="page-card stack">
-        <div className="section-heading">
-          <h2>Identity</h2>
-        </div>
+          <dl className="detail-rows">
+            <div className="detail-row">
+              <dt>Display name</dt>
+              <dd>{profile.displayName}</dd>
+            </div>
+            <div className="detail-row">
+              <dt>Username</dt>
+              <dd>{profile.username}</dd>
+            </div>
+            <div className="detail-row">
+              <dt>Email</dt>
+              <dd>{profile.email}</dd>
+            </div>
+            <div className="detail-row">
+              <dt>Role</dt>
+              <dd>{profile.role}</dd>
+            </div>
+          </dl>
+        </section>
 
-        <dl className="detail-grid">
-          <div className="detail-item">
-            <dt>Display name</dt>
-            <dd>{profile.displayName}</dd>
-          </div>
-          <div className="detail-item">
-            <dt>Username</dt>
-            <dd>{profile.username}</dd>
-          </div>
-          <div className="detail-item">
-            <dt>Email</dt>
-            <dd>{profile.email}</dd>
-          </div>
-          <div className="detail-item">
-            <dt>Role</dt>
-            <dd>{profile.role}</dd>
-          </div>
-        </dl>
-      </article>
+        <aside className="workspace-column stack">
+          <section className="workspace-band stack">
+            <div className="section-heading">
+              <h2>Account records</h2>
+              <p className="page-description">
+                Stable identifiers and profile notes for support or audit follow-up.
+              </p>
+            </div>
 
-      <article className="page-card stack">
-        <div className="section-heading">
-          <h2>Details</h2>
-        </div>
-
-        <dl className="detail-grid">
-          <div className="detail-item">
-            <dt>User ID</dt>
-            <dd>{profile.userId}</dd>
-          </div>
-          <div className="detail-item">
-            <dt>Profile ID</dt>
-            <dd>{profile.id}</dd>
-          </div>
-          <div className="detail-item detail-item-wide">
-            <dt>Bio</dt>
-            <dd>{profile.bio || 'No bio added.'}</dd>
-          </div>
-        </dl>
-      </article>
+            <dl className="detail-rows">
+              <div className="detail-row">
+                <dt>User ID</dt>
+                <dd>{profile.userId}</dd>
+              </div>
+              <div className="detail-row">
+                <dt>Profile ID</dt>
+                <dd>{profile.id}</dd>
+              </div>
+              <div className="detail-row detail-row-wide">
+                <dt>Bio</dt>
+                <dd>{profile.bio || 'No bio added.'}</dd>
+              </div>
+            </dl>
+          </section>
+        </aside>
+      </div>
     </section>
   );
 }

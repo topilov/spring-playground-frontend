@@ -9,7 +9,13 @@ export function ResetPasswordPage() {
 
   return (
     <AuthPageShell
-      subtitle="Set a new password for your account."
+      subtitle="Set a new password and return to operator access."
+      utility={
+        <p className="status-banner">
+          Use the link from your inbox. If it expires, request a fresh reset from
+          sign in.
+        </p>
+      }
       title="Reset password"
     >
       <ResetPasswordForm token={token} />

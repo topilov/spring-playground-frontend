@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import * as authSessionModule from '../features/auth/session/useAuthSession';
 import { routes } from './router';
+import { AuthPageShell } from '../shared/ui/AuthPageShell';
 
 function renderRoute(initialEntry: string) {
   const queryClient = new QueryClient({
@@ -30,6 +31,12 @@ function renderRoute(initialEntry: string) {
   return { router };
 }
 
+function getRoleNames(container: HTMLElement, role: 'link' | 'button') {
+  return within(container)
+    .queryAllByRole(role)
+    .map((element) => element.textContent ?? '');
+}
+
 describe('app routes', () => {
   afterEach(() => {
     cleanup();
@@ -51,7 +58,12 @@ describe('app routes', () => {
       expect(router.state.location.pathname).toBe('/login');
     });
 
-    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    const authIntro = screen.getByRole('region', { name: 'Sign in' });
+
+    expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    expect(
+      within(authIntro).getByText('Use your account details or a registered passkey.')
+    ).toBeTruthy();
   });
 
   it('redirects authenticated visitors from the root route to profile', async () => {
@@ -78,6 +90,40 @@ describe('app routes', () => {
     });
 
     expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
+    expect(screen.getByRole('status', { name: 'Session context' }).textContent).toContain(
+      'Demo User'
+    );
+  });
+
+  it('preserves long session context labels without dropping the full name', async () => {
+    const longDisplayName =
+      'Operator Display Name For The Signal Room Session Context Header Pill';
+
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: longDisplayName,
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/profile');
+    });
+
+    expect(screen.getByRole('status', { name: 'Session context' }).getAttribute('title')).toBe(
+      `Signed in as ${longDisplayName}`
+    );
   });
 
   it('redirects anonymous visitors from the protected profile route to login', async () => {
@@ -136,10 +182,73 @@ describe('app routes', () => {
     renderRoute('/register');
 
     const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
+    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
 
-    expect(within(primaryNav).getByRole('link', { name: 'Sign in' })).toBeTruthy();
-    expect(within(primaryNav).queryByRole('link', { name: 'Home' })).toBeNull();
-    expect(within(primaryNav).queryByRole('link', { name: 'Register' })).toBeNull();
+    expect(getRoleNames(primaryNav, 'link')).toEqual(['Sign in']);
+    expect(getRoleNames(primaryNav, 'button')).toEqual([]);
+    expect(getRoleNames(utilityNav, 'link')).toEqual(['Create account']);
+    expect(getRoleNames(utilityNav, 'button')).toEqual([]);
+  });
+
+  it('shows an authenticated header with account actions and a utility sign out action', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/profile');
+
+    const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
+    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
+
+    expect(getRoleNames(primaryNav, 'link')).toEqual(['Profile', 'Settings']);
+    expect(getRoleNames(primaryNav, 'button')).toEqual([]);
+    expect(getRoleNames(utilityNav, 'link')).toEqual([]);
+    expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
+  });
+
+  it('renders the auth shell utility slot without disturbing content or footer composition', () => {
+    render(
+      <AuthPageShell
+        footer={<a href="/help">Need help?</a>}
+        subtitle="Use the utility action for secondary help."
+        title="Sign in"
+        utility={<button type="button">Use passkey</button>}
+      >
+        <p>Primary content</p>
+      </AuthPageShell>
+    );
+
+    const authIntro = screen.getByRole('region', { name: 'Sign in' });
+    const authContent = screen.getByRole('region', { name: 'Authentication content' });
+
+    expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    expect(within(authIntro).getByText('Use the utility action for secondary help.')).toBeTruthy();
+    expect(authIntro.parentElement).toBe(authContent.parentElement);
+    expect(screen.getByRole('button', { name: 'Use passkey' })).toBeTruthy();
+    expect(within(authContent).getByText('Primary content')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();
+  });
+
+  it('collapses the auth shell cleanly when no primary content is present', () => {
+    render(<AuthPageShell subtitle="Loading your account details." title="Profile" />);
+
+    const authIntro = screen.getByRole('region', { name: 'Profile' });
+
+    expect(within(authIntro).getByText('Loading your account details.')).toBeTruthy();
+    expect(screen.queryByRole('region', { name: 'Authentication content' })).toBeNull();
+    expect(authIntro.parentElement?.className).toContain('auth-layout-solo');
   });
 
   it('renders the reset-password route for anonymous visitors', async () => {

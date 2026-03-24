@@ -17,6 +17,21 @@ import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 const resendSuccessMessage =
   'If that email is still unverified, a new link has been sent.';
 
+function getShellSubtitle(
+  verificationStatus: 'idle' | 'verifying' | 'verified' | 'failed',
+  hasToken: boolean
+) {
+  if (verificationStatus === 'verified') {
+    return 'Verification complete. Return to operator access when ready.';
+  }
+
+  if (hasToken) {
+    return 'Finish the link check, then recover operator access if needed.';
+  }
+
+  return 'Use the original verification link or dispatch another one from here.';
+}
+
 export function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const [token] = useState(() => searchParams.get('token')?.trim() ?? '');
@@ -89,30 +104,49 @@ export function VerifyEmailPage() {
           </AppLink>
         </div>
       }
-      subtitle={
-        token ? 'Finish setting up your account.' : 'Open your link or request a new one.'
+      subtitle={getShellSubtitle(verificationStatus, Boolean(token))}
+      utility={
+        <div className="stack">
+          {verificationStatus === 'verifying' ? (
+            <p className="status-banner" role="status">
+              Checking your verification link...
+            </p>
+          ) : null}
+
+          {verificationStatus === 'verified' ? (
+            <p className="status-banner status-success" role="status">
+              Email verified. Operator access is ready for sign-in.
+            </p>
+          ) : null}
+
+          {verificationStatus === 'failed' ? (
+            <p className="status-banner status-error" role="alert">
+              {verificationError}
+            </p>
+          ) : null}
+
+          {verificationStatus === 'idle' && !resendMessage && !form.formState.errors.root ? (
+            <p className="status-banner" role="status">
+              Open the email link, or request a new one below.
+            </p>
+          ) : null}
+
+          {resendMessage ? (
+            <p className="status-banner status-success" role="status">
+              {resendMessage}
+            </p>
+          ) : null}
+
+          {form.formState.errors.root ? (
+            <p className="status-banner status-error" role="alert">
+              {form.formState.errors.root.message}
+            </p>
+          ) : null}
+        </div>
       }
       title="Verify email"
     >
-      {verificationStatus === 'verifying' ? (
-        <p className="status-banner">Checking your verification link...</p>
-      ) : null}
-
-      {verificationStatus === 'verified' ? (
-        <p className="status-banner status-success">
-          Email verified. You can sign in now.
-        </p>
-      ) : null}
-
-      {verificationStatus === 'failed' ? (
-        <p className="status-banner status-error" role="alert">
-          {verificationError}
-        </p>
-      ) : null}
-
-      {verificationStatus === 'idle' ? (
-        <p className="status-banner">Open the email link, or request a new one below.</p>
-      ) : null}
+      <p className="page-description">Need another link? Send it to the address below.</p>
 
       <form className="stack" onSubmit={handleResend}>
         <label className="field">
@@ -142,16 +176,7 @@ export function VerifyEmailPage() {
             : 'Resend verification email'}
         </button>
 
-        {form.formState.errors.root ? (
-          <p className="status-banner status-error" role="alert">
-            {form.formState.errors.root.message}
-          </p>
-        ) : null}
       </form>
-
-      {resendMessage ? (
-        <p className="status-banner status-success">{resendMessage}</p>
-      ) : null}
     </AuthPageShell>
   );
 }

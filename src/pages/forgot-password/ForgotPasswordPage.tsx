@@ -13,7 +13,13 @@ export function ForgotPasswordPage() {
           </AppLink>
         </div>
       }
-      subtitle="Enter your email to receive a reset link."
+      subtitle="Request a fresh password reset link for an existing account."
+      utility={
+        <p className="status-banner">
+          Enter the account email exactly as registered. If the inbox stays quiet,
+          check spam before sending another request.
+        </p>
+      }
       title="Reset password"
     >
       <ForgotPasswordForm />

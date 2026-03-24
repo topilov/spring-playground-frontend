@@ -94,11 +94,17 @@ export function PasskeySection() {
   };
 
   return (
-    <section className="stack">
-      <div className="section-heading">
-        <h2>Passkeys</h2>
-        <p className="page-description">
-          Use passkeys for faster sign-in on trusted devices.
+    <section className="passkey-panel stack">
+      <div className="workspace-band-header">
+        <div className="section-heading">
+          <h2>Passkeys</h2>
+          <p className="page-description">
+            Use passkeys for faster sign-in on trusted devices.
+          </p>
+        </div>
+        <p className="workspace-note">
+          Add a device, keep the label readable, and retire old credentials when they are no
+          longer nearby.
         </p>
       </div>
 
@@ -129,7 +135,9 @@ export function PasskeySection() {
       ) : null}
 
       {passkeysQuery.isLoading ? (
-        <p className="page-description">Loading passkeys...</p>
+        <div className="passkey-status">
+          <p className="page-description">Loading passkeys...</p>
+        </div>
       ) : null}
 
       {passkeysQuery.isError ? (
@@ -143,7 +151,10 @@ export function PasskeySection() {
 
       {!passkeysQuery.isLoading && !passkeysQuery.isError && passkeys.length === 0 ? (
         <article className="passkey-empty-state">
-          <p className="page-description">No passkeys yet.</p>
+          <h3>No passkeys yet.</h3>
+          <p className="page-description">
+            Register a passkey to keep sign-in faster on a device you already trust.
+          </p>
         </article>
       ) : null}
 
@@ -154,7 +165,7 @@ export function PasskeySection() {
             const isDeleting = confirmDeleteId === passkey.id;
 
             return (
-              <li className="passkey-card" key={passkey.id}>
+              <li className="passkey-entry" key={passkey.id}>
                 <div className="passkey-card-header">
                   <div className="stack">
                     <h3>{passkey.name}</h3>

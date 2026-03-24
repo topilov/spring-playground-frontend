@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 
 interface AuthPageShellProps {
   children?: ReactNode;
   footer?: ReactNode;
   subtitle?: string;
+  utility?: ReactNode;
   title: string;
 }
 
@@ -11,17 +12,39 @@ export function AuthPageShell({
   children,
   footer,
   subtitle,
+  utility,
   title,
 }: AuthPageShellProps) {
+  const titleId = useId();
+  const subtitleId = useId();
+  const hasContent = Boolean(children);
+
   return (
     <section className="auth-page">
       <article className="auth-card">
-        <header className="auth-intro">
-          <h1>{title}</h1>
-          {subtitle ? <p>{subtitle}</p> : null}
-        </header>
+        <div className={hasContent ? 'auth-layout' : 'auth-layout auth-layout-solo'}>
+          <section
+            aria-describedby={subtitle ? subtitleId : undefined}
+            aria-labelledby={titleId}
+            className="auth-intro"
+          >
+            <div className="auth-intro-copy">
+              <h1 id={titleId}>{title}</h1>
+              {subtitle ? <p id={subtitleId}>{subtitle}</p> : null}
+            </div>
 
-        {children ? <div className="stack">{children}</div> : null}
+            {utility ? (
+              <div aria-live="polite" className="auth-utility">
+                {utility}
+              </div>
+            ) : null}
+          </section>
+          {hasContent ? (
+            <section aria-label="Authentication content" className="auth-content stack">
+              {children}
+            </section>
+          ) : null}
+        </div>
 
         {footer ? <footer className="auth-footer">{footer}</footer> : null}
       </article>
