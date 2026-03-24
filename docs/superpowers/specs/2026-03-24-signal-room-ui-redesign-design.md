@@ -62,6 +62,12 @@ The shared shell becomes the main product anchor:
 
 The shell should feel embedded into the surface, not like a separate toolbar placed on top of the page.
 
+For action clarity:
+
+- on anonymous routes, the right-side utility action should be a route-appropriate account transition such as `Create account` or `Back to sign in`
+- on authenticated routes, the right-side utility action should remain account-oriented, with `Sign out` as the default
+- route switching should stay in the minimal navigation group rather than competing with the utility action
+
 ### Anonymous Routes
 
 Anonymous routes use the same environment as the signed-in app.
@@ -196,7 +202,7 @@ Key rules:
 Implementation should be verified with:
 
 - existing test suite for routing, auth, and passkey behavior
-- a targeted responsive manual pass across login, register, profile, and security
+- a targeted responsive manual pass across login, register, profile, and security at mobile (~390px), tablet (~768px), and desktop (~1280px) widths
 - a visual check that anonymous and authenticated routes now feel like one system
 
 No implementation should claim completion without confirming the UI still respects current route and auth behavior.
