@@ -13,7 +13,13 @@ export function RegisterPage() {
           </AppLink>
         </div>
       }
-      subtitle="Create a new account."
+      subtitle="Create an operator account and verify it before first access."
+      utility={
+        <p className="status-banner">
+          Use an address you can verify now. Sign-in remains locked until email
+          verification completes.
+        </p>
+      }
       title="Create account"
     >
       <RegisterForm />
