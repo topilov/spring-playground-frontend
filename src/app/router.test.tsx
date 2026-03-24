@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import * as authSessionModule from '../features/auth/session/useAuthSession';
 import { routes } from './router';
+import { AuthPageShell } from '../shared/ui/AuthPageShell';
 
 function renderRoute(initialEntry: string) {
   const queryClient = new QueryClient({
@@ -28,6 +29,12 @@ function renderRoute(initialEntry: string) {
   );
 
   return { router };
+}
+
+function getRoleNames(container: HTMLElement, role: 'link' | 'button') {
+  return within(container)
+    .queryAllByRole(role)
+    .map((element) => element.textContent ?? '');
 }
 
 describe('app routes', () => {
@@ -138,10 +145,10 @@ describe('app routes', () => {
     const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
     const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
 
-    expect(within(primaryNav).getByRole('link', { name: 'Sign in' })).toBeTruthy();
-    expect(within(utilityNav).getByRole('link', { name: 'Create account' })).toBeTruthy();
-    expect(within(primaryNav).queryByRole('link', { name: 'Profile' })).toBeNull();
-    expect(within(utilityNav).queryByRole('button', { name: 'Sign out' })).toBeNull();
+    expect(getRoleNames(primaryNav, 'link')).toEqual(['Sign in']);
+    expect(getRoleNames(primaryNav, 'button')).toEqual([]);
+    expect(getRoleNames(utilityNav, 'link')).toEqual(['Create account']);
+    expect(getRoleNames(utilityNav, 'button')).toEqual([]);
   });
 
   it('shows an authenticated header with account actions and a utility sign out action', async () => {
@@ -166,9 +173,28 @@ describe('app routes', () => {
     const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
     const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
 
-    expect(within(primaryNav).getByRole('link', { name: 'Profile' })).toBeTruthy();
-    expect(within(primaryNav).queryByRole('link', { name: 'Sign in' })).toBeNull();
-    expect(within(utilityNav).getByRole('button', { name: 'Sign out' })).toBeTruthy();
+    expect(getRoleNames(primaryNav, 'link')).toEqual(['Profile', 'Settings']);
+    expect(getRoleNames(primaryNav, 'button')).toEqual([]);
+    expect(getRoleNames(utilityNav, 'link')).toEqual([]);
+    expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
+  });
+
+  it('renders the auth shell utility slot without disturbing content or footer composition', () => {
+    render(
+      <AuthPageShell
+        footer={<a href="/help">Need help?</a>}
+        subtitle="Use the utility action for secondary help."
+        title="Sign in"
+        utility={<button type="button">Use passkey</button>}
+      >
+        <p>Primary content</p>
+      </AuthPageShell>
+    );
+
+    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Use passkey' })).toBeTruthy();
+    expect(screen.getByText('Primary content')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();
   });
 
   it('renders the reset-password route for anonymous visitors', async () => {
