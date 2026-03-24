@@ -61,7 +61,9 @@ describe('app routes', () => {
     const authIntro = screen.getByRole('region', { name: 'Sign in' });
 
     expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
-    expect(within(authIntro).getByText('Use your account details or a passkey.')).toBeTruthy();
+    expect(
+      within(authIntro).getByText('Use your account details or a registered passkey.')
+    ).toBeTruthy();
   });
 
   it('redirects authenticated visitors from the root route to profile', async () => {
