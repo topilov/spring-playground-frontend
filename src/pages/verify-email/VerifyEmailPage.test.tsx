@@ -102,4 +102,26 @@ describe('VerifyEmailPage', () => {
       await screen.findByText('If that email is still unverified, a new link has been sent.')
     ).toBeTruthy();
   });
+
+  it('shows a resend error message in the shared shell status area', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi.fn().mockRejectedValue(new Error('Mailbox unavailable.'));
+
+    useResendVerificationEmailMutationMock.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    });
+
+    renderPage('/verify-email?email=demo@example.com');
+
+    await user.click(screen.getByRole('button', { name: 'Resend verification email' }));
+
+    await waitFor(() => {
+      expect(mutateAsync).toHaveBeenCalledWith({ email: 'demo@example.com' });
+    });
+
+    const alert = await screen.findByRole('alert');
+    expect(alert.textContent).toContain('Mailbox unavailable.');
+    expect(alert.closest('form')).toBeNull();
+  });
 });

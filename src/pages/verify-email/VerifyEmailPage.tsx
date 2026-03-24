@@ -132,6 +132,12 @@ export function VerifyEmailPage() {
           {resendMessage ? (
             <p className="status-banner status-success">{resendMessage}</p>
           ) : null}
+
+          {form.formState.errors.root ? (
+            <p className="status-banner status-error" role="alert">
+              {form.formState.errors.root.message}
+            </p>
+          ) : null}
         </div>
       }
       title="Verify email"
@@ -168,11 +174,6 @@ export function VerifyEmailPage() {
             : 'Resend verification email'}
         </button>
 
-        {form.formState.errors.root ? (
-          <p className="status-banner status-error" role="alert">
-            {form.formState.errors.root.message}
-          </p>
-        ) : null}
       </form>
     </AuthPageShell>
   );
