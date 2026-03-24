@@ -2,6 +2,9 @@ import { useRef, useState, type MutableRefObject } from 'react';
 
 import type { TurnstileRuntime, TurnstileWidgetId } from './TurnstileScript';
 
+export const TURNSTILE_INCOMPLETE_MESSAGE =
+  'Complete the verification step and try again.';
+
 interface PendingTokenRequest {
   promise: Promise<string>;
   reject: (error: unknown) => void;
@@ -55,30 +58,7 @@ export function useTurnstileController(): TurnstileController {
           throw new Error('Turnstile is not ready.');
         }
 
-        if (pendingTokenRequestRef.current) {
-          return pendingTokenRequestRef.current.promise;
-        }
-
-        let resolveToken!: (token: string) => void;
-        let rejectToken!: (error: unknown) => void;
-        const promise = new Promise<string>((resolve, reject) => {
-          resolveToken = resolve;
-          rejectToken = reject;
-        });
-
-        pendingTokenRequestRef.current = {
-          promise,
-          reject: rejectToken,
-          resolve: resolveToken,
-        };
-
-        try {
-          runtime.execute(widgetId);
-        } catch (error) {
-          rejectPendingTokenRequest(pendingTokenRequestRef, error);
-        }
-
-        return promise;
+        throw new Error(TURNSTILE_INCOMPLETE_MESSAGE);
       },
       reset() {
         tokenRef.current = null;

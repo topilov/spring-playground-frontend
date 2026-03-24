@@ -45,6 +45,9 @@ describe('TurnstileWidget', () => {
       expect(getByTestId('ready').textContent).toBe('true');
     });
     expect(renderMock).toHaveBeenCalledTimes(1);
+    expect(renderMock.mock.calls[0]?.[1]).toMatchObject({
+      execution: 'render',
+    });
   });
 
   it('forwards reset requests to the turnstile runtime', async () => {

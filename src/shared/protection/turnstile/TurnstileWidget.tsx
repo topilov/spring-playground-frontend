@@ -53,7 +53,7 @@ export function TurnstileWidget({
 
         widgetId = runtime.render(container, {
           sitekey: siteKey,
-          execution: 'execute',
+          execution: 'render',
           callback: (token) => controller.handleToken(token),
           'error-callback': () => controller.handleError(),
           'expired-callback': () => controller.handleExpired(),
