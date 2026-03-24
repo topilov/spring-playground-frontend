@@ -46,15 +46,6 @@ export function TwoFactorLoginPage() {
     }
   }, [challenge, navigate]);
 
-  useEffect(() => {
-    if (challenge?.methods.includes('BACKUP_CODE')) {
-      setMethod('TOTP');
-      return;
-    }
-
-    setMethod('TOTP');
-  }, [challenge]);
-
   if (!challenge) {
     return (
       <AuthPageShell
