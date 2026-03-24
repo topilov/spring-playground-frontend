@@ -8,8 +8,10 @@ import { NotFoundPage } from '../pages/not-found/NotFoundPage';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import { RegisterPage } from '../pages/register/RegisterPage';
 import { ResetPasswordPage } from '../pages/reset-password/ResetPasswordPage';
+import { AccountSettingsPage } from '../pages/settings/AccountSettingsPage';
 import { SecuritySettingsPage } from '../pages/settings/SecuritySettingsPage';
 import { VerifyEmailPage } from '../pages/verify-email/VerifyEmailPage';
+import { VerifyEmailChangePage } from '../pages/verify-email-change/VerifyEmailChangePage';
 import { routePaths } from '../shared/routing/paths';
 import { AppLayout } from './layout/AppLayout';
 import { AnonymousOnlyRoute } from './routes/AnonymousOnlyRoute';
@@ -27,6 +29,10 @@ export const routes: RouteObject[] = [
       {
         path: routePaths.verifyEmail.slice(1),
         element: <VerifyEmailPage />,
+      },
+      {
+        path: routePaths.verifyEmailChange.slice(1),
+        element: <VerifyEmailChangePage />,
       },
       {
         element: <AnonymousOnlyRoute />,
@@ -59,6 +65,10 @@ export const routes: RouteObject[] = [
           {
             path: routePaths.profile.slice(1),
             element: <ProfilePage />,
+          },
+          {
+            path: routePaths.settingsAccount.slice(1),
+            element: <AccountSettingsPage />,
           },
           {
             path: routePaths.settingsSecurity.slice(1),

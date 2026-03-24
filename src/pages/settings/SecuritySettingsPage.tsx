@@ -1,8 +1,8 @@
+import { PasswordChangeSection } from '../../features/profile/components/PasswordChangeSection';
 import { PasskeySection } from '../../features/passkeys/components/PasskeySection';
 import { TwoFactorSection } from '../../features/two-factor/components/TwoFactorSection';
-import { AppLink } from '../../shared/routing/AppLink';
-import { routePaths } from '../../shared/routing/paths';
 import { PageHeader } from '../../shared/ui/PageHeader';
+import { SettingsTabs } from './SettingsTabs';
 
 export function SecuritySettingsPage() {
   return (
@@ -18,17 +18,11 @@ export function SecuritySettingsPage() {
         title="Security"
       />
 
-      <nav aria-label="Settings sections" className="section-tabs">
-        <AppLink
-          className="section-tab section-tab-active"
-          to={routePaths.settingsSecurity}
-        >
-          Security
-        </AppLink>
-      </nav>
+      <SettingsTabs active="security" />
 
       <div className="workspace-shell workspace-shell-split">
-        <section className="workspace-band workspace-band-primary stack">
+        <section className="stack">
+          <PasswordChangeSection />
           <TwoFactorSection />
           <PasskeySection />
         </section>

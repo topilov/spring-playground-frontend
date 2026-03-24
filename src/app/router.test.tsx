@@ -218,6 +218,34 @@ describe('app routes', () => {
     expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
   });
 
+  it('renders the account settings route with account and security tabs', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/settings/account');
+
+    expect(await screen.findByRole('heading', { name: 'Account' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Account' }).getAttribute('href')).toBe(
+      '/settings/account'
+    );
+    expect(screen.getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
+      '/settings/security'
+    );
+  });
+
   it('renders the auth shell utility slot without disturbing content or footer composition', () => {
     render(
       <AuthPageShell
