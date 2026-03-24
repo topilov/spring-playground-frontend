@@ -377,7 +377,8 @@ input {
 .auth-intro h1,
 .page-header h1,
 .section-heading h2,
-.passkey-card h3 {
+.passkey-entry h3,
+.passkey-empty-state h3 {
   margin: 0;
   font-family: 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif;
   letter-spacing: -0.03em;
