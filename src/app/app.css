@@ -770,6 +770,10 @@ input {
     justify-content: flex-start;
   }
 
+  .page-header-aside {
+    justify-items: start;
+  }
+
   .auth-page {
     min-height: auto;
   }
@@ -793,6 +797,10 @@ input {
   .page-header-actions,
   .page-header-aside {
     justify-content: flex-start;
+  }
+
+  .page-header-aside {
+    justify-items: start;
   }
 
   .auth-card {
