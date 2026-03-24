@@ -30,6 +30,14 @@ function rejectPendingTokenRequest(
   pendingTokenRequestRef.current = null;
 }
 
+function readSolvedToken(
+  runtime: TurnstileRuntime,
+  widgetId: TurnstileWidgetId
+): string | null {
+  const token = runtime.getResponse?.(widgetId)?.trim();
+  return token ? token : null;
+}
+
 export function useTurnstileController(): TurnstileController {
   const [isReady, setIsReady] = useState(false);
   const isReadyRef = useRef(isReady);
@@ -47,15 +55,22 @@ export function useTurnstileController(): TurnstileController {
         return isReadyRef.current;
       },
       async acquireToken() {
-        if (tokenRef.current) {
-          return tokenRef.current;
-        }
-
         const runtime = runtimeRef.current;
         const widgetId = widgetIdRef.current;
 
         if (!runtime || !widgetId) {
           throw new Error('Turnstile is not ready.');
+        }
+
+        const solvedToken = readSolvedToken(runtime, widgetId);
+
+        if (solvedToken) {
+          tokenRef.current = solvedToken;
+          return solvedToken;
+        }
+
+        if (tokenRef.current) {
+          return tokenRef.current;
         }
 
         throw new Error(TURNSTILE_INCOMPLETE_MESSAGE);

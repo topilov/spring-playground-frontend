@@ -15,6 +15,7 @@ export interface TurnstileRenderOptions {
 export interface TurnstileRuntime {
   render(container: HTMLElement, options: TurnstileRenderOptions): TurnstileWidgetId;
   execute(widgetId: TurnstileWidgetId): void;
+  getResponse?(widgetId: TurnstileWidgetId): string;
   reset(widgetId: TurnstileWidgetId): void;
   remove?(widgetId: TurnstileWidgetId): void;
 }

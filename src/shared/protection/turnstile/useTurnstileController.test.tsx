@@ -17,6 +17,7 @@ describe('useTurnstileController', () => {
       {
         render: vi.fn(),
         execute,
+        getResponse: vi.fn().mockReturnValue(''),
         reset: vi.fn(),
       },
       'widget-id'
@@ -35,6 +36,7 @@ describe('useTurnstileController', () => {
       {
         render: vi.fn(),
         execute: vi.fn(),
+        getResponse: vi.fn().mockReturnValue(''),
         reset: vi.fn(),
       },
       'widget-id'
@@ -42,5 +44,23 @@ describe('useTurnstileController', () => {
     result.current.handleToken('captcha-token');
 
     await expect(result.current.acquireToken()).resolves.toBe('captcha-token');
+  });
+
+  it('prefers the current widget response when Turnstile already has a solved token', async () => {
+    const getResponse = vi.fn().mockReturnValue('fresh-widget-token');
+    const { result } = renderHook(() => useTurnstileController());
+
+    result.current.attach(
+      {
+        render: vi.fn(),
+        execute: vi.fn(),
+        getResponse,
+        reset: vi.fn(),
+      },
+      'widget-id'
+    );
+
+    await expect(result.current.acquireToken()).resolves.toBe('fresh-widget-token');
+    expect(getResponse).toHaveBeenCalledWith('widget-id');
   });
 });
