@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { getApiErrorMessage } from '../../../shared/api/errorMessage';
+import { ProtectedStatusBanner } from '../../../shared/protection/ProtectedStatusBanner';
+import { TurnstileWidget } from '../../../shared/protection/turnstile/TurnstileWidget';
+import { useTurnstileController } from '../../../shared/protection/turnstile/useTurnstileController';
+import { useProtectedAction } from '../../../shared/protection/useProtectedAction';
 import { useForgotPasswordMutation } from '../mutations';
 import {
   forgotPasswordFormSchema,
@@ -15,6 +19,11 @@ const genericSuccessMessage =
 export function ForgotPasswordForm() {
   const [successMessage, setSuccessMessage] = useState('');
   const forgotPasswordMutation = useForgotPasswordMutation();
+  const turnstileController = useTurnstileController();
+  const protectedAction = useProtectedAction({
+    acquireToken: () => turnstileController.acquireToken(),
+    reset: () => turnstileController.reset(),
+  });
   const form = useForm<ForgotPasswordFormValues>({
     defaultValues: {
       email: '',
@@ -25,12 +34,23 @@ export function ForgotPasswordForm() {
   const onSubmit = form.handleSubmit(async (values) => {
     form.clearErrors('root');
     setSuccessMessage('');
+    protectedAction.resetStatus();
 
     try {
-      await forgotPasswordMutation.mutateAsync(values);
+      await protectedAction.execute({
+        execute: (captchaToken) =>
+          forgotPasswordMutation.mutateAsync({
+            ...values,
+            captchaToken,
+          }),
+      });
       setSuccessMessage(genericSuccessMessage);
       form.reset();
     } catch (error) {
+      if (protectedAction.wasHandledError(error)) {
+        return;
+      }
+
       form.setError('root', {
         message: getApiErrorMessage(error, 'We could not submit your reset request.'),
       });
@@ -54,6 +74,12 @@ export function ForgotPasswordForm() {
             </span>
           ) : null}
         </label>
+
+        <TurnstileWidget controller={turnstileController} />
+        <ProtectedStatusBanner
+          errorMessage={protectedAction.errorMessage}
+          protection={protectedAction.protection}
+        />
 
         <button
           className="button button-primary button-full"

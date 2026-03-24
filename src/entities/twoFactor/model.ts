@@ -35,11 +35,13 @@ export interface DisableTwoFactorResult {
 export interface VerifyTwoFactorLoginInput {
   loginChallengeId: string;
   code: string;
+  captchaToken: string;
 }
 
 export interface VerifyTwoFactorBackupCodeLoginInput {
   loginChallengeId: string;
   backupCode: string;
+  captchaToken: string;
 }
 
 export type TwoFactorStatusResponseDto = ApiResponse<'/api/auth/2fa/status', 'get'>;
@@ -140,6 +142,7 @@ export function toTwoFactorLoginVerifyRequest(
   return {
     loginChallengeId: payload.loginChallengeId,
     code: normalizeCode(payload.code),
+    captchaToken: payload.captchaToken,
   };
 }
 
@@ -149,6 +152,7 @@ export function toTwoFactorBackupCodeLoginVerifyRequest(
   return {
     loginChallengeId: payload.loginChallengeId,
     backupCode: normalizeCode(payload.backupCode),
+    captchaToken: payload.captchaToken,
   };
 }
 

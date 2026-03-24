@@ -219,6 +219,7 @@ describe('passkeys api', () => {
 
     const result = await startPasskeyLogin({
       usernameOrEmail: 'demo@example.com',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toEqual({
@@ -232,7 +233,12 @@ describe('passkeys api', () => {
     expect(url).toBe(buildApiUrl('/api/auth/passkey-login/options'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
-    expect(init?.body).toBe(JSON.stringify({ usernameOrEmail: 'demo@example.com' }));
+    expect(init?.body).toBe(
+      JSON.stringify({
+        usernameOrEmail: 'demo@example.com',
+        captchaToken: 'captcha-token',
+      })
+    );
   });
 
   it('verifies passkey login and returns the normal session user', async () => {
@@ -259,6 +265,7 @@ describe('passkeys api', () => {
       credential: {
         id: 'credential-id',
       },
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toMatchObject({
@@ -277,6 +284,7 @@ describe('passkeys api', () => {
         credential: {
           id: 'credential-id',
         },
+        captchaToken: 'captcha-token',
       })
     );
   });

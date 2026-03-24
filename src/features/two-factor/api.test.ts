@@ -188,6 +188,7 @@ describe('two-factor api', () => {
     const result = await verifyTwoFactorLogin({
       loginChallengeId: 'login-challenge-id',
       code: '123456',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toMatchObject({
@@ -203,6 +204,7 @@ describe('two-factor api', () => {
       JSON.stringify({
         loginChallengeId: 'login-challenge-id',
         code: '123456',
+        captchaToken: 'captcha-token',
       })
     );
   });
@@ -229,6 +231,7 @@ describe('two-factor api', () => {
     const result = await verifyTwoFactorBackupCodeLogin({
       loginChallengeId: 'login-challenge-id',
       backupCode: 'ABCD-EFGH-JKLM',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toMatchObject({
@@ -244,6 +247,7 @@ describe('two-factor api', () => {
       JSON.stringify({
         loginChallengeId: 'login-challenge-id',
         backupCode: 'ABCD-EFGH-JKLM',
+        captchaToken: 'captcha-token',
       })
     );
   });

@@ -39,6 +39,7 @@ describe('auth api', () => {
       username: 'new-user',
       email: 'new-user@example.com',
       password: 'very-secret-password',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toEqual({
@@ -56,6 +57,7 @@ describe('auth api', () => {
         username: 'new-user',
         email: 'new-user@example.com',
         password: 'very-secret-password',
+        captchaToken: 'captcha-token',
       })
     );
   });
@@ -74,6 +76,7 @@ describe('auth api', () => {
 
     const result = await forgotPassword({
       email: 'demo@example.com',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toEqual({ accepted: true });
@@ -82,7 +85,12 @@ describe('auth api', () => {
     expect(url).toBe(buildApiUrl('/api/auth/forgot-password'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
-    expect(init?.body).toBe(JSON.stringify({ email: 'demo@example.com' }));
+    expect(init?.body).toBe(
+      JSON.stringify({
+        email: 'demo@example.com',
+        captchaToken: 'captcha-token',
+      })
+    );
   });
 
   it('submits reset-password requests to the backend', async () => {
@@ -100,6 +108,7 @@ describe('auth api', () => {
     const result = await resetPassword({
       token: 'reset-token',
       newPassword: 'new-very-secret-password',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toEqual({ reset: true });
@@ -112,6 +121,7 @@ describe('auth api', () => {
       JSON.stringify({
         token: 'reset-token',
         newPassword: 'new-very-secret-password',
+        captchaToken: 'captcha-token',
       })
     );
   });
@@ -155,6 +165,7 @@ describe('auth api', () => {
 
     const result = await resendVerificationEmail({
       email: 'demo@example.com',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toEqual({ accepted: true });
@@ -163,7 +174,12 @@ describe('auth api', () => {
     expect(url).toBe(buildApiUrl('/api/auth/resend-verification-email'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
-    expect(init?.body).toBe(JSON.stringify({ email: 'demo@example.com' }));
+    expect(init?.body).toBe(
+      JSON.stringify({
+        email: 'demo@example.com',
+        captchaToken: 'captcha-token',
+      })
+    );
   });
 
   it('submits login requests to the backend', async () => {
@@ -190,6 +206,7 @@ describe('auth api', () => {
     const result = await login({
       usernameOrEmail: 'demo',
       password: 'demo-password',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toMatchObject({
@@ -202,6 +219,13 @@ describe('auth api', () => {
     expect(url).toBe(buildApiUrl('/api/auth/login'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
+    expect(init?.body).toBe(
+      JSON.stringify({
+        usernameOrEmail: 'demo',
+        password: 'demo-password',
+        captchaToken: 'captcha-token',
+      })
+    );
   });
 
   it('returns a two-factor login challenge when the backend requires a second step', async () => {
@@ -225,6 +249,7 @@ describe('auth api', () => {
     const result = await login({
       usernameOrEmail: 'demo',
       password: 'demo-password',
+      captchaToken: 'captcha-token',
     });
 
     expect(result).toEqual({
@@ -238,6 +263,13 @@ describe('auth api', () => {
     expect(url).toBe(buildApiUrl('/api/auth/login'));
     expect(init?.method).toBe('POST');
     expect(init?.credentials).toBe('include');
+    expect(init?.body).toBe(
+      JSON.stringify({
+        usernameOrEmail: 'demo',
+        password: 'demo-password',
+        captchaToken: 'captcha-token',
+      })
+    );
   });
 
   it('submits logout requests to the backend', async () => {

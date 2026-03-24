@@ -34,6 +34,22 @@ describe('appConfig', () => {
     expect(appConfig.rawSchemaUrl).toBe('');
   });
 
+  it('reads the configured Turnstile site key', async () => {
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', 'site-key-123');
+
+    const { appConfig } = await import('./appConfig');
+
+    expect(appConfig.turnstileSiteKey).toBe('site-key-123');
+  });
+
+  it('returns an empty Turnstile site key when the env value is missing', async () => {
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', '');
+
+    const { appConfig } = await import('./appConfig');
+
+    expect(appConfig.turnstileSiteKey).toBe('');
+  });
+
   it('logs the raw and resolved VITE_API_BASE_URL values', async () => {
     vi.stubEnv('VITE_API_BASE_URL', '  https://api.example.test  ');
     const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});

@@ -10,6 +10,10 @@ import {
   type ResendVerificationEmailFormValues,
 } from '../../features/auth/forms';
 import { getApiErrorMessage } from '../../shared/api/errorMessage';
+import { ProtectedStatusBanner } from '../../shared/protection/ProtectedStatusBanner';
+import { TurnstileWidget } from '../../shared/protection/turnstile/TurnstileWidget';
+import { useTurnstileController } from '../../shared/protection/turnstile/useTurnstileController';
+import { useProtectedAction } from '../../shared/protection/useProtectedAction';
 import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
 import { getQueryParamValue } from '../../shared/routing/queryParams';
@@ -43,6 +47,11 @@ export function VerifyEmailPage() {
   >(token ? 'verifying' : 'idle');
   const [resendMessage, setResendMessage] = useState('');
   const resendVerificationEmailMutation = useResendVerificationEmailMutation();
+  const turnstileController = useTurnstileController();
+  const protectedAction = useProtectedAction({
+    acquireToken: () => turnstileController.acquireToken(),
+    reset: () => turnstileController.reset(),
+  });
   const form = useForm<ResendVerificationEmailFormValues>({
     defaultValues: {
       email: searchParams.get('email')?.trim() ?? '',
@@ -84,15 +93,32 @@ export function VerifyEmailPage() {
   const handleResend = form.handleSubmit(async (values) => {
     form.clearErrors('root');
     setResendMessage('');
+    protectedAction.resetStatus();
     try {
-      await resendVerificationEmailMutation.mutateAsync(values);
+      await protectedAction.execute({
+        execute: (captchaToken) =>
+          resendVerificationEmailMutation.mutateAsync({
+            ...values,
+            captchaToken,
+          }),
+      });
       setResendMessage(resendSuccessMessage);
     } catch (error) {
+      if (protectedAction.wasHandledError(error)) {
+        return;
+      }
+
       form.setError('root', {
         message: getApiErrorMessage(error, 'We could not send another verification email.'),
       });
     }
   });
+
+  const hasResendInlineStatus =
+    Boolean(resendMessage) ||
+    Boolean(form.formState.errors.root) ||
+    Boolean(protectedAction.errorMessage) ||
+    Boolean(protectedAction.protection);
 
   return (
     <AuthPageShell
@@ -127,7 +153,7 @@ export function VerifyEmailPage() {
             </p>
           ) : null}
 
-          {verificationStatus === 'idle' && !resendMessage && !form.formState.errors.root ? (
+          {verificationStatus === 'idle' && !hasResendInlineStatus ? (
             <p className="status-banner" role="status">
               Open the email link, or request a new one below.
             </p>
@@ -166,6 +192,12 @@ export function VerifyEmailPage() {
           ) : null}
         </label>
 
+        <TurnstileWidget controller={turnstileController} />
+        <ProtectedStatusBanner
+          errorMessage={protectedAction.errorMessage}
+          protection={protectedAction.protection}
+        />
+
         <button
           className="button button-secondary button-full"
           disabled={
@@ -177,7 +209,6 @@ export function VerifyEmailPage() {
             ? 'Sending verification email...'
             : 'Resend verification email'}
         </button>
-
       </form>
     </AuthPageShell>
   );

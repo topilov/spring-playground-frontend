@@ -13,6 +13,10 @@ import {
   useVerifyTwoFactorBackupCodeMutation,
   useVerifyTwoFactorLoginMutation,
 } from '../../features/two-factor/hooks';
+import { ProtectedStatusBanner } from '../../shared/protection/ProtectedStatusBanner';
+import { TurnstileWidget } from '../../shared/protection/turnstile/TurnstileWidget';
+import { useTurnstileController } from '../../shared/protection/turnstile/useTurnstileController';
+import { useProtectedAction } from '../../shared/protection/useProtectedAction';
 import { routePaths } from '../../shared/routing/paths';
 import { AppLink } from '../../shared/routing/AppLink';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
@@ -28,6 +32,11 @@ export function TwoFactorLoginPage() {
   const navigate = useNavigate();
   const verifyTwoFactorLoginMutation = useVerifyTwoFactorLoginMutation();
   const verifyTwoFactorBackupCodeMutation = useVerifyTwoFactorBackupCodeMutation();
+  const turnstileController = useTurnstileController();
+  const protectedAction = useProtectedAction({
+    acquireToken: () => turnstileController.acquireToken(),
+    reset: () => turnstileController.reset(),
+  });
   const challenge = useMemo(() => loadPendingTwoFactorLoginChallenge(), []);
   const [method, setMethod] = useState<'TOTP' | 'BACKUP_CODE'>('TOTP');
   const [code, setCode] = useState('');
@@ -78,17 +87,26 @@ export function TwoFactorLoginPage() {
     }
 
     setActionError('');
+    protectedAction.resetStatus();
 
     try {
-      await verifyTwoFactorLoginMutation.mutateAsync({
-        loginChallengeId: challenge.loginChallengeId,
-        code,
+      await protectedAction.execute({
+        execute: (captchaToken) =>
+          verifyTwoFactorLoginMutation.mutateAsync({
+            loginChallengeId: challenge.loginChallengeId,
+            code,
+            captchaToken,
+          }),
       });
       clearPendingTwoFactorLoginChallenge();
       navigate(challenge.redirectTo, {
         replace: true,
       });
     } catch (error) {
+      if (protectedAction.wasHandledError(error)) {
+        return;
+      }
+
       if (isTwoFactorChallengeUnavailable(error)) {
         resetToLogin();
         return;
@@ -112,17 +130,26 @@ export function TwoFactorLoginPage() {
     }
 
     setActionError('');
+    protectedAction.resetStatus();
 
     try {
-      await verifyTwoFactorBackupCodeMutation.mutateAsync({
-        loginChallengeId: challenge.loginChallengeId,
-        backupCode,
+      await protectedAction.execute({
+        execute: (captchaToken) =>
+          verifyTwoFactorBackupCodeMutation.mutateAsync({
+            loginChallengeId: challenge.loginChallengeId,
+            backupCode,
+            captchaToken,
+          }),
       });
       clearPendingTwoFactorLoginChallenge();
       navigate(challenge.redirectTo, {
         replace: true,
       });
     } catch (error) {
+      if (protectedAction.wasHandledError(error)) {
+        return;
+      }
+
       if (isTwoFactorChallengeUnavailable(error)) {
         resetToLogin();
         return;
@@ -195,6 +222,12 @@ export function TwoFactorLoginPage() {
             />
           </label>
 
+          <TurnstileWidget controller={turnstileController} />
+          <ProtectedStatusBanner
+            errorMessage={protectedAction.errorMessage}
+            protection={protectedAction.protection}
+          />
+
           <button className="button button-primary button-full" disabled={isSubmitting} type="submit">
             {verifyTwoFactorLoginMutation.isPending ? 'Verifying code...' : 'Verify code'}
           </button>
@@ -212,6 +245,12 @@ export function TwoFactorLoginPage() {
               value={backupCode}
             />
           </label>
+
+          <TurnstileWidget controller={turnstileController} />
+          <ProtectedStatusBanner
+            errorMessage={protectedAction.errorMessage}
+            protection={protectedAction.protection}
+          />
 
           <button className="button button-primary button-full" disabled={isSubmitting} type="submit">
             {verifyTwoFactorBackupCodeMutation.isPending

@@ -5,10 +5,21 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ApiClientError, buildApiUrl } from '../../shared/api/apiClient';
 import { VerifyEmailPage } from './VerifyEmailPage';
 
 const verifyEmailMock = vi.fn();
 const useResendVerificationEmailMutationMock = vi.fn();
+const turnstileController = {
+  acquireToken: vi.fn(),
+  reset: vi.fn(),
+  isReady: true,
+  attach: vi.fn(),
+  detach: vi.fn(),
+  handleError: vi.fn(),
+  handleExpired: vi.fn(),
+  handleToken: vi.fn(),
+};
 
 vi.mock('../../features/auth/api', () => ({
   verifyEmail: (payload: { token: string }) => verifyEmailMock(payload),
@@ -18,6 +29,23 @@ vi.mock('../../features/auth/mutations', () => ({
   useResendVerificationEmailMutation: () =>
     useResendVerificationEmailMutationMock(),
 }));
+
+vi.mock('../../shared/protection/turnstile/useTurnstileController', () => ({
+  useTurnstileController: () => turnstileController,
+}));
+
+vi.mock('../../shared/protection/turnstile/TurnstileWidget', () => ({
+  TurnstileWidget: () => <div data-testid="turnstile-widget">Turnstile widget</div>,
+}));
+
+function buildApiError(status: number, responseBody: unknown) {
+  return new ApiClientError({
+    status,
+    statusText: status === 429 ? 'Too Many Requests' : 'Bad Request',
+    url: buildApiUrl('/api/auth/resend-verification-email'),
+    responseBody,
+  });
+}
 
 function renderPage(path: string) {
   return render(
@@ -32,6 +60,8 @@ function renderPage(path: string) {
 describe('VerifyEmailPage', () => {
   beforeEach(() => {
     verifyEmailMock.mockReset();
+    turnstileController.acquireToken.mockResolvedValue('captcha-token');
+    turnstileController.reset.mockClear();
     useResendVerificationEmailMutationMock.mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
@@ -97,6 +127,29 @@ describe('VerifyEmailPage', () => {
     expect(screen.getByRole('button', { name: 'Resend verification email' })).toBeTruthy();
   });
 
+  it('renders turnstile inline and submits resend verification with a captcha token', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi.fn().mockResolvedValue({ accepted: true });
+
+    useResendVerificationEmailMutationMock.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    });
+
+    renderPage('/verify-email?email=demo@example.com');
+
+    expect(screen.getByTestId('turnstile-widget')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'Resend verification email' }));
+
+    await waitFor(() => {
+      expect(mutateAsync).toHaveBeenCalledWith({
+        email: 'demo@example.com',
+        captchaToken: 'captcha-token',
+      });
+    });
+  });
+
   it('shows a resend success message after requesting another verification email', async () => {
     const user = userEvent.setup();
     const mutateAsync = vi.fn().mockResolvedValue({ sent: true });
@@ -111,7 +164,10 @@ describe('VerifyEmailPage', () => {
     await user.click(screen.getByRole('button', { name: 'Resend verification email' }));
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledWith({ email: 'demo@example.com' });
+      expect(mutateAsync).toHaveBeenCalledWith({
+        email: 'demo@example.com',
+        captchaToken: 'captcha-token',
+      });
     });
 
     expect(
@@ -136,11 +192,55 @@ describe('VerifyEmailPage', () => {
     await user.click(screen.getByRole('button', { name: 'Resend verification email' }));
 
     await waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledWith({ email: 'demo@example.com' });
+      expect(mutateAsync).toHaveBeenCalledWith({
+        email: 'demo@example.com',
+        captchaToken: 'captcha-token',
+      });
     });
 
     const alert = await screen.findByRole('alert');
     expect(alert.textContent).toContain('Mailbox unavailable.');
     expect(alert.closest('form')).toBeNull();
+  });
+
+  it('keeps the generic accepted UX after resend requests', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi.fn().mockResolvedValue({ accepted: true });
+
+    useResendVerificationEmailMutationMock.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    });
+
+    renderPage('/verify-email?email=demo@example.com');
+
+    await user.click(screen.getByRole('button', { name: 'Resend verification email' }));
+
+    expect(
+      await screen.findByText('If that email is still unverified, a new link has been sent.')
+    ).toBeTruthy();
+  });
+
+  it('shows the shared calm protection message for resend protection failures', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi.fn().mockRejectedValue(
+      buildApiError(400, {
+        error: 'Captcha validation failed.',
+        code: 'CAPTCHA_INVALID',
+      })
+    );
+
+    useResendVerificationEmailMutationMock.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    });
+
+    renderPage('/verify-email?email=demo@example.com');
+
+    await user.click(screen.getByRole('button', { name: 'Resend verification email' }));
+
+    expect(
+      await screen.findByText('Please try the verification again before submitting.')
+    ).toBeTruthy();
   });
 });
