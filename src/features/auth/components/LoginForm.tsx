@@ -7,6 +7,10 @@ import { ApiClientError } from '../../../shared/api/apiClient';
 import { getApiErrorMessage } from '../../../shared/api/errorMessage';
 import { isAppPath, routePaths } from '../../../shared/routing/paths';
 import { AppLink } from '../../../shared/routing/AppLink';
+import { isTwoFactorLoginChallenge } from '../../../entities/session/model';
+import {
+  savePendingTwoFactorLoginChallenge,
+} from '../../two-factor/challengeStorage';
 import { usePasskeyLoginMutation } from '../../passkeys/hooks';
 import { isEmailNotVerifiedError } from '../errors';
 import { useLoginMutation } from '../mutations';
@@ -35,7 +39,21 @@ export function LoginForm() {
     setShowVerificationCta(false);
 
     try {
-      await loginMutation.mutateAsync(values);
+      const result = await loginMutation.mutateAsync(values);
+
+      if (isTwoFactorLoginChallenge(result)) {
+        savePendingTwoFactorLoginChallenge({
+          loginChallengeId: result.loginChallengeId,
+          methods: result.methods,
+          expiresAt: result.expiresAt,
+          redirectTo: getRedirectTarget(location.state?.from),
+        });
+        navigate(routePaths.loginTwoFactor, {
+          replace: true,
+        });
+        return;
+      }
+
       navigate(getRedirectTarget(location.state?.from), {
         replace: true,
       });

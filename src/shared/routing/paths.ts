@@ -2,6 +2,7 @@ export const routePaths = {
   forgotPassword: '/forgot-password',
   home: '/',
   login: '/login',
+  loginTwoFactor: '/login/2fa',
   profile: '/profile',
   register: '/register',
   resetPassword: '/reset-password',

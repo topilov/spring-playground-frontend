@@ -204,6 +204,42 @@ describe('auth api', () => {
     expect(init?.credentials).toBe('include');
   });
 
+  it('returns a two-factor login challenge when the backend requires a second step', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          requiresTwoFactor: true,
+          loginChallengeId: 'login-challenge-id',
+          methods: ['TOTP', 'BACKUP_CODE'],
+          expiresAt: '2026-03-24T10:15:30Z',
+        }),
+        {
+          status: 202,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    );
+
+    const result = await login({
+      usernameOrEmail: 'demo',
+      password: 'demo-password',
+    });
+
+    expect(result).toEqual({
+      requiresTwoFactor: true,
+      loginChallengeId: 'login-challenge-id',
+      methods: ['TOTP', 'BACKUP_CODE'],
+      expiresAt: '2026-03-24T10:15:30Z',
+    });
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(buildApiUrl('/api/auth/login'));
+    expect(init?.method).toBe('POST');
+    expect(init?.credentials).toBe('include');
+  });
+
   it('submits logout requests to the backend', async () => {
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')
