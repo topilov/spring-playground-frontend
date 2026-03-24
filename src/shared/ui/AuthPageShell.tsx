@@ -17,11 +17,12 @@ export function AuthPageShell({
 }: AuthPageShellProps) {
   const titleId = useId();
   const subtitleId = useId();
+  const hasContent = Boolean(children);
 
   return (
     <section className="auth-page">
       <article className="auth-card">
-        <div className="auth-layout">
+        <div className={hasContent ? 'auth-layout' : 'auth-layout auth-layout-solo'}>
           <section
             aria-describedby={subtitle ? subtitleId : undefined}
             aria-labelledby={titleId}
@@ -34,8 +35,7 @@ export function AuthPageShell({
 
             {utility ? <div className="auth-utility">{utility}</div> : null}
           </section>
-
-          {children ? (
+          {hasContent ? (
             <section aria-label="Authentication content" className="auth-content stack">
               {children}
             </section>

@@ -93,6 +93,37 @@ describe('app routes', () => {
     );
   });
 
+  it('preserves long session context labels without dropping the full name', async () => {
+    const longDisplayName =
+      'Operator Display Name For The Signal Room Session Context Header Pill';
+
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: longDisplayName,
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/profile');
+    });
+
+    expect(screen.getByRole('status', { name: 'Session context' }).getAttribute('title')).toBe(
+      `Signed in as ${longDisplayName}`
+    );
+  });
+
   it('redirects anonymous visitors from the protected profile route to login', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'anonymous',
@@ -206,6 +237,16 @@ describe('app routes', () => {
     expect(screen.getByRole('button', { name: 'Use passkey' })).toBeTruthy();
     expect(within(authContent).getByText('Primary content')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();
+  });
+
+  it('collapses the auth shell cleanly when no primary content is present', () => {
+    render(<AuthPageShell subtitle="Loading your account details." title="Profile" />);
+
+    const authIntro = screen.getByRole('region', { name: 'Profile' });
+
+    expect(within(authIntro).getByText('Loading your account details.')).toBeTruthy();
+    expect(screen.queryByRole('region', { name: 'Authentication content' })).toBeNull();
+    expect(authIntro.parentElement?.className).toContain('auth-layout-solo');
   });
 
   it('renders the reset-password route for anonymous visitors', async () => {

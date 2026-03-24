@@ -46,7 +46,12 @@ export function AppLayout() {
         </AppLink>
 
         {sessionContext ? (
-          <p aria-label="Session context" className="header-meta" role="status">
+          <p
+            aria-label="Session context"
+            className="header-meta"
+            role="status"
+            title={sessionContext}
+          >
             {sessionContext}
           </p>
         ) : (
