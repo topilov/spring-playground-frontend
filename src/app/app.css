@@ -335,14 +335,15 @@ input {
   backdrop-filter: blur(18px);
 }
 
-.auth-header {
+.auth-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-4);
+  grid-template-columns: minmax(16rem, 1fr) minmax(0, 24rem);
+  gap: var(--space-6);
   align-items: start;
 }
 
 .auth-intro,
+.auth-intro-copy,
 .page-header-copy,
 .section-heading,
 .stack,
@@ -351,6 +352,11 @@ input {
 }
 
 .auth-intro {
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.auth-intro-copy {
   gap: var(--space-2);
   max-width: 22rem;
 }
@@ -384,12 +390,13 @@ input {
 
 .auth-utility {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: start;
 }
 
 .auth-content {
-  width: min(100%, 24rem);
+  width: 100%;
+  min-width: 0;
 }
 
 .auth-footer {
@@ -629,7 +636,7 @@ input {
 }
 
 @media (max-width: 760px) {
-  .auth-header,
+  .auth-layout,
   .page-header,
   .passkey-card-header,
   .passkey-add-form {

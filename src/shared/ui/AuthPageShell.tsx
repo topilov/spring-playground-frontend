@@ -21,20 +21,26 @@ export function AuthPageShell({
   return (
     <section className="auth-page">
       <article className="auth-card">
-        <div className="auth-header">
+        <div className="auth-layout">
           <section
             aria-describedby={subtitle ? subtitleId : undefined}
             aria-labelledby={titleId}
             className="auth-intro"
           >
-            <h1 id={titleId}>{title}</h1>
-            {subtitle ? <p id={subtitleId}>{subtitle}</p> : null}
+            <div className="auth-intro-copy">
+              <h1 id={titleId}>{title}</h1>
+              {subtitle ? <p id={subtitleId}>{subtitle}</p> : null}
+            </div>
+
+            {utility ? <div className="auth-utility">{utility}</div> : null}
           </section>
 
-          {utility ? <div className="auth-utility">{utility}</div> : null}
+          {children ? (
+            <section aria-label="Authentication content" className="auth-content stack">
+              {children}
+            </section>
+          ) : null}
         </div>
-
-        {children ? <div className="auth-content stack">{children}</div> : null}
 
         {footer ? <footer className="auth-footer">{footer}</footer> : null}
       </article>

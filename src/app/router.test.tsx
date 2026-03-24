@@ -198,11 +198,13 @@ describe('app routes', () => {
     );
 
     const authIntro = screen.getByRole('region', { name: 'Sign in' });
+    const authContent = screen.getByRole('region', { name: 'Authentication content' });
 
     expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
     expect(within(authIntro).getByText('Use the utility action for secondary help.')).toBeTruthy();
+    expect(authIntro.parentElement).toBe(authContent.parentElement);
     expect(screen.getByRole('button', { name: 'Use passkey' })).toBeTruthy();
-    expect(screen.getByText('Primary content')).toBeTruthy();
+    expect(within(authContent).getByText('Primary content')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();
   });
 
