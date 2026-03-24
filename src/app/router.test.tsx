@@ -58,7 +58,10 @@ describe('app routes', () => {
       expect(router.state.location.pathname).toBe('/login');
     });
 
-    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    const authIntro = screen.getByRole('region', { name: 'Sign in' });
+
+    expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    expect(within(authIntro).getByText('Use your account details or a passkey.')).toBeTruthy();
   });
 
   it('redirects authenticated visitors from the root route to profile', async () => {
@@ -85,6 +88,9 @@ describe('app routes', () => {
     });
 
     expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
+    expect(screen.getByRole('status', { name: 'Session context' }).textContent).toContain(
+      'Demo User'
+    );
   });
 
   it('redirects anonymous visitors from the protected profile route to login', async () => {
@@ -191,7 +197,10 @@ describe('app routes', () => {
       </AuthPageShell>
     );
 
-    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    const authIntro = screen.getByRole('region', { name: 'Sign in' });
+
+    expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    expect(within(authIntro).getByText('Use the utility action for secondary help.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Use passkey' })).toBeTruthy();
     expect(screen.getByText('Primary content')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();

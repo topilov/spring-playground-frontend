@@ -13,7 +13,7 @@ function getHeaderLinkClassName(isActive: boolean) {
 
 export function AppLayout() {
   const navigate = useNavigate();
-  const { isAuthenticated, status } = useAuthSession();
+  const { isAuthenticated, profile, status } = useAuthSession();
   const logoutMutation = useLogoutMutation();
   const [logoutError, setLogoutError] = useState('');
 
@@ -28,6 +28,13 @@ export function AppLayout() {
     }
   };
 
+  const sessionContext =
+    status === 'loading'
+      ? 'Checking session'
+      : isAuthenticated && profile
+        ? `Signed in as ${profile.displayName}`
+        : null;
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -38,11 +45,15 @@ export function AppLayout() {
           <span className="brand-name">Spring Playground</span>
         </AppLink>
 
-        <div className="header-actions">
-          {status === 'loading' ? (
-            <span className="header-meta">Checking session</span>
-          ) : null}
+        {sessionContext ? (
+          <p aria-label="Session context" className="header-meta" role="status">
+            {sessionContext}
+          </p>
+        ) : (
+          <div className="header-meta-spacer" aria-hidden="true" />
+        )}
 
+        <div className="header-actions">
           <nav aria-label="Primary" className="inline-actions">
             {isAuthenticated ? (
               <>
