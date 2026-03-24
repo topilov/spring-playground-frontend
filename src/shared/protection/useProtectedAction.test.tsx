@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ApiClientError, buildApiUrl } from '../api/apiClient';
 import { useProtectedAction } from './useProtectedAction';
+import { TURNSTILE_INCOMPLETE_MESSAGE } from './turnstile/useTurnstileController';
 
 describe('useProtectedAction', () => {
   it('acquires a token before calling execute', async () => {
@@ -147,6 +148,23 @@ describe('useProtectedAction', () => {
       expect(result.current.errorMessage).toBe(
         'We could not verify that you are human. Please try again.'
       );
+    });
+  });
+
+  it('asks the user to complete the visible captcha when no token is available yet', async () => {
+    const acquireToken = vi.fn().mockRejectedValue(new Error(TURNSTILE_INCOMPLETE_MESSAGE));
+    const reset = vi.fn();
+    const execute = vi.fn();
+    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+
+    await expect(result.current.execute({ execute })).rejects.toThrow(
+      TURNSTILE_INCOMPLETE_MESSAGE
+    );
+
+    expect(execute).not.toHaveBeenCalled();
+    expect(reset).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(result.current.errorMessage).toBe(TURNSTILE_INCOMPLETE_MESSAGE);
     });
   });
 

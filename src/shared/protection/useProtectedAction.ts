@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 
 import { getProtectionResultFromError } from './contract';
+import { TURNSTILE_INCOMPLETE_MESSAGE } from './turnstile/useTurnstileController';
 import type { ProtectionResult } from './types';
 
 const TURNSTILE_FAILURE_MESSAGE =
@@ -48,9 +49,13 @@ export function useProtectedAction({
 
     try {
       captchaToken = await acquireToken();
-    } catch {
-      setErrorMessage(TURNSTILE_FAILURE_MESSAGE);
-      const handledError = new Error(TURNSTILE_FAILURE_MESSAGE);
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message === TURNSTILE_INCOMPLETE_MESSAGE
+          ? TURNSTILE_INCOMPLETE_MESSAGE
+          : TURNSTILE_FAILURE_MESSAGE;
+      setErrorMessage(message);
+      const handledError = new Error(message);
       handledErrorRef.current = handledError;
       throw handledError;
     }
