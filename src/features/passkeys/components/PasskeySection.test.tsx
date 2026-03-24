@@ -346,7 +346,22 @@ describe('PasskeySection', () => {
     expect(mutateAsync).not.toHaveBeenCalled();
   });
 
-  it('shows loading and query error states without exposing the empty state', () => {
+  it('shows a loading state without exposing the empty state', () => {
+    usePasskeysQueryMock.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      error: null,
+    });
+
+    renderSection();
+
+    expect(screen.getByText('Loading passkeys...')).toBeTruthy();
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByText('No passkeys yet.')).toBeNull();
+  });
+
+  it('shows a query error state without exposing the empty state', () => {
     usePasskeysQueryMock.mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -359,6 +374,7 @@ describe('PasskeySection', () => {
     expect(screen.getByRole('alert').textContent).toContain(
       'Passkeys are temporarily unavailable.'
     );
+    expect(screen.queryByText('Loading passkeys...')).toBeNull();
     expect(screen.queryByText('No passkeys yet.')).toBeNull();
   });
 
