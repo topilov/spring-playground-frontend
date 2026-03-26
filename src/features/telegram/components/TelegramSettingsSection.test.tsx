@@ -13,6 +13,9 @@ const useConfirmTelegramConnectionCodeMutationMock = vi.fn();
 const useConfirmTelegramConnectionPasswordMutationMock = vi.fn();
 const useDisconnectTelegramMutationMock = vi.fn();
 const useUpdateTelegramFocusSettingsMutationMock = vi.fn();
+const useCreateTelegramModeMutationMock = vi.fn();
+const useUpdateTelegramModeMutationMock = vi.fn();
+const useDeleteTelegramModeMutationMock = vi.fn();
 const useCreateTelegramAutomationTokenMutationMock = vi.fn();
 const useRegenerateTelegramAutomationTokenMutationMock = vi.fn();
 const useRevokeTelegramAutomationTokenMutationMock = vi.fn();
@@ -28,6 +31,9 @@ vi.mock('../hooks', () => ({
   useDisconnectTelegramMutation: () => useDisconnectTelegramMutationMock(),
   useUpdateTelegramFocusSettingsMutation: () =>
     useUpdateTelegramFocusSettingsMutationMock(),
+  useCreateTelegramModeMutation: () => useCreateTelegramModeMutationMock(),
+  useUpdateTelegramModeMutation: () => useUpdateTelegramModeMutationMock(),
+  useDeleteTelegramModeMutation: () => useDeleteTelegramModeMutationMock(),
   useCreateTelegramAutomationTokenMutation: () =>
     useCreateTelegramAutomationTokenMutationMock(),
   useRegenerateTelegramAutomationTokenMutation: () =>
@@ -49,9 +55,8 @@ function createSettings(overrides: Record<string, unknown> = {}) {
       lastUsedAt: null,
     },
     defaultEmojiStatusDocumentId: null,
-    effectiveFocusMode: null,
-    resolvedEmojiMappings: {},
-    activeFocusModes: [],
+    activeFocusMode: null,
+    modes: [],
     ...overrides,
   };
 }
@@ -81,6 +86,18 @@ describe('TelegramSettingsSection', () => {
       isPending: false,
     });
     useUpdateTelegramFocusSettingsMutationMock.mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    });
+    useCreateTelegramModeMutationMock.mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    });
+    useUpdateTelegramModeMutationMock.mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+    });
+    useDeleteTelegramModeMutationMock.mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
     });
@@ -197,10 +214,12 @@ describe('TelegramSettingsSection', () => {
     useTelegramSettingsQueryMock.mockReturnValue({
       data: createSettings({
         defaultEmojiStatusDocumentId: '7000',
-        resolvedEmojiMappings: {
-          personal: '1001',
-          sleep: '1005',
-        },
+        modes: [
+          {
+            mode: 'work',
+            emojiStatusDocumentId: '1001',
+          },
+        ],
       }),
       isLoading: false,
       isError: false,
@@ -215,26 +234,94 @@ describe('TelegramSettingsSection', () => {
 
     await user.clear(screen.getByLabelText('No focus emoji status'));
     await user.type(screen.getByLabelText('No focus emoji status'), ' 7001 ');
-    await user.clear(screen.getByLabelText('Personal'));
-    await user.type(screen.getByLabelText('Personal'), ' 2001 ');
-    await user.clear(screen.getByLabelText('Airplane'));
-    await user.type(screen.getByLabelText('Airplane'), '   ');
-    await user.click(screen.getByRole('button', { name: 'Save focus settings' }));
+    await user.click(screen.getByRole('button', { name: 'Save default status' }));
 
     await waitFor(() => {
       expect(updateFocusSettings).toHaveBeenCalledWith({
         defaultEmojiStatusDocumentId: '7001',
-        mappings: {
-          personal: '2001',
-          airplane: '',
-          do_not_disturb: '',
-          reduce_interruptions: '',
-          sleep: '1005',
-        },
       });
     });
 
-    expect(screen.queryByText('User override')).toBeNull();
+    expect(screen.queryByLabelText('Personal')).toBeNull();
+  });
+
+  it('creates a custom telegram mode with trimmed values', async () => {
+    const user = userEvent.setup();
+    const createMode = vi.fn().mockResolvedValue({
+      mode: 'deep_work',
+      emojiStatusDocumentId: '2001',
+    });
+
+    useCreateTelegramModeMutationMock.mockReturnValue({
+      mutateAsync: createMode,
+      isPending: false,
+    });
+
+    render(<TelegramSettingsSection />);
+
+    await user.type(screen.getByLabelText('New mode name'), '  deep_work  ');
+    await user.type(screen.getByLabelText('New mode emoji status'), ' 2001 ');
+    await user.click(screen.getByRole('button', { name: 'Add mode' }));
+
+    await waitFor(() => {
+      expect(createMode).toHaveBeenCalledWith({
+        mode: 'deep_work',
+        emojiStatusDocumentId: '2001',
+      });
+    });
+  });
+
+  it('updates and deletes an existing custom telegram mode', async () => {
+    const user = userEvent.setup();
+    const updateMode = vi.fn().mockResolvedValue({
+      mode: 'deep_work',
+      emojiStatusDocumentId: '1002',
+    });
+    const deleteMode = vi.fn().mockResolvedValue(undefined);
+
+    useTelegramSettingsQueryMock.mockReturnValue({
+      data: createSettings({
+        modes: [
+          {
+            mode: 'work',
+            emojiStatusDocumentId: '1001',
+          },
+        ],
+      }),
+      isLoading: false,
+      isError: false,
+      error: null,
+    });
+    useUpdateTelegramModeMutationMock.mockReturnValue({
+      mutateAsync: updateMode,
+      isPending: false,
+    });
+    useDeleteTelegramModeMutationMock.mockReturnValue({
+      mutateAsync: deleteMode,
+      isPending: false,
+    });
+
+    render(<TelegramSettingsSection />);
+
+    await user.clear(screen.getByLabelText('Mode name for work'));
+    await user.type(screen.getByLabelText('Mode name for work'), '  deep_work ');
+    await user.clear(screen.getByLabelText('Emoji status for work'));
+    await user.type(screen.getByLabelText('Emoji status for work'), ' 1002 ');
+    await user.click(screen.getByRole('button', { name: 'Save mode work' }));
+
+    await waitFor(() => {
+      expect(updateMode).toHaveBeenCalledWith({
+        mode: 'work',
+        newMode: 'deep_work',
+        emojiStatusDocumentId: '1002',
+      });
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Delete mode work' }));
+
+    await waitFor(() => {
+      expect(deleteMode).toHaveBeenCalledWith('work');
+    });
   });
 
   it('shows the raw automation token once after creation and supports copy', async () => {
@@ -272,11 +359,13 @@ describe('TelegramSettingsSection', () => {
           premium: false,
         },
         defaultEmojiStatusDocumentId: '7000',
-        effectiveFocusMode: 'sleep',
-        resolvedEmojiMappings: {
-          sleep: '1005',
-        },
-        activeFocusModes: ['sleep'],
+        activeFocusMode: 'sleep',
+        modes: [
+          {
+            mode: 'sleep',
+            emojiStatusDocumentId: '1005',
+          },
+        ],
       }),
       isLoading: false,
       isError: false,

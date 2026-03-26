@@ -691,10 +691,25 @@ input {
   min-height: 6.5rem;
 }
 
-.telegram-focus-grid {
+.telegram-mode-form {
   display: grid;
   gap: var(--space-3);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  align-items: end;
+}
+
+.telegram-mode-list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.telegram-mode-card {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(180deg, rgba(18, 23, 25, 0.88), rgba(11, 14, 16, 0.92)),
+    var(--surface-soft);
 }
 
 .telegram-raw-token {

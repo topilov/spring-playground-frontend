@@ -18,6 +18,12 @@ export function getTelegramErrorMessage(error: unknown, fallback: string): strin
       return 'That Telegram step is no longer valid. Start again.';
     case 'TELEGRAM_PENDING_AUTH_NOT_FOUND':
       return 'That Telegram sign-in step expired. Start again.';
+    case 'TELEGRAM_MODE_INVALID':
+      return 'Enter a valid mode name and emoji status.';
+    case 'TELEGRAM_MODE_ALREADY_EXISTS':
+      return 'That Telegram mode already exists.';
+    case 'TELEGRAM_MODE_NOT_FOUND':
+      return 'That Telegram mode no longer exists. Refresh and try again.';
     case 'TELEGRAM_NOT_CONNECTED':
       return 'Connect Telegram before using that action.';
     case 'TELEGRAM_PREMIUM_REQUIRED':

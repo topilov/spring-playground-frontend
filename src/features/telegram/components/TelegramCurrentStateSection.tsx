@@ -5,8 +5,11 @@ interface TelegramCurrentStateSectionProps {
 }
 
 function getAppliedEmojiStatusDocumentId(settings: TelegramSettings): string | null {
-  if (settings.effectiveFocusMode) {
-    return settings.resolvedEmojiMappings[settings.effectiveFocusMode] ?? null;
+  if (settings.activeFocusMode) {
+    return (
+      settings.modes.find((entry) => entry.mode === settings.activeFocusMode)
+        ?.emojiStatusDocumentId ?? null
+    );
   }
 
   return settings.defaultEmojiStatusDocumentId;
@@ -23,7 +26,7 @@ export function TelegramCurrentStateSection({
         <div className="section-heading">
           <h2>Current state</h2>
           <p className="page-description">
-            View the current backend-owned Telegram and focus-sync state.
+            View the current backend-owned Telegram connection and mode-sync state.
           </p>
         </div>
       </div>
@@ -36,20 +39,20 @@ export function TelegramCurrentStateSection({
 
       <dl className="detail-grid">
         <div className="detail-item">
-          <dt>Active focus modes</dt>
-          <dd>
-            {settings.activeFocusModes.length > 0
-              ? settings.activeFocusModes.join(', ')
-              : 'No active focus'}
-          </dd>
-        </div>
-        <div className="detail-item">
-          <dt>Effective focus mode</dt>
-          <dd>{settings.effectiveFocusMode ?? 'No focus'}</dd>
+          <dt>Active mode</dt>
+          <dd>{settings.activeFocusMode ?? 'No active mode'}</dd>
         </div>
         <div className="detail-item">
           <dt>Applied emoji status</dt>
           <dd>{appliedEmojiStatusDocumentId ?? 'Cleared'}</dd>
+        </div>
+        <div className="detail-item">
+          <dt>Stored modes</dt>
+          <dd>
+            {settings.modes.length > 0
+              ? settings.modes.map((entry) => entry.mode).join(', ')
+              : 'No stored modes'}
+          </dd>
         </div>
         <div className="detail-item">
           <dt>Telegram Premium</dt>

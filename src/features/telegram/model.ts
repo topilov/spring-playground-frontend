@@ -1,14 +1,5 @@
 import type { ApiRequestBody, ApiResponse } from '../../shared/api/contract';
 
-export const telegramFocusModes = [
-  'personal',
-  'airplane',
-  'do_not_disturb',
-  'reduce_interruptions',
-  'sleep',
-] as const;
-
-export type TelegramFocusMode = (typeof telegramFocusModes)[number];
 export type TelegramConnectionStatus = 'DISCONNECTED' | 'CONNECTED';
 export type TelegramPendingAuthStep = 'CODE' | 'PASSWORD';
 
@@ -32,6 +23,11 @@ export interface TelegramAutomationTokenSummary {
   lastUsedAt: string | null;
 }
 
+export interface TelegramMode {
+  mode: string;
+  emojiStatusDocumentId: string;
+}
+
 export interface TelegramSettings {
   connected: boolean;
   connectionStatus: TelegramConnectionStatus;
@@ -39,9 +35,8 @@ export interface TelegramSettings {
   pendingAuth: TelegramPendingAuth | null;
   automationToken: TelegramAutomationTokenSummary;
   defaultEmojiStatusDocumentId: string | null;
-  effectiveFocusMode: TelegramFocusMode | null;
-  resolvedEmojiMappings: Partial<Record<TelegramFocusMode, string>>;
-  activeFocusModes: TelegramFocusMode[];
+  activeFocusMode: string | null;
+  modes: TelegramMode[];
 }
 
 export interface TelegramConnectionState {
@@ -67,7 +62,17 @@ export interface ConfirmTelegramConnectionPasswordInput {
 
 export interface UpdateTelegramFocusSettingsInput {
   defaultEmojiStatusDocumentId?: string | null;
-  mappings: Partial<Record<TelegramFocusMode, string>>;
+}
+
+export interface CreateTelegramModeInput {
+  mode: string;
+  emojiStatusDocumentId: string;
+}
+
+export interface UpdateTelegramModeInput {
+  mode: string;
+  newMode?: string;
+  emojiStatusDocumentId?: string | null;
 }
 
 export interface TelegramAutomationToken {
@@ -96,9 +101,22 @@ export type TelegramFocusSettingsRequestDto = ApiRequestBody<
   '/api/profile/me/telegram/focus-settings',
   'put'
 >;
+export type TelegramCreateModeRequestDto = ApiRequestBody<
+  '/api/profile/me/telegram/modes',
+  'post'
+>;
+export type TelegramUpdateModeRequestDto = ApiRequestBody<
+  '/api/profile/me/telegram/modes/{mode}',
+  'patch'
+>;
 export type TelegramAutomationTokenResponseDto = ApiResponse<
   '/api/profile/me/telegram/automation-token',
   'post'
+>;
+export type TelegramModeResponseDto = ApiResponse<
+  '/api/profile/me/telegram/modes',
+  'post',
+  201
 >;
 
 function normalizeOptionalString(value: string | null | undefined): string | undefined {
@@ -151,20 +169,11 @@ function mapConnectionStatus(
   return connected ? 'CONNECTED' : 'DISCONNECTED';
 }
 
-function mapResolvedEmojiMappings(
-  mappings: TelegramSettingsResponseDto['resolvedEmojiMappings']
-): Partial<Record<TelegramFocusMode, string>> {
-  const result: Partial<Record<TelegramFocusMode, string>> = {};
-
-  for (const mode of telegramFocusModes) {
-    const value = mappings[mode];
-
-    if (typeof value === 'string' && value.trim()) {
-      result[mode] = value;
-    }
-  }
-
-  return result;
+function mapTelegramMode(payload: TelegramModeResponseDto): TelegramMode {
+  return {
+    mode: payload.mode,
+    emojiStatusDocumentId: payload.emojiStatusDocumentId,
+  };
 }
 
 export function mapTelegramSettingsResponse(
@@ -189,9 +198,8 @@ export function mapTelegramSettingsResponse(
     defaultEmojiStatusDocumentId: normalizeNullableString(
       payload.defaultEmojiStatusDocumentId
     ),
-    effectiveFocusMode: payload.effectiveFocusMode ?? null,
-    resolvedEmojiMappings: mapResolvedEmojiMappings(payload.resolvedEmojiMappings),
-    activeFocusModes: payload.activeFocusModes ?? [],
+    activeFocusMode: payload.activeFocusMode ?? null,
+    modes: payload.modes.map(mapTelegramMode),
   };
 }
 
@@ -238,16 +246,30 @@ export function toTelegramFocusSettingsRequest(
   const defaultEmojiStatusDocumentId = normalizeOptionalString(
     payload.defaultEmojiStatusDocumentId
   );
-  const mappings = Object.fromEntries(
-    Object.entries(payload.mappings).flatMap(([mode, value]) => {
-      const normalized = normalizeOptionalString(value);
-      return normalized ? [[mode, normalized]] : [];
-    })
-  );
 
   return {
     ...(defaultEmojiStatusDocumentId ? { defaultEmojiStatusDocumentId } : {}),
-    ...(Object.keys(mappings).length > 0 ? { mappings } : {}),
+  };
+}
+
+export function toTelegramCreateModeRequest(
+  payload: CreateTelegramModeInput
+): TelegramCreateModeRequestDto {
+  return {
+    mode: payload.mode.trim(),
+    emojiStatusDocumentId: payload.emojiStatusDocumentId.trim(),
+  };
+}
+
+export function toTelegramUpdateModeRequest(
+  payload: UpdateTelegramModeInput
+): TelegramUpdateModeRequestDto {
+  const newMode = normalizeOptionalString(payload.newMode);
+  const emojiStatusDocumentId = normalizeOptionalString(payload.emojiStatusDocumentId);
+
+  return {
+    ...(newMode ? { newMode } : {}),
+    ...(emojiStatusDocumentId ? { emojiStatusDocumentId } : {}),
   };
 }
 
@@ -258,4 +280,8 @@ export function mapTelegramAutomationTokenResponse(
     token: payload.token,
     tokenHint: payload.tokenHint,
   };
+}
+
+export function mapTelegramModeResponse(payload: TelegramModeResponseDto): TelegramMode {
+  return mapTelegramMode(payload);
 }

@@ -80,6 +80,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/me/telegram/modes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listModes"];
+        put?: never;
+        post: operations["createMode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/profile/me/telegram/connect/start": {
         parameters: {
             query?: never;
@@ -520,6 +536,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile/me/telegram/modes/{mode}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteMode"];
+        options?: never;
+        head?: never;
+        patch: operations["updateMode"];
+        trace?: never;
+    };
     "/api/auth/passkeys/{id}": {
         parameters: {
             query?: never;
@@ -676,9 +708,6 @@ export interface components {
         };
         TelegramFocusSettingsRequest: {
             defaultEmojiStatusDocumentId?: string;
-            mappings?: {
-                [key: string]: string;
-            };
         };
         TelegramAutomationTokenSummaryResponse: {
             present: boolean;
@@ -687,6 +716,10 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             lastUsedAt?: string;
+        };
+        TelegramModeResponse: {
+            mode: string;
+            emojiStatusDocumentId: string;
         };
         TelegramPendingAuthResponse: {
             pendingAuthId: string;
@@ -701,12 +734,8 @@ export interface components {
             pendingAuth?: components["schemas"]["TelegramPendingAuthResponse"];
             automationToken: components["schemas"]["TelegramAutomationTokenSummaryResponse"];
             defaultEmojiStatusDocumentId?: string;
-            /** @enum {string} */
-            effectiveFocusMode?: "personal" | "airplane" | "do_not_disturb" | "reduce_interruptions" | "sleep";
-            resolvedEmojiMappings: {
-                [key: string]: string;
-            };
-            activeFocusModes: ("personal" | "airplane" | "do_not_disturb" | "reduce_interruptions" | "sleep")[];
+            activeFocusMode?: string;
+            modes: components["schemas"]["TelegramModeResponse"][];
         };
         TelegramUserSummaryResponse: {
             /** Format: int64 */
@@ -717,14 +746,12 @@ export interface components {
             premium: boolean;
         };
         TelegramFocusUpdateRequest: {
-            /** @enum {string} */
-            mode: "personal" | "airplane" | "do_not_disturb" | "reduce_interruptions" | "sleep";
+            mode: string;
             active: boolean;
         };
         TelegramFocusUpdateResponse: {
             applied: boolean;
-            /** @enum {string} */
-            effectiveFocusMode?: "personal" | "airplane" | "do_not_disturb" | "reduce_interruptions" | "sleep";
+            activeFocusMode?: string;
             appliedEmojiStatusDocumentId?: string;
         };
         UpdateUsernameRequest: {
@@ -734,6 +761,10 @@ export interface components {
         SimpleErrorResponse: {
             /** @example Username 'demo' is already in use */
             error: string;
+        };
+        TelegramCreateModeRequest: {
+            mode: string;
+            emojiStatusDocumentId: string;
         };
         TelegramConnectStartRequest: {
             phoneNumber: string;
@@ -1029,6 +1060,10 @@ export interface components {
         RegenerateBackupCodesResponse: {
             backupCodes: string[];
         };
+        TelegramUpdateModeRequest: {
+            newMode?: string;
+            emojiStatusDocumentId?: string;
+        };
         /** @description Passkey rename request. */
         RenamePasskeyRequest: {
             /** @example Work Laptop */
@@ -1038,6 +1073,9 @@ export interface components {
         PublicPingResponse: {
             /** @example ok */
             status: string;
+        };
+        TelegramModeListResponse: {
+            modes: components["schemas"]["TelegramModeResponse"][];
         };
         /** @description Current TOTP two-factor authentication status for the authenticated user. */
         TwoFactorStatusResponse: {
@@ -1240,6 +1278,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SimpleErrorResponse"];
+                };
+            };
+        };
+    };
+    listModes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TelegramModeListResponse"];
+                };
+            };
+        };
+    };
+    createMode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TelegramCreateModeRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TelegramModeResponse"];
                 };
             };
         };
@@ -1980,6 +2062,52 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RegenerateBackupCodesResponse"];
+                };
+            };
+        };
+    };
+    deleteMode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mode: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateMode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mode: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TelegramUpdateModeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TelegramModeResponse"];
                 };
             };
         };

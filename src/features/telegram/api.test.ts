@@ -5,11 +5,14 @@ import {
   confirmTelegramConnectionCode,
   confirmTelegramConnectionPassword,
   createTelegramAutomationToken,
+  createTelegramMode,
+  deleteTelegramMode,
   disconnectTelegram,
   getTelegramSettings,
   regenerateTelegramAutomationToken,
   revokeTelegramAutomationToken,
   startTelegramConnection,
+  updateTelegramMode,
   updateTelegramFocusSettings,
 } from './api';
 
@@ -38,15 +41,17 @@ describe('telegram api', () => {
             lastUsedAt: '2026-03-26T11:00:00Z',
           },
           defaultEmojiStatusDocumentId: '7000',
-          effectiveFocusMode: 'sleep',
-          resolvedEmojiMappings: {
-            personal: '1001',
-            airplane: '1002',
-            do_not_disturb: '1003',
-            reduce_interruptions: '1004',
-            sleep: '1005',
-          },
-          activeFocusModes: ['sleep'],
+          activeFocusMode: 'work',
+          modes: [
+            {
+              mode: 'work',
+              emojiStatusDocumentId: '1001',
+            },
+            {
+              mode: 'gym',
+              emojiStatusDocumentId: '1007',
+            },
+          ],
         }),
         {
           status: 200,
@@ -77,15 +82,17 @@ describe('telegram api', () => {
         lastUsedAt: '2026-03-26T11:00:00Z',
       },
       defaultEmojiStatusDocumentId: '7000',
-      effectiveFocusMode: 'sleep',
-      resolvedEmojiMappings: {
-        personal: '1001',
-        airplane: '1002',
-        do_not_disturb: '1003',
-        reduce_interruptions: '1004',
-        sleep: '1005',
-      },
-      activeFocusModes: ['sleep'],
+      activeFocusMode: 'work',
+      modes: [
+        {
+          mode: 'work',
+          emojiStatusDocumentId: '1001',
+        },
+        {
+          mode: 'gym',
+          emojiStatusDocumentId: '1007',
+        },
+      ],
     });
 
     const [url, init] = fetchMock.mock.calls[0];
@@ -234,11 +241,7 @@ describe('telegram api', () => {
             present: false,
           },
           defaultEmojiStatusDocumentId: '7000',
-          resolvedEmojiMappings: {
-            personal: '1001',
-            sleep: '1005',
-          },
-          activeFocusModes: [],
+          modes: [],
         }),
         {
           status: 200,
@@ -251,11 +254,6 @@ describe('telegram api', () => {
 
     await updateTelegramFocusSettings({
       defaultEmojiStatusDocumentId: ' 7000 ',
-      mappings: {
-        personal: ' 1001 ',
-        airplane: ' ',
-        sleep: '1005',
-      },
     });
 
     const [url, init] = fetchMock.mock.calls[0];
@@ -264,12 +262,92 @@ describe('telegram api', () => {
     expect(init?.body).toBe(
       JSON.stringify({
         defaultEmojiStatusDocumentId: '7000',
-        mappings: {
-          personal: '1001',
-          sleep: '1005',
-        },
       })
     );
+  });
+
+  it('creates, updates, and deletes telegram modes with trimmed values', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            mode: 'work',
+            emojiStatusDocumentId: '1001',
+          }),
+          {
+            status: 201,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            mode: 'deep_work',
+            emojiStatusDocumentId: '1002',
+          }),
+          {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+    await expect(
+      createTelegramMode({
+        mode: '  work  ',
+        emojiStatusDocumentId: ' 1001 ',
+      })
+    ).resolves.toEqual({
+      mode: 'work',
+      emojiStatusDocumentId: '1001',
+    });
+
+    await expect(
+      updateTelegramMode({
+        mode: ' work ',
+        newMode: '  deep_work  ',
+        emojiStatusDocumentId: ' 1002 ',
+      })
+    ).resolves.toEqual({
+      mode: 'deep_work',
+      emojiStatusDocumentId: '1002',
+    });
+
+    await expect(deleteTelegramMode(' work ')).resolves.toBeUndefined();
+
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      buildApiUrl('/api/profile/me/telegram/modes')
+    );
+    expect(fetchMock.mock.calls[0]?.[1]?.method).toBe('POST');
+    expect(fetchMock.mock.calls[0]?.[1]?.body).toBe(
+      JSON.stringify({
+        mode: 'work',
+        emojiStatusDocumentId: '1001',
+      })
+    );
+
+    expect(fetchMock.mock.calls[1]?.[0]).toBe(
+      buildApiUrl('/api/profile/me/telegram/modes/work')
+    );
+    expect(fetchMock.mock.calls[1]?.[1]?.method).toBe('PATCH');
+    expect(fetchMock.mock.calls[1]?.[1]?.body).toBe(
+      JSON.stringify({
+        newMode: 'deep_work',
+        emojiStatusDocumentId: '1002',
+      })
+    );
+
+    expect(fetchMock.mock.calls[2]?.[0]).toBe(
+      buildApiUrl('/api/profile/me/telegram/modes/work')
+    );
+    expect(fetchMock.mock.calls[2]?.[1]?.method).toBe('DELETE');
   });
 
   it('creates and regenerates the automation token and revokes it', async () => {
