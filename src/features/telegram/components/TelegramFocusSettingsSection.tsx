@@ -1,35 +1,19 @@
 import { useState } from 'react';
 
-import { telegramFocusModes, type TelegramFocusMode } from '../model';
-
 interface TelegramFocusSettingsSectionProps {
   initialDefaultEmojiStatusDocumentId: string;
-  initialMappings: Record<TelegramFocusMode, string>;
   actionError: string;
   isSaving: boolean;
   onSubmit: (
     event: React.FormEvent<HTMLFormElement>,
     values: {
       defaultEmojiStatusDocumentId: string;
-      mappings: Record<TelegramFocusMode, string>;
     }
   ) => void;
 }
 
-function toFieldLabel(mode: TelegramFocusMode): string {
-  switch (mode) {
-    case 'do_not_disturb':
-      return 'Do not disturb';
-    case 'reduce_interruptions':
-      return 'Reduce interruptions';
-    default:
-      return mode.charAt(0).toUpperCase() + mode.slice(1);
-  }
-}
-
 export function TelegramFocusSettingsSection({
   initialDefaultEmojiStatusDocumentId,
-  initialMappings,
   actionError,
   isSaving,
   onSubmit,
@@ -37,15 +21,14 @@ export function TelegramFocusSettingsSection({
   const [defaultEmojiStatusDocumentId, setDefaultEmojiStatusDocumentId] = useState(
     initialDefaultEmojiStatusDocumentId
   );
-  const [mappings, setMappings] = useState(initialMappings);
 
   return (
     <section className="workspace-band stack">
       <div className="workspace-band-header">
         <div className="section-heading">
-          <h2>Focus settings</h2>
+          <h2>Default status</h2>
           <p className="page-description">
-            Keep the no-focus emoji status and each supported focus mapping explicit.
+            Set the emoji status the backend should apply when no Telegram mode is active.
           </p>
         </div>
       </div>
@@ -61,7 +44,6 @@ export function TelegramFocusSettingsSection({
         onSubmit={(event) =>
           onSubmit(event, {
             defaultEmojiStatusDocumentId,
-            mappings,
           })
         }
       >
@@ -74,27 +56,9 @@ export function TelegramFocusSettingsSection({
           />
         </label>
 
-        <div className="telegram-focus-grid">
-          {telegramFocusModes.map((mode) => (
-            <label className="field" key={mode}>
-              <span>{toFieldLabel(mode)}</span>
-              <input
-                onChange={(event) =>
-                  setMappings((current) => ({
-                    ...current,
-                    [mode]: event.target.value,
-                  }))
-                }
-                placeholder="1001"
-                value={mappings[mode]}
-              />
-            </label>
-          ))}
-        </div>
-
         <div className="inline-actions">
           <button className="button button-primary" disabled={isSaving} type="submit">
-            {isSaving ? 'Saving focus settings...' : 'Save focus settings'}
+            {isSaving ? 'Saving default status...' : 'Save default status'}
           </button>
         </div>
       </form>

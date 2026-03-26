@@ -5,18 +5,22 @@ import {
   useConfirmTelegramConnectionCodeMutation,
   useConfirmTelegramConnectionPasswordMutation,
   useCreateTelegramAutomationTokenMutation,
+  useCreateTelegramModeMutation,
+  useDeleteTelegramModeMutation,
   useDisconnectTelegramMutation,
   useRegenerateTelegramAutomationTokenMutation,
   useRevokeTelegramAutomationTokenMutation,
   useStartTelegramConnectionMutation,
   useTelegramSettingsQuery,
   useUpdateTelegramFocusSettingsMutation,
+  useUpdateTelegramModeMutation,
 } from '../hooks';
-import { telegramFocusModes, type TelegramConnectionState, type TelegramFocusMode, type TelegramSettings } from '../model';
+import type { TelegramConnectionState, TelegramSettings } from '../model';
 import { TelegramAutomationTokenSection } from './TelegramAutomationTokenSection';
 import { TelegramConnectionSection } from './TelegramConnectionSection';
 import { TelegramCurrentStateSection } from './TelegramCurrentStateSection';
 import { TelegramFocusSettingsSection } from './TelegramFocusSettingsSection';
+import { TelegramModesSection } from './TelegramModesSection';
 
 function deriveConnectionState(settings: TelegramSettings): TelegramConnectionState {
   return {
@@ -27,26 +31,9 @@ function deriveConnectionState(settings: TelegramSettings): TelegramConnectionSt
   };
 }
 
-function createEmptyMappings(): Record<TelegramFocusMode, string> {
-  return {
-    personal: '',
-    airplane: '',
-    do_not_disturb: '',
-    reduce_interruptions: '',
-    sleep: '',
-  };
-}
-
 function deriveFocusForm(settings: TelegramSettings) {
-  const mappings = createEmptyMappings();
-
-  for (const mode of telegramFocusModes) {
-    mappings[mode] = settings.resolvedEmojiMappings[mode] ?? '';
-  }
-
   return {
     defaultEmojiStatusDocumentId: settings.defaultEmojiStatusDocumentId ?? '',
-    mappings,
   };
 }
 
@@ -57,6 +44,9 @@ export function TelegramSettingsSection() {
   const confirmPasswordMutation = useConfirmTelegramConnectionPasswordMutation();
   const disconnectMutation = useDisconnectTelegramMutation();
   const updateFocusSettingsMutation = useUpdateTelegramFocusSettingsMutation();
+  const createModeMutation = useCreateTelegramModeMutation();
+  const updateModeMutation = useUpdateTelegramModeMutation();
+  const deleteModeMutation = useDeleteTelegramModeMutation();
   const createTokenMutation = useCreateTelegramAutomationTokenMutation();
   const regenerateTokenMutation = useRegenerateTelegramAutomationTokenMutation();
   const revokeTokenMutation = useRevokeTelegramAutomationTokenMutation();
@@ -70,7 +60,7 @@ export function TelegramSettingsSection() {
   const [password, setPassword] = useState('');
   const [connectionError, setConnectionError] = useState('');
   const [focusError, setFocusError] = useState('');
-
+  const [modeError, setModeError] = useState('');
   const [tokenError, setTokenError] = useState('');
   const [rawToken, setRawToken] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
@@ -181,7 +171,6 @@ export function TelegramSettingsSection() {
     event: React.FormEvent<HTMLFormElement>,
     values: {
       defaultEmojiStatusDocumentId: string;
-      mappings: Record<TelegramFocusMode, string>;
     }
   ) => {
     event.preventDefault();
@@ -190,13 +179,76 @@ export function TelegramSettingsSection() {
     try {
       await updateFocusSettingsMutation.mutateAsync({
         defaultEmojiStatusDocumentId: values.defaultEmojiStatusDocumentId.trim(),
-        mappings: Object.fromEntries(
-          telegramFocusModes.map((mode) => [mode, values.mappings[mode].trim()])
-        ) as Record<TelegramFocusMode, string>,
       });
     } catch (error) {
       setFocusError(
-        getTelegramErrorMessage(error, 'We could not save the Telegram focus settings.')
+        getTelegramErrorMessage(error, 'We could not save the Telegram default status.')
+      );
+    }
+  };
+
+  const handleCreateMode = async (values: {
+    mode: string;
+    emojiStatusDocumentId: string;
+  }) => {
+    const mode = values.mode.trim();
+    const emojiStatusDocumentId = values.emojiStatusDocumentId.trim();
+
+    if (!mode || !emojiStatusDocumentId) {
+      setModeError('Enter both a mode name and emoji status.');
+      return;
+    }
+
+    setModeError('');
+
+    try {
+      await createModeMutation.mutateAsync({
+        mode,
+        emojiStatusDocumentId,
+      });
+    } catch (error) {
+      setModeError(
+        getTelegramErrorMessage(error, 'We could not create that Telegram mode.')
+      );
+    }
+  };
+
+  const handleUpdateMode = async (values: {
+    mode: string;
+    newMode: string;
+    emojiStatusDocumentId: string;
+  }) => {
+    const newMode = values.newMode.trim();
+    const emojiStatusDocumentId = values.emojiStatusDocumentId.trim();
+
+    if (!newMode || !emojiStatusDocumentId) {
+      setModeError('Enter both a mode name and emoji status.');
+      return;
+    }
+
+    setModeError('');
+
+    try {
+      await updateModeMutation.mutateAsync({
+        mode: values.mode,
+        newMode,
+        emojiStatusDocumentId,
+      });
+    } catch (error) {
+      setModeError(
+        getTelegramErrorMessage(error, 'We could not update that Telegram mode.')
+      );
+    }
+  };
+
+  const handleDeleteMode = async (mode: string) => {
+    setModeError('');
+
+    try {
+      await deleteModeMutation.mutateAsync(mode);
+    } catch (error) {
+      setModeError(
+        getTelegramErrorMessage(error, 'We could not delete that Telegram mode.')
       );
     }
   };
@@ -300,10 +352,21 @@ export function TelegramSettingsSection() {
       <TelegramFocusSettingsSection
         actionError={focusError}
         initialDefaultEmojiStatusDocumentId={deriveFocusForm(settings).defaultEmojiStatusDocumentId}
-        initialMappings={deriveFocusForm(settings).mappings}
         isSaving={updateFocusSettingsMutation.isPending}
         key={JSON.stringify(deriveFocusForm(settings))}
         onSubmit={handleFocusSubmit}
+      />
+
+      <TelegramModesSection
+        actionError={modeError}
+        initialModes={settings.modes}
+        isCreating={createModeMutation.isPending}
+        isDeleting={deleteModeMutation.isPending}
+        isUpdating={updateModeMutation.isPending}
+        key={JSON.stringify(settings.modes)}
+        onCreate={handleCreateMode}
+        onDelete={handleDeleteMode}
+        onUpdate={handleUpdateMode}
       />
 
       <TelegramAutomationTokenSection

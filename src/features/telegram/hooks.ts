@@ -4,17 +4,22 @@ import {
   confirmTelegramConnectionCode,
   confirmTelegramConnectionPassword,
   createTelegramAutomationToken,
+  createTelegramMode,
+  deleteTelegramMode,
   disconnectTelegram,
   getTelegramSettings,
   regenerateTelegramAutomationToken,
   revokeTelegramAutomationToken,
   startTelegramConnection,
+  updateTelegramMode,
   updateTelegramFocusSettings,
 } from './api';
 import type {
   ConfirmTelegramConnectionCodeInput,
   ConfirmTelegramConnectionPasswordInput,
+  CreateTelegramModeInput,
   StartTelegramConnectionInput,
+  UpdateTelegramModeInput,
   UpdateTelegramFocusSettingsInput,
 } from './model';
 
@@ -71,6 +76,22 @@ export function useUpdateTelegramFocusSettingsMutation() {
   return useTelegramInvalidatingMutation(
     (payload: UpdateTelegramFocusSettingsInput) => updateTelegramFocusSettings(payload)
   );
+}
+
+export function useCreateTelegramModeMutation() {
+  return useTelegramInvalidatingMutation(
+    (payload: CreateTelegramModeInput) => createTelegramMode(payload)
+  );
+}
+
+export function useUpdateTelegramModeMutation() {
+  return useTelegramInvalidatingMutation(
+    (payload: UpdateTelegramModeInput) => updateTelegramMode(payload)
+  );
+}
+
+export function useDeleteTelegramModeMutation() {
+  return useTelegramInvalidatingMutation((mode: string) => deleteTelegramMode(mode));
 }
 
 export function useCreateTelegramAutomationTokenMutation() {
