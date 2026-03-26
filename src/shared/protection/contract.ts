@@ -36,11 +36,7 @@ function hasProtectionFallbackCode(code: string): boolean {
   return code === 'PROTECTION_ERROR' || code === 'CAPTCHA_REQUIRED';
 }
 
-function getProtectionKind(
-  status: number,
-  code: string | undefined,
-  retryAfterSeconds: number | undefined
-): ProtectionKind | null {
+function getProtectionKind(code: string | undefined): ProtectionKind | null {
   if (code === 'CAPTCHA_INVALID') {
     return 'captcha_invalid';
   }
@@ -67,7 +63,7 @@ export function getProtectionResultFromError(error: unknown): ProtectionResult |
 
   const code = readCode(error.responseBody);
   const retryAfterSeconds = readRetryAfterSeconds(error.responseBody);
-  const kind = getProtectionKind(error.status, code, retryAfterSeconds);
+  const kind = getProtectionKind(code);
 
   if (!kind) {
     return null;

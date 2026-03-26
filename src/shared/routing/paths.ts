@@ -8,6 +8,7 @@ export const routePaths = {
   resetPassword: '/reset-password',
   settingsAccount: '/settings/account',
   settingsSecurity: '/settings/security',
+  settingsTelegram: '/settings/telegram',
   verifyEmail: '/verify-email',
   verifyEmailChange: '/verify-email-change',
 } as const;

@@ -10,6 +10,7 @@ import { RegisterPage } from '../pages/register/RegisterPage';
 import { ResetPasswordPage } from '../pages/reset-password/ResetPasswordPage';
 import { AccountSettingsPage } from '../pages/settings/AccountSettingsPage';
 import { SecuritySettingsPage } from '../pages/settings/SecuritySettingsPage';
+import { TelegramSettingsPage } from '../pages/settings/TelegramSettingsPage';
 import { VerifyEmailPage } from '../pages/verify-email/VerifyEmailPage';
 import { VerifyEmailChangePage } from '../pages/verify-email-change/VerifyEmailChangePage';
 import { routePaths } from '../shared/routing/paths';
@@ -73,6 +74,10 @@ export const routes: RouteObject[] = [
           {
             path: routePaths.settingsSecurity.slice(1),
             element: <SecuritySettingsPage />,
+          },
+          {
+            path: routePaths.settingsTelegram.slice(1),
+            element: <TelegramSettingsPage />,
           },
         ],
       },

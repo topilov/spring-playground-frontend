@@ -2,7 +2,7 @@ import { AppLink } from '../../shared/routing/AppLink';
 import { routePaths } from '../../shared/routing/paths';
 
 interface SettingsTabsProps {
-  active: 'account' | 'security';
+  active: 'account' | 'security' | 'telegram';
 }
 
 export function SettingsTabs({ active }: SettingsTabsProps) {
@@ -27,6 +27,16 @@ export function SettingsTabs({ active }: SettingsTabsProps) {
         to={routePaths.settingsSecurity}
       >
         Security
+      </AppLink>
+      <AppLink
+        className={
+          active === 'telegram'
+            ? 'section-tab section-tab-active'
+            : 'section-tab'
+        }
+        to={routePaths.settingsTelegram}
+      >
+        Telegram
       </AppLink>
     </nav>
   );

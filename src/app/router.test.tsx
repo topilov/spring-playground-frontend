@@ -244,6 +244,9 @@ describe('app routes', () => {
     expect(screen.getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
       '/settings/security'
     );
+    expect(screen.getByRole('link', { name: 'Telegram' }).getAttribute('href')).toBe(
+      '/settings/telegram'
+    );
   });
 
   it('renders the auth shell utility slot without disturbing content or footer composition', () => {
@@ -319,6 +322,32 @@ describe('app routes', () => {
     });
 
     expect(screen.getByRole('heading', { name: 'Security' })).toBeTruthy();
+  });
+
+  it('renders the protected telegram settings route for authenticated users', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/settings/telegram');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/settings/telegram');
+    });
+
+    expect(screen.getByRole('heading', { name: 'Telegram' })).toBeTruthy();
   });
 
   it('blocks protected routes when the session state cannot be verified', async () => {
