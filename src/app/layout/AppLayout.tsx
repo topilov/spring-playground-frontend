@@ -9,7 +9,7 @@ import { AppShell } from './AppShell';
 import { PublicShell } from './PublicShell';
 
 interface AppLayoutProps {
-  shell: 'app' | 'public';
+  shell: 'app' | 'public' | 'session';
 }
 
 export function AppLayout({ shell }: AppLayoutProps) {
@@ -36,7 +36,7 @@ export function AppLayout({ shell }: AppLayoutProps) {
         ? `Signed in as ${profile.displayName}`
         : null;
 
-  if (shell === 'public') {
+  if (shell === 'public' || (shell === 'session' && !isAuthenticated)) {
     return (
       <PublicShell
         sessionContext={sessionContext}

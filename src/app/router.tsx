@@ -34,10 +34,6 @@ export const routes: RouteObject[] = [
             element: <VerifyEmailPage />,
           },
           {
-            path: routePaths.verifyEmailChange.slice(1),
-            element: <VerifyEmailChangePage />,
-          },
-          {
             element: <AnonymousOnlyRoute />,
             children: [
               {
@@ -65,6 +61,15 @@ export const routes: RouteObject[] = [
           {
             path: '*',
             element: <NotFoundPage />,
+          },
+        ],
+      },
+      {
+        element: <AppLayout shell="session" />,
+        children: [
+          {
+            path: routePaths.verifyEmailChange.slice(1),
+            element: <VerifyEmailChangePage />,
           },
         ],
       },

@@ -227,12 +227,12 @@ describe('app routes', () => {
 
     renderRoute('/profile');
 
-    const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
+    await screen.findByRole('navigation', { name: 'Workspace' });
+
     const workspaceNav = screen.getByRole('navigation', { name: 'Workspace' });
     const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
 
-    expect(getRoleNames(primaryNav, 'link')).toEqual([]);
-    expect(getRoleNames(primaryNav, 'button')).toEqual([]);
+    expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull();
     expect(getRoleNames(workspaceNav, 'link')).toEqual([
       'Profile',
       'Account',
@@ -241,6 +241,43 @@ describe('app routes', () => {
     ]);
     expect(getRoleNames(workspaceNav, 'button')).toEqual([]);
     expect(getRoleNames(utilityNav, 'link')).toEqual([]);
+    expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
+  });
+
+  it('keeps authenticated shell navigation on verify-email-change for signed-in users', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/verify-email-change');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/verify-email-change');
+    });
+
+    const workspaceNav = await screen.findByRole('navigation', { name: 'Workspace' });
+    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
+
+    expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Verify email change' })).toBeTruthy();
+    expect(getRoleNames(workspaceNav, 'link')).toEqual([
+      'Profile',
+      'Account',
+      'Security',
+      'Telegram',
+    ]);
     expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
   });
 

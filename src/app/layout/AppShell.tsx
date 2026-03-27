@@ -43,8 +43,6 @@ export function AppShell({
         )}
 
         <div className="header-actions">
-          <nav aria-label="Primary" className="inline-actions" />
-
           <nav aria-label="Utility" className="inline-actions">
             <button
               className="button button-secondary"
