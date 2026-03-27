@@ -387,6 +387,8 @@ describe('app routes', () => {
     });
 
     expect(screen.getByRole('heading', { name: 'Security' })).toBeTruthy();
+    expect(screen.getByRole('group', { name: 'Security status' })).toBeTruthy();
+    expect(screen.getByText('Manage sign-in methods and account access posture.')).toBeTruthy();
   });
 
   it('renders the protected telegram settings route for authenticated users', async () => {

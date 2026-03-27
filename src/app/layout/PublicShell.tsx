@@ -20,54 +20,58 @@ export function PublicShell({
   showAnonymousActions,
 }: PublicShellProps) {
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <AppLink className="brand" to={routePaths.home}>
-          <span aria-hidden="true" className="brand-mark">
-            SP
-          </span>
-          <span className="brand-name">Spring Playground</span>
-        </AppLink>
+    <div className="app-shell app-shell-public">
+      <header className="app-header shell-header">
+        <div className="shell-header-bar">
+          <AppLink className="brand" to={routePaths.home}>
+            <span aria-hidden="true" className="brand-mark">
+              SP
+            </span>
+            <span className="brand-name">Spring Playground</span>
+          </AppLink>
 
-        {sessionContext ? (
-          <p
-            aria-label="Session context"
-            className="header-meta"
-            role="status"
-            title={sessionContext}
-          >
-            {sessionContext}
-          </p>
-        ) : (
-          <div className="header-meta-spacer" aria-hidden="true" />
-        )}
+          {sessionContext ? (
+            <p
+              aria-label="Session context"
+              className="header-meta"
+              role="status"
+              title={sessionContext}
+            >
+              {sessionContext}
+            </p>
+          ) : (
+            <div className="header-meta-spacer" aria-hidden="true" />
+          )}
 
-        <div className="header-actions">
-          <nav aria-label="Primary" className="inline-actions">
-            {showAnonymousActions ? (
-              <NavLink
-                className={({ isActive }) => getHeaderLinkClassName(isActive)}
-                to={routePaths.login}
-              >
-                Sign in
-              </NavLink>
-            ) : null}
-          </nav>
+          <div className="header-actions shell-actions">
+            <nav aria-label="Primary" className="inline-actions shell-nav">
+              {showAnonymousActions ? (
+                <NavLink
+                  className={({ isActive }) => getHeaderLinkClassName(isActive)}
+                  to={routePaths.login}
+                >
+                  Sign in
+                </NavLink>
+              ) : null}
+            </nav>
 
-          <nav aria-label="Utility" className="inline-actions">
-            {showAnonymousActions ? (
-              <NavLink
-                className={({ isActive }) => getHeaderLinkClassName(isActive)}
-                to={routePaths.register}
-              >
-                Create account
-              </NavLink>
-            ) : null}
-          </nav>
+            <nav aria-label="Utility" className="inline-actions shell-nav">
+              {showAnonymousActions ? (
+                <NavLink
+                  className={({ isActive }) => getHeaderLinkClassName(isActive)}
+                  to={routePaths.register}
+                >
+                  Create account
+                </NavLink>
+              ) : null}
+            </nav>
+          </div>
         </div>
       </header>
 
-      <main className="app-main">{children}</main>
+      <main className="app-main shell-main">
+        <div className="shell-stage shell-stage-public">{children}</div>
+      </main>
     </div>
   );
 }
