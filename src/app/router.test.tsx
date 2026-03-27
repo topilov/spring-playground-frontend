@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as authSessionModule from '../features/auth/session/useAuthSession';
 import { routes } from './router';
 import { AuthPageShell } from '../shared/ui/AuthPageShell';
+import { PageHeader } from '../shared/ui/PageHeader';
 
 function renderRoute(initialEntry: string) {
   const queryClient = new QueryClient({
@@ -328,13 +329,33 @@ describe('app routes', () => {
 
     const authIntro = screen.getByRole('region', { name: 'Sign in' });
     const authContent = screen.getByRole('region', { name: 'Authentication content' });
+    const supportRail = screen.getByLabelText('Sign in support');
 
     expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
     expect(within(authIntro).getByText('Use the utility action for secondary help.')).toBeTruthy();
     expect(authIntro.parentElement).toBe(authContent.parentElement);
+    expect(supportRail.tagName).toBe('ASIDE');
+    expect(supportRail.getAttribute('aria-live')).toBeNull();
     expect(screen.getByRole('button', { name: 'Use passkey' })).toBeTruthy();
     expect(within(authContent).getByText('Primary content')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();
+  });
+
+  it('renders page header status and actions as named groups', () => {
+    render(
+      <PageHeader
+        actions={<button type="button">Refresh</button>}
+        description="Manage sign-in methods and account access posture."
+        status={<p role="status">Passkey and two-factor changes apply immediately.</p>}
+        title="Security"
+      />
+    );
+
+    const statusGroup = screen.getByRole('group', { name: 'Security status' });
+    const actionsGroup = screen.getByRole('group', { name: 'Security actions' });
+
+    expect(within(statusGroup).getByRole('status')).toBeTruthy();
+    expect(within(actionsGroup).getByRole('button', { name: 'Refresh' })).toBeTruthy();
   });
 
   it('collapses the auth shell cleanly when no primary content is present', () => {

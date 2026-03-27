@@ -182,6 +182,7 @@ textarea {
 .detail-item {
   transition:
     transform var(--motion-duration) var(--motion-ease),
+    background var(--motion-duration) ease,
     background-color var(--motion-duration) ease,
     border-color var(--motion-duration) ease,
     color var(--motion-duration) ease,

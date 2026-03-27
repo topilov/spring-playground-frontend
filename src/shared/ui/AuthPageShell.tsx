@@ -34,11 +34,7 @@ export function AuthPageShell({
             </div>
 
             {utility ? (
-              <aside
-                aria-label={`${title} support`}
-                aria-live="polite"
-                className="auth-support"
-              >
+              <aside aria-label={`${title} support`} className="auth-support">
                 {utility}
               </aside>
             ) : null}
