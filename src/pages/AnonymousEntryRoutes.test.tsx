@@ -1,6 +1,6 @@
 /* @vitest-environment jsdom */
 
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -104,7 +104,24 @@ describe('anonymous entry routes', () => {
     expect(
       screen.getByText('A calm place to explore account access, profile tools, and session flows.')
     ).toBeTruthy();
-    expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole('link', { name: 'Create account' }).length).toBeGreaterThan(0);
+
+    const authContent = screen.getByRole('region', { name: 'Authentication content' });
+    expect(within(authContent).getByRole('link', { name: 'Sign in' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Create account' })).toBeTruthy();
+  });
+
+  it('renders the home route loading state while the session is being checked', () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'loading',
+      errorMessage: null,
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/', <HomePage />);
+
+    expect(screen.getByRole('heading', { name: 'Checking session' })).toBeTruthy();
+    expect(screen.getByText('Opening your account.')).toBeTruthy();
   });
 });

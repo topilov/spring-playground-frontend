@@ -23,16 +23,6 @@ export function HomePage() {
 
   return (
     <AuthPageShell
-      footer={
-        <div className="auth-links">
-          <AppLink className="text-link" to={routePaths.login}>
-            Sign in
-          </AppLink>
-          <AppLink className="text-link" to={routePaths.register}>
-            Create account
-          </AppLink>
-        </div>
-      }
       subtitle="A calm place to explore account access, profile tools, and session flows."
       utility={
         <p className="status-banner">

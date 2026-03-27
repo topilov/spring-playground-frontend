@@ -60,8 +60,27 @@ describe('app routes', () => {
     expect(
       screen.getByText('A calm place to explore account access, profile tools, and session flows.')
     ).toBeTruthy();
-    expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole('link', { name: 'Create account' }).length).toBeGreaterThan(0);
+
+    const authContent = screen.getByRole('region', { name: 'Authentication content' });
+    expect(within(authContent).getByRole('link', { name: 'Sign in' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Create account' })).toBeTruthy();
+  });
+
+  it('preserves the loading state on the root route while session status is pending', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'loading',
+      errorMessage: null,
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/');
+
+    await screen.findByRole('heading', { name: 'Checking session' });
+
+    expect(router.state.location.pathname).toBe('/');
+    expect(screen.getByText('Opening your account.')).toBeTruthy();
   });
 
   it('redirects authenticated visitors from the root route to profile', async () => {
