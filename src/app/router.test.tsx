@@ -205,9 +205,10 @@ describe('app routes', () => {
     expect(getRoleNames(primaryNav, 'button')).toEqual([]);
     expect(getRoleNames(utilityNav, 'link')).toEqual(['Create account']);
     expect(getRoleNames(utilityNav, 'button')).toEqual([]);
+    expect(screen.queryByRole('navigation', { name: 'Workspace' })).toBeNull();
   });
 
-  it('shows an authenticated header with account actions and a utility sign out action', async () => {
+  it('shows the authenticated shell with persistent workspace navigation and a utility sign out action', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'authenticated',
       errorMessage: null,
@@ -227,10 +228,18 @@ describe('app routes', () => {
     renderRoute('/profile');
 
     const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
+    const workspaceNav = screen.getByRole('navigation', { name: 'Workspace' });
     const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
 
-    expect(getRoleNames(primaryNav, 'link')).toEqual(['Profile', 'Settings']);
+    expect(getRoleNames(primaryNav, 'link')).toEqual([]);
     expect(getRoleNames(primaryNav, 'button')).toEqual([]);
+    expect(getRoleNames(workspaceNav, 'link')).toEqual([
+      'Profile',
+      'Account',
+      'Security',
+      'Telegram',
+    ]);
+    expect(getRoleNames(workspaceNav, 'button')).toEqual([]);
     expect(getRoleNames(utilityNav, 'link')).toEqual([]);
     expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
   });
@@ -254,14 +263,16 @@ describe('app routes', () => {
 
     renderRoute('/settings/account');
 
+    const workspaceNav = await screen.findByRole('navigation', { name: 'Workspace' });
+
     expect(await screen.findByRole('heading', { name: 'Account' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Account' }).getAttribute('href')).toBe(
+    expect(within(workspaceNav).getByRole('link', { name: 'Account' }).getAttribute('href')).toBe(
       '/settings/account'
     );
-    expect(screen.getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
+    expect(within(workspaceNav).getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
       '/settings/security'
     );
-    expect(screen.getByRole('link', { name: 'Telegram' }).getAttribute('href')).toBe(
+    expect(within(workspaceNav).getByRole('link', { name: 'Telegram' }).getAttribute('href')).toBe(
       '/settings/telegram'
     );
   });
