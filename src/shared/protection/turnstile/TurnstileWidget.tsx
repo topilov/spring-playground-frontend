@@ -27,6 +27,10 @@ export function TurnstileWidget({
     let isDisposed = false;
     let widgetId: TurnstileWidgetId | null = null;
 
+    if (!appConfig.captchaRequired) {
+      return undefined;
+    }
+
     if (!siteKey) {
       controller.handleError(new Error('Turnstile site key is not configured.'));
       return undefined;
@@ -77,6 +81,10 @@ export function TurnstileWidget({
       controller.detach();
     };
   }, [controller, siteKey]);
+
+  if (!appConfig.captchaRequired) {
+    return null;
+  }
 
   return <div aria-live="polite" ref={containerRef} />;
 }

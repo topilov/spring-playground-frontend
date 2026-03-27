@@ -7,6 +7,7 @@ import { ProtectedStatusBanner } from '../../../shared/protection/ProtectedStatu
 import { TurnstileWidget } from '../../../shared/protection/turnstile/TurnstileWidget';
 import { useTurnstileController } from '../../../shared/protection/turnstile/useTurnstileController';
 import { useProtectedAction } from '../../../shared/protection/useProtectedAction';
+import { appConfig } from '../../../shared/config/appConfig';
 import { useForgotPasswordMutation } from '../mutations';
 import {
   forgotPasswordFormSchema,
@@ -21,6 +22,7 @@ export function ForgotPasswordForm() {
   const forgotPasswordMutation = useForgotPasswordMutation();
   const turnstileController = useTurnstileController();
   const protectedAction = useProtectedAction({
+    enabled: appConfig.captchaRequired,
     acquireToken: () => turnstileController.acquireToken(),
     reset: () => turnstileController.reset(),
   });

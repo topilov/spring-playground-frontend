@@ -19,3 +19,9 @@ Backend references:
 - Repo: `https://github.com/topilov/spring-playground-backend`
 - Intended Pages OpenAPI JSON: `https://topilov.github.io/spring-playground-backend/openapi/openapi.json`
 - Raw schema fallback used by tooling when Pages is not ready: `https://raw.githubusercontent.com/topilov/spring-playground-backend/main/openapi/openapi.yaml`
+
+Local development notes:
+
+- The backend local profile may disable captcha. Mirror that only in non-production frontend runs with `VITE_AUTH_CAPTCHA_REQUIRED=false`; never relax captcha behavior for production.
+- Local demo credentials for backend-local development only: login `demo`, password `demo-password`.
+- Keep passkey login aligned with the shared protection flow: acquire captcha for the protected login start request, but do not reuse a stale Turnstile token across the WebAuthn ceremony.

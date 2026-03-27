@@ -80,4 +80,33 @@ describe('TurnstileWidget', () => {
 
     await expect(ensureTurnstileScript()).resolves.toBeUndefined();
   });
+
+  it('renders nothing when captcha protection is disabled for local development', async () => {
+    vi.resetModules();
+    vi.doMock('../../config/appConfig', () => ({
+      appConfig: {
+        turnstileSiteKey: '',
+        captchaRequired: false,
+      },
+    }));
+
+    const { TurnstileWidget: DisabledTurnstileWidget } = await import('./TurnstileWidget');
+    const controller = {
+      acquireToken: vi.fn(),
+      reset: vi.fn(),
+      isReady: false,
+      attach: vi.fn(),
+      detach: vi.fn(),
+      handleError: vi.fn(),
+      handleExpired: vi.fn(),
+      handleToken: vi.fn(),
+    };
+
+    const { container } = render(
+      <DisabledTurnstileWidget controller={controller} siteKey="" />
+    );
+
+    expect(container.innerHTML).toBe('');
+    expect(controller.handleError).not.toHaveBeenCalled();
+  });
 });

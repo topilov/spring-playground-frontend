@@ -30,7 +30,7 @@ export interface RequestEmailChangeInput {
 
 export interface VerifyEmailChangeInput {
   token: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export type ProfileResponseDto = ApiResponse<'/api/profile/me', 'get'>;

@@ -17,6 +17,7 @@ import { ProtectedStatusBanner } from '../../shared/protection/ProtectedStatusBa
 import { TurnstileWidget } from '../../shared/protection/turnstile/TurnstileWidget';
 import { useTurnstileController } from '../../shared/protection/turnstile/useTurnstileController';
 import { useProtectedAction } from '../../shared/protection/useProtectedAction';
+import { appConfig } from '../../shared/config/appConfig';
 import { routePaths } from '../../shared/routing/paths';
 import { AppLink } from '../../shared/routing/AppLink';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
@@ -34,6 +35,7 @@ export function TwoFactorLoginPage() {
   const verifyTwoFactorBackupCodeMutation = useVerifyTwoFactorBackupCodeMutation();
   const turnstileController = useTurnstileController();
   const protectedAction = useProtectedAction({
+    enabled: appConfig.captchaRequired,
     acquireToken: () => turnstileController.acquireToken(),
     reset: () => turnstileController.reset(),
   });

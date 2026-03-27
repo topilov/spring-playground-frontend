@@ -89,7 +89,6 @@ export function usePasskeyLoginMutation() {
       return finishPasskeyLogin({
         ceremonyId: ceremony.ceremonyId,
         credential,
-        captchaToken: payload.captchaToken,
       });
     },
     onSuccess: async () => {

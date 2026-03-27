@@ -50,6 +50,24 @@ describe('appConfig', () => {
     expect(appConfig.turnstileSiteKey).toBe('');
   });
 
+  it('keeps captcha enabled by default in production builds', async () => {
+    vi.stubEnv('MODE', 'production');
+    vi.stubEnv('VITE_AUTH_CAPTCHA_REQUIRED', 'false');
+
+    const { appConfig } = await import('./appConfig');
+
+    expect(appConfig.captchaRequired).toBe(true);
+  });
+
+  it('allows local development to disable captcha explicitly', async () => {
+    vi.stubEnv('MODE', 'development');
+    vi.stubEnv('VITE_AUTH_CAPTCHA_REQUIRED', 'false');
+
+    const { appConfig } = await import('./appConfig');
+
+    expect(appConfig.captchaRequired).toBe(false);
+  });
+
   it('logs the raw and resolved VITE_API_BASE_URL values', async () => {
     vi.stubEnv('VITE_API_BASE_URL', '  https://api.example.test  ');
     const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});

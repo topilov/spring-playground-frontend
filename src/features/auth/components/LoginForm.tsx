@@ -11,6 +11,7 @@ import { useTurnstileController } from '../../../shared/protection/turnstile/use
 import { useProtectedAction } from '../../../shared/protection/useProtectedAction';
 import { isAppPath, routePaths } from '../../../shared/routing/paths';
 import { AppLink } from '../../../shared/routing/AppLink';
+import { appConfig } from '../../../shared/config/appConfig';
 import { isTwoFactorLoginChallenge } from '../../../entities/session/model';
 import {
   savePendingTwoFactorLoginChallenge,
@@ -31,6 +32,7 @@ export function LoginForm() {
   const passkeyLoginMutation = usePasskeyLoginMutation();
   const turnstileController = useTurnstileController();
   const protectedAction = useProtectedAction({
+    enabled: appConfig.captchaRequired,
     acquireToken: () => turnstileController.acquireToken(),
     reset: () => turnstileController.reset(),
   });

@@ -4,7 +4,7 @@ export interface RegisterInput {
   username: string;
   email: string;
   password: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export interface RegisterResult {
@@ -23,7 +23,7 @@ export interface VerifyEmailResult {
 
 export interface ResendVerificationEmailInput {
   email: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export interface ResendVerificationEmailResult {
@@ -32,7 +32,7 @@ export interface ResendVerificationEmailResult {
 
 export interface ForgotPasswordInput {
   email: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export interface ForgotPasswordResult {
@@ -42,7 +42,7 @@ export interface ForgotPasswordResult {
 export interface ResetPasswordInput {
   token: string;
   newPassword: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export interface ResetPasswordResult {
