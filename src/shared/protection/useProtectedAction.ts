@@ -8,12 +8,13 @@ const TURNSTILE_FAILURE_MESSAGE =
   'We could not verify that you are human. Please try again.';
 
 interface UseProtectedActionOptions {
+  enabled: boolean;
   acquireToken: () => Promise<string>;
   reset: () => void;
 }
 
 interface ProtectedExecutionOptions<T> {
-  execute: (captchaToken: string) => Promise<T>;
+  execute: (captchaToken: string | undefined) => Promise<T>;
 }
 
 interface UseProtectedActionResult {
@@ -33,6 +34,7 @@ function safeReset(reset: () => void): void {
 }
 
 export function useProtectedAction({
+  enabled,
   acquireToken,
   reset,
 }: UseProtectedActionOptions): UseProtectedActionResult {
@@ -45,24 +47,28 @@ export function useProtectedAction({
     setProtection(null);
     handledErrorRef.current = null;
 
-    let captchaToken: string;
+    let captchaToken: string | undefined;
 
-    try {
-      captchaToken = await acquireToken();
-    } catch (error) {
-      const message =
-        error instanceof Error && error.message === TURNSTILE_INCOMPLETE_MESSAGE
-          ? TURNSTILE_INCOMPLETE_MESSAGE
-          : TURNSTILE_FAILURE_MESSAGE;
-      setErrorMessage(message);
-      const handledError = new Error(message);
-      handledErrorRef.current = handledError;
-      throw handledError;
+    if (enabled) {
+      try {
+        captchaToken = await acquireToken();
+      } catch (error) {
+        const message =
+          error instanceof Error && error.message === TURNSTILE_INCOMPLETE_MESSAGE
+            ? TURNSTILE_INCOMPLETE_MESSAGE
+            : TURNSTILE_FAILURE_MESSAGE;
+        setErrorMessage(message);
+        const handledError = new Error(message);
+        handledErrorRef.current = handledError;
+        throw handledError;
+      }
     }
 
     try {
       const result = await run(captchaToken);
-      safeReset(reset);
+      if (enabled) {
+        safeReset(reset);
+      }
       return result;
     } catch (error) {
       const protectionResult = getProtectionResultFromError(error);
@@ -72,7 +78,9 @@ export function useProtectedAction({
         handledErrorRef.current = error;
       }
 
-      safeReset(reset);
+      if (enabled) {
+        safeReset(reset);
+      }
 
       throw error;
     }

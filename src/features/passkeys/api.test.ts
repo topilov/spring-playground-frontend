@@ -288,4 +288,41 @@ describe('passkeys api', () => {
       })
     );
   });
+
+  it('omits the captcha token from passkey verify when the frontend has no fresh token to send', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          authenticated: true,
+          userId: 1,
+          username: 'demo',
+          email: 'demo@example.com',
+          role: 'USER',
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    );
+
+    await finishPasskeyLogin({
+      ceremonyId: 'login-ceremony',
+      credential: {
+        id: 'credential-id',
+      },
+    });
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init?.body).toBe(
+      JSON.stringify({
+        ceremonyId: 'login-ceremony',
+        credential: {
+          id: 'credential-id',
+        },
+      })
+    );
+  });
 });

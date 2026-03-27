@@ -3,7 +3,7 @@ import type { ApiRequestBody, ApiResponse } from '../../shared/api/contract';
 export interface LoginCredentials {
   usernameOrEmail: string;
   password: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export interface SessionUser {

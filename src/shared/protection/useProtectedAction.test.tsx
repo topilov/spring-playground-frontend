@@ -12,7 +12,9 @@ describe('useProtectedAction', () => {
     const acquireToken = vi.fn().mockResolvedValue('captcha-token');
     const reset = vi.fn();
     const execute = vi.fn().mockResolvedValue({ ok: true });
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     const response = await result.current.execute({ execute });
 
@@ -25,7 +27,9 @@ describe('useProtectedAction', () => {
     const acquireToken = vi.fn().mockResolvedValue('captcha-token');
     const reset = vi.fn();
     const execute = vi.fn().mockResolvedValue({ ok: true });
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     await result.current.execute({ execute });
 
@@ -38,7 +42,9 @@ describe('useProtectedAction', () => {
       throw new Error('widget disappeared');
     });
     const execute = vi.fn().mockResolvedValue({ ok: true });
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     await expect(result.current.execute({ execute })).resolves.toEqual({ ok: true });
   });
@@ -56,7 +62,9 @@ describe('useProtectedAction', () => {
       },
     });
     const execute = vi.fn().mockRejectedValue(protectionError);
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     await expect(result.current.execute({ execute })).rejects.toBe(protectionError);
 
@@ -84,7 +92,9 @@ describe('useProtectedAction', () => {
       },
     });
     const execute = vi.fn().mockRejectedValue(protectionError);
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     await expect(result.current.execute({ execute })).rejects.toBe(protectionError);
 
@@ -122,7 +132,9 @@ describe('useProtectedAction', () => {
       .fn()
       .mockRejectedValueOnce(businessError)
       .mockResolvedValueOnce({ ok: true });
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     await expect(result.current.execute({ execute })).rejects.toBe(businessError);
     await expect(result.current.execute({ execute })).resolves.toEqual({ ok: true });
@@ -136,7 +148,9 @@ describe('useProtectedAction', () => {
     const acquireToken = vi.fn().mockRejectedValue(new Error('turnstile unavailable'));
     const reset = vi.fn();
     const execute = vi.fn();
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     await expect(result.current.execute({ execute })).rejects.toThrow(
       'We could not verify that you are human. Please try again.'
@@ -155,7 +169,9 @@ describe('useProtectedAction', () => {
     const acquireToken = vi.fn().mockRejectedValue(new Error(TURNSTILE_INCOMPLETE_MESSAGE));
     const reset = vi.fn();
     const execute = vi.fn();
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     await expect(result.current.execute({ execute })).rejects.toThrow(
       TURNSTILE_INCOMPLETE_MESSAGE
@@ -172,7 +188,9 @@ describe('useProtectedAction', () => {
     const acquireToken = vi.fn().mockRejectedValue(new Error('turnstile unavailable'));
     const reset = vi.fn();
     const execute = vi.fn();
-    const { result } = renderHook(() => useProtectedAction({ acquireToken, reset }));
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: true })
+    );
 
     const thrownError = await result.current.execute({ execute }).catch((error) => error);
 
@@ -186,5 +204,21 @@ describe('useProtectedAction', () => {
     result.current.resetStatus();
 
     expect(result.current.wasHandledError(thrownError)).toBe(false);
+  });
+
+  it('skips captcha acquisition entirely when protection is disabled', async () => {
+    const acquireToken = vi.fn();
+    const reset = vi.fn();
+    const execute = vi.fn().mockResolvedValue({ ok: true });
+    const { result } = renderHook(() =>
+      useProtectedAction({ acquireToken, reset, enabled: false })
+    );
+
+    const response = await result.current.execute({ execute });
+
+    expect(acquireToken).not.toHaveBeenCalled();
+    expect(execute).toHaveBeenCalledWith(undefined);
+    expect(reset).not.toHaveBeenCalled();
+    expect(response).toEqual({ ok: true });
   });
 });

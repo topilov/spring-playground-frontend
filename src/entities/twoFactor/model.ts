@@ -35,13 +35,13 @@ export interface DisableTwoFactorResult {
 export interface VerifyTwoFactorLoginInput {
   loginChallengeId: string;
   code: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export interface VerifyTwoFactorBackupCodeLoginInput {
   loginChallengeId: string;
   backupCode: string;
-  captchaToken: string;
+  captchaToken?: string;
 }
 
 export type TwoFactorStatusResponseDto = ApiResponse<'/api/auth/2fa/status', 'get'>;
