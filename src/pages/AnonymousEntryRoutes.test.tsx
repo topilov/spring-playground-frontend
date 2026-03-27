@@ -6,9 +6,11 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ForgotPasswordPage } from './forgot-password/ForgotPasswordPage';
+import { HomePage } from './home/HomePage';
 import { LoginPage } from './login/LoginPage';
 import { RegisterPage } from './register/RegisterPage';
 import { ResetPasswordPage } from './reset-password/ResetPasswordPage';
+import * as authSessionModule from '../features/auth/session/useAuthSession';
 
 const useLoginMutationMock = vi.fn();
 const useRegisterMutationMock = vi.fn();
@@ -85,5 +87,24 @@ describe('anonymous entry routes', () => {
     expect(screen.getByText('Set a new password and return to operator access.')).toBeTruthy();
     expect(screen.getByText('Use the link from your inbox. If it expires, request a fresh reset from sign in.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Reset password' })).toBeTruthy();
+  });
+
+  it('renders the home route as a public entry surface for anonymous users', () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'anonymous',
+      errorMessage: null,
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/', <HomePage />);
+
+    expect(screen.getByRole('heading', { name: 'Spring Playground' })).toBeTruthy();
+    expect(
+      screen.getByText('A calm place to explore account access, profile tools, and session flows.')
+    ).toBeTruthy();
+    expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Create account' }).length).toBeGreaterThan(0);
   });
 });

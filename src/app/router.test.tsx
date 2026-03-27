@@ -43,7 +43,7 @@ describe('app routes', () => {
     vi.restoreAllMocks();
   });
 
-  it('redirects anonymous visitors from the root route to login', async () => {
+  it('renders the public home surface for anonymous visitors on the root route', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'anonymous',
       errorMessage: null,
@@ -54,16 +54,14 @@ describe('app routes', () => {
 
     const { router } = renderRoute('/');
 
-    await waitFor(() => {
-      expect(router.state.location.pathname).toBe('/login');
-    });
+    await screen.findByRole('heading', { name: 'Spring Playground' });
 
-    const authIntro = screen.getByRole('region', { name: 'Sign in' });
-
-    expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
+    expect(router.state.location.pathname).toBe('/');
     expect(
-      within(authIntro).getByText('Use your account details or a registered passkey.')
+      screen.getByText('A calm place to explore account access, profile tools, and session flows.')
     ).toBeTruthy();
+    expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Create account' }).length).toBeGreaterThan(0);
   });
 
   it('redirects authenticated visitors from the root route to profile', async () => {
