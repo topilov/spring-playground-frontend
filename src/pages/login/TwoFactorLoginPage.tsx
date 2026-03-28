@@ -61,7 +61,7 @@ export function TwoFactorLoginPage() {
     return (
       <AuthPageShell
         subtitle="Redirecting back to the first sign-in step."
-        title="Two-factor verification"
+        title="Two-factor sign in"
       />
     );
   }
@@ -175,7 +175,7 @@ export function TwoFactorLoginPage() {
           </AppLink>
         </div>
       }
-      subtitle="Finish password sign-in with your authenticator app or a one-time backup code."
+      subtitle="Finish sign-in with your authenticator app or a backup code."
       utility={
         <div className="stack">
           <p className="status-banner" role="status">
@@ -188,7 +188,7 @@ export function TwoFactorLoginPage() {
           ) : null}
         </div>
       }
-      title="Two-factor verification"
+      title="Two-factor sign in"
     >
       {backupCodeEnabled ? (
         <div className="inline-actions">

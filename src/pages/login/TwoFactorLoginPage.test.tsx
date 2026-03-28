@@ -107,6 +107,7 @@ describe('TwoFactorLoginPage', () => {
 
     renderPage();
 
+    expect(screen.getByRole('heading', { name: 'Two-factor sign in' })).toBeTruthy();
     expect(screen.getByTestId('turnstile-widget')).toBeTruthy();
 
     await user.type(screen.getByLabelText('Authenticator code'), '123456');
@@ -141,6 +142,9 @@ describe('TwoFactorLoginPage', () => {
 
     renderPage();
 
+    expect(
+      screen.getByText('Finish sign-in with your authenticator app or a backup code.')
+    ).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Use backup code' }));
     await user.type(screen.getByLabelText('Backup code'), 'ABCD-EFGH-JKLM');
     await user.click(screen.getByRole('button', { name: 'Verify backup code' }));

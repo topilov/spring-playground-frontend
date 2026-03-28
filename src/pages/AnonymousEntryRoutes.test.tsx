@@ -56,8 +56,12 @@ describe('anonymous entry routes', () => {
   it('renders the login route with operator guidance', () => {
     renderRoute('/login', <LoginPage />);
 
-    expect(screen.getByText('Use your account details or a registered passkey.')).toBeTruthy();
-    expect(screen.getByText('Password sign-in and passkey sign-in use the same operator account.')).toBeTruthy();
+    expect(
+      screen.getByText('Enter the account workspace with a password or a registered passkey.')
+    ).toBeTruthy();
+    expect(
+      screen.getByText('Passkeys, passwords, and recovery all return to the same account.')
+    ).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Sign in with passkey' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Forgot password' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Create account' })).toBeTruthy();
@@ -66,8 +70,16 @@ describe('anonymous entry routes', () => {
   it('renders the register route with verification guidance', () => {
     renderRoute('/register', <RegisterPage />);
 
-    expect(screen.getByText('Create an operator account and verify it before first access.')).toBeTruthy();
-    expect(screen.getByText('Use an address you can verify now. Sign-in remains locked until email verification completes.')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Create the account you will use for profile access, sign-in checks, and recovery.'
+      )
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Use an address you can verify now. Sign-in stays paused until email verification is complete.'
+      )
+    ).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Create account' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Sign in' })).toBeTruthy();
   });
@@ -75,8 +87,14 @@ describe('anonymous entry routes', () => {
   it('renders the forgot-password route with recovery guidance', () => {
     renderRoute('/forgot-password', <ForgotPasswordPage />);
 
-    expect(screen.getByText('Request a fresh password reset link for an existing account.')).toBeTruthy();
-    expect(screen.getByText('Enter the account email exactly as registered. If the inbox stays quiet, check spam before sending another request.')).toBeTruthy();
+    expect(
+      screen.getByText('Request a fresh reset link for the account you want to reopen.')
+    ).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Use the account email exactly as registered. If the inbox stays quiet, check spam before sending another request.'
+      )
+    ).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Send reset link' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Back to sign in' })).toBeTruthy();
   });
@@ -84,8 +102,12 @@ describe('anonymous entry routes', () => {
   it('renders the reset-password route with link guidance', () => {
     renderRoute('/reset-password?token=reset-token', <ResetPasswordPage />);
 
-    expect(screen.getByText('Set a new password and return to operator access.')).toBeTruthy();
-    expect(screen.getByText('Use the link from your inbox. If it expires, request a fresh reset from sign in.')).toBeTruthy();
+    expect(screen.getByText('Set a new password and return to the account workspace.')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Use the reset link from your inbox. If it expires, request another one from sign in.'
+      )
+    ).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Reset password' })).toBeTruthy();
   });
 
@@ -102,12 +124,18 @@ describe('anonymous entry routes', () => {
 
     expect(screen.getByRole('heading', { name: 'Spring Playground' })).toBeTruthy();
     expect(
-      screen.getByText('A calm place to explore account access, profile tools, and session flows.')
+      screen.getByText(
+        'Identity workspace for profile access, sign-in checks, and account recovery.'
+      )
     ).toBeTruthy();
+    expect(screen.getByText('Passkeys')).toBeTruthy();
+    expect(screen.getByText('Two-factor')).toBeTruthy();
+    expect(screen.getByText('Telegram')).toBeTruthy();
 
     const authContent = screen.getByRole('region', { name: 'Authentication content' });
     expect(within(authContent).getByRole('link', { name: 'Sign in' })).toBeTruthy();
     expect(within(authContent).getByRole('link', { name: 'Create account' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Recover account' })).toBeTruthy();
   });
 
   it('renders the home route loading state while the session is being checked', () => {
@@ -122,6 +150,6 @@ describe('anonymous entry routes', () => {
     renderRoute('/', <HomePage />);
 
     expect(screen.getByRole('heading', { name: 'Checking session' })).toBeTruthy();
-    expect(screen.getByText('Opening your account.')).toBeTruthy();
+    expect(screen.getByText('Loading your workspace entry.')).toBeTruthy();
   });
 });

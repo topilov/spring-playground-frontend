@@ -59,12 +59,18 @@ describe('app routes', () => {
 
     expect(router.state.location.pathname).toBe('/');
     expect(
-      screen.getByText('A calm place to explore account access, profile tools, and session flows.')
+      screen.getByText(
+        'Identity workspace for profile access, sign-in checks, and account recovery.'
+      )
     ).toBeTruthy();
+    expect(screen.getByText('Passkeys')).toBeTruthy();
+    expect(screen.getByText('Two-factor')).toBeTruthy();
+    expect(screen.getByText('Telegram')).toBeTruthy();
 
     const authContent = screen.getByRole('region', { name: 'Authentication content' });
     expect(within(authContent).getByRole('link', { name: 'Sign in' })).toBeTruthy();
     expect(within(authContent).getByRole('link', { name: 'Create account' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Recover account' })).toBeTruthy();
   });
 
   it('preserves the loading state on the root route while session status is pending', async () => {
@@ -81,7 +87,7 @@ describe('app routes', () => {
     await screen.findByRole('heading', { name: 'Checking session' });
 
     expect(router.state.location.pathname).toBe('/');
-    expect(screen.getByText('Opening your account.')).toBeTruthy();
+    expect(screen.getByText('Loading your workspace entry.')).toBeTruthy();
   });
 
   it('redirects authenticated visitors from the root route to profile', async () => {

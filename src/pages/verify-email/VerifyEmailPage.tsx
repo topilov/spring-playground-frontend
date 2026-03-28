@@ -28,14 +28,14 @@ function getShellSubtitle(
   hasToken: boolean
 ) {
   if (verificationStatus === 'verified') {
-    return 'Verification complete. Return to operator access when ready.';
+    return 'Verification cleared. Return to sign-in when you are ready to continue.';
   }
 
   if (hasToken) {
-    return 'Finish the link check, then recover operator access if needed.';
+    return 'Complete the email check and return to sign-in when the link clears.';
   }
 
-  return 'Use the original verification link or dispatch another one from here.';
+  return 'Use the verification link from your inbox, or issue a fresh one from this screen.';
 }
 
 export function VerifyEmailPage() {
@@ -139,13 +139,13 @@ export function VerifyEmailPage() {
         <div className="stack">
           {verificationStatus === 'verifying' ? (
             <p className="status-banner" role="status">
-              Checking your verification link...
+              Checking verification link...
             </p>
           ) : null}
 
           {verificationStatus === 'verified' ? (
             <p className="status-banner status-success" role="status">
-              Email verified. Operator access is ready for sign-in.
+              Email verified. The account workspace is ready for sign-in.
             </p>
           ) : null}
 
@@ -157,7 +157,7 @@ export function VerifyEmailPage() {
 
           {verificationStatus === 'idle' && !hasResendInlineStatus ? (
             <p className="status-banner" role="status">
-              Open the email link, or request a new one below.
+              Open the email verification link, or request another one below.
             </p>
           ) : null}
 
@@ -176,7 +176,9 @@ export function VerifyEmailPage() {
       }
       title="Verify email"
     >
-      <p className="page-description">Need another link? Send it to the address below.</p>
+      <p className="page-description">
+        Need another link? Send it to the address below and keep the account flow moving.
+      </p>
 
       <form className="stack" onSubmit={handleResend}>
         <label className="field">

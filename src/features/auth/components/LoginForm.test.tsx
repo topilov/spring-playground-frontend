@@ -80,6 +80,7 @@ describe('LoginForm', () => {
     renderForm();
 
     expect(screen.getByRole('button', { name: 'Sign in with passkey' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeTruthy();
   });
 
   it('renders turnstile inline and submits login with a captcha token', async () => {

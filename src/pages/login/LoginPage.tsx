@@ -22,11 +22,11 @@ export function LoginPage() {
           </AppLink>
         </div>
       }
-      subtitle="Use your account details or a registered passkey."
+      subtitle="Enter the account workspace with a password or a registered passkey."
       utility={
         <div className="stack">
           <p className="status-banner">
-            Password sign-in and passkey sign-in use the same operator account.
+            Passkeys, passwords, and recovery all return to the same account.
           </p>
           {authNotice ? (
             <p className="status-banner" role="status">
