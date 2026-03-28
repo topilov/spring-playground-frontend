@@ -52,7 +52,7 @@ export function TelegramModesSection({
   const isBusy = isCreating || isDeleting || isUpdating;
 
   return (
-    <section className="workspace-band stack">
+    <section className="page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Telegram modes</h2>
@@ -99,8 +99,8 @@ export function TelegramModesSection({
         </label>
 
         <div className="inline-actions">
-          <button className="button button-primary" disabled={isBusy} type="submit">
-            {isCreating ? 'Adding mode...' : 'Add mode'}
+          <button className="button button-primary form-action-button" disabled={isBusy} type="submit">
+            {isCreating ? 'Adding mode…' : 'Add mode'}
           </button>
         </div>
       </form>
@@ -159,16 +159,16 @@ export function TelegramModesSection({
                 </label>
 
                 <div className="inline-actions">
-                  <button className="button button-primary" disabled={isBusy} type="submit">
-                    {isUpdating ? `Saving mode ${entry.mode}...` : `Save mode ${entry.mode}`}
+                  <button className="button button-primary form-action-button" disabled={isBusy} type="submit">
+                    {isUpdating ? `Saving mode ${entry.mode}…` : `Save mode ${entry.mode}`}
                   </button>
                   <button
-                    className="button"
+                    className="button form-action-button"
                     disabled={isBusy}
                     onClick={() => onDelete(entry.mode)}
                     type="button"
                   >
-                    {isDeleting ? `Deleting mode ${entry.mode}...` : `Delete mode ${entry.mode}`}
+                    {isDeleting ? `Deleting mode ${entry.mode}…` : `Delete mode ${entry.mode}`}
                   </button>
                 </div>
               </form>

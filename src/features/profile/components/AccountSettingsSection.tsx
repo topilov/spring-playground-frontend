@@ -69,7 +69,7 @@ export function AccountSettingsSection() {
 
   return (
     <section className="stack">
-      <section className="workspace-band workspace-band-primary stack">
+      <section className="page-card stack">
         <div className="workspace-band-header">
           <div className="section-heading">
             <h2>Username</h2>
@@ -89,6 +89,7 @@ export function AccountSettingsSection() {
               autoComplete="username"
               maxLength={64}
               placeholder="demo"
+              spellCheck={false}
               {...usernameForm.register('username')}
             />
             {usernameForm.formState.errors.username ? (
@@ -99,11 +100,11 @@ export function AccountSettingsSection() {
           </label>
 
           <button
-            className="button button-primary"
+            className="button button-primary form-action-button"
             disabled={usernameForm.formState.isSubmitting}
             type="submit"
           >
-            {usernameForm.formState.isSubmitting ? 'Saving username...' : 'Save username'}
+            {usernameForm.formState.isSubmitting ? 'Saving username…' : 'Save username'}
           </button>
 
           {usernameSuccessMessage ? (
@@ -120,7 +121,7 @@ export function AccountSettingsSection() {
         </form>
       </section>
 
-      <section className="workspace-band stack">
+      <section className="page-card stack">
         <div className="workspace-band-header">
           <div className="section-heading">
             <h2>Email</h2>
@@ -138,6 +139,7 @@ export function AccountSettingsSection() {
             <input
               autoComplete="email"
               placeholder="name@example.com"
+              spellCheck={false}
               type="email"
               {...emailForm.register('newEmail')}
             />
@@ -149,12 +151,12 @@ export function AccountSettingsSection() {
           </label>
 
           <button
-            className="button button-primary"
+            className="button button-primary form-action-button"
             disabled={emailForm.formState.isSubmitting}
             type="submit"
           >
             {emailForm.formState.isSubmitting
-              ? 'Requesting email change...'
+              ? 'Requesting email change…'
               : 'Request email change'}
           </button>
 

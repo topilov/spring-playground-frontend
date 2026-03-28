@@ -61,7 +61,7 @@ export function TwoFactorLoginPage() {
     return (
       <AuthPageShell
         subtitle="Redirecting back to the first sign-in step."
-        title="Two-factor verification"
+        title="Two-factor sign in"
       />
     );
   }
@@ -175,7 +175,7 @@ export function TwoFactorLoginPage() {
           </AppLink>
         </div>
       }
-      subtitle="Finish password sign-in with your authenticator app or a one-time backup code."
+      subtitle="Finish sign-in with your authenticator app or a backup code."
       utility={
         <div className="stack">
           <p className="status-banner" role="status">
@@ -188,7 +188,7 @@ export function TwoFactorLoginPage() {
           ) : null}
         </div>
       }
-      title="Two-factor verification"
+      title="Two-factor sign in"
     >
       {backupCodeEnabled ? (
         <div className="inline-actions">
@@ -220,6 +220,7 @@ export function TwoFactorLoginPage() {
               inputMode="numeric"
               onChange={(event) => setCode(event.target.value)}
               placeholder="123456"
+              spellCheck={false}
               value={code}
             />
           </label>
@@ -231,7 +232,7 @@ export function TwoFactorLoginPage() {
           />
 
           <button className="button button-primary button-full" disabled={isSubmitting} type="submit">
-            {verifyTwoFactorLoginMutation.isPending ? 'Verifying code...' : 'Verify code'}
+            {verifyTwoFactorLoginMutation.isPending ? 'Verifying code…' : 'Verify code'}
           </button>
         </form>
       ) : null}
@@ -244,6 +245,7 @@ export function TwoFactorLoginPage() {
               autoCapitalize="characters"
               onChange={(event) => setBackupCode(event.target.value)}
               placeholder="ABCD-EFGH-JKLM"
+              spellCheck={false}
               value={backupCode}
             />
           </label>
@@ -256,7 +258,7 @@ export function TwoFactorLoginPage() {
 
           <button className="button button-primary button-full" disabled={isSubmitting} type="submit">
             {verifyTwoFactorBackupCodeMutation.isPending
-              ? 'Verifying backup code...'
+              ? 'Verifying backup code…'
               : 'Verify backup code'}
           </button>
         </form>

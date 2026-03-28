@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 
 interface PageHeaderProps {
   actions?: ReactNode;
@@ -15,20 +15,35 @@ export function PageHeader({
   status,
   title,
 }: PageHeaderProps) {
+  const titleId = useId();
+  const descriptionId = useId();
   const hasAside = Boolean(actions || status);
+  const describedBy = description ? descriptionId : undefined;
 
   return (
-    <header className="page-header">
+    <header
+      aria-describedby={describedBy}
+      aria-labelledby={titleId}
+      className="page-header"
+    >
       <div className="page-header-copy">
         {eyebrow ? <p className="page-eyebrow">{eyebrow}</p> : null}
-        <h1>{title}</h1>
-        {description ? <p className="page-description">{description}</p> : null}
+        <h1 id={titleId}>{title}</h1>
+        {description ? <p className="page-description" id={descriptionId}>{description}</p> : null}
       </div>
 
       {hasAside ? (
         <div className="page-header-aside stack">
-          {status ? <div className="page-header-status">{status}</div> : null}
-          {actions ? <div className="page-header-actions">{actions}</div> : null}
+          {status ? (
+            <div aria-label={`${title} status`} className="page-header-status" role="group">
+              {status}
+            </div>
+          ) : null}
+          {actions ? (
+            <div aria-label={`${title} actions`} className="page-header-actions" role="group">
+              {actions}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </header>

@@ -1,8 +1,6 @@
 import { useLocation } from 'react-router-dom';
 
 import { LoginForm } from '../../features/auth/components/LoginForm';
-import { AppLink } from '../../shared/routing/AppLink';
-import { routePaths } from '../../shared/routing/paths';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 export function LoginPage() {
@@ -12,21 +10,11 @@ export function LoginPage() {
 
   return (
     <AuthPageShell
-      footer={
-        <div className="auth-links">
-          <AppLink className="text-link" to={routePaths.forgotPassword}>
-            Forgot password
-          </AppLink>
-          <AppLink className="text-link" to={routePaths.register}>
-            Create account
-          </AppLink>
-        </div>
-      }
-      subtitle="Use your account details or a registered passkey."
+      subtitle="Enter the account workspace with a password or a registered passkey."
       utility={
         <div className="stack">
-          <p className="status-banner">
-            Password sign-in and passkey sign-in use the same operator account.
+          <p className="status-banner" role="status">
+            Passkeys, passwords, and recovery all return to the same account.
           </p>
           {authNotice ? (
             <p className="status-banner" role="status">

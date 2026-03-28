@@ -44,18 +44,19 @@ describe('ProfilePage', () => {
     refreshSession.mockImplementation(async () => null);
   });
 
-  it('renders authenticated profile details and profile actions', () => {
+  it('renders authenticated profile details and refresh action', () => {
     renderProfilePage();
 
     expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
+    expect(
+      screen.getByText('Reference view for the signed-in identity and account record.')
+    ).toBeTruthy();
     expect(screen.getAllByText('Signal Room Operator').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('signal-room')).toBeTruthy();
     expect(screen.getByText('signal-room@example.com')).toBeTruthy();
     expect(screen.getByText('Keeps the workspace in sync.')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
-      '/settings/security'
-    );
     expect(screen.getByRole('button', { name: 'Refresh' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Account information' })).toBeTruthy();
   });
 
   it('shows the loading shell while the session is pending', () => {

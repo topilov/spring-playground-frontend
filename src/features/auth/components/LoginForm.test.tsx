@@ -80,6 +80,7 @@ describe('LoginForm', () => {
     renderForm();
 
     expect(screen.getByRole('button', { name: 'Sign in with passkey' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeTruthy();
   });
 
   it('renders turnstile inline and submits login with a captcha token', async () => {
@@ -101,7 +102,7 @@ describe('LoginForm', () => {
 
     expect(screen.getByTestId('turnstile-widget')).toBeTruthy();
 
-    await user.type(screen.getByLabelText('Email or username'), 'demo@example.com');
+    await user.type(screen.getByLabelText('Login'), 'demo@example.com');
     await user.type(screen.getByLabelText('Password'), 'very-secret');
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
@@ -182,7 +183,7 @@ describe('LoginForm', () => {
 
     renderForm();
 
-    await user.type(screen.getByLabelText('Email or username'), 'demo@example.com');
+    await user.type(screen.getByLabelText('Login'), 'demo@example.com');
     await user.type(screen.getByLabelText('Password'), 'very-secret');
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
 
@@ -210,7 +211,7 @@ describe('LoginForm', () => {
 
     renderForm();
 
-    await user.type(screen.getByLabelText('Email or username'), 'demo@example.com');
+    await user.type(screen.getByLabelText('Login'), 'demo@example.com');
     await user.type(screen.getByLabelText('Password'), 'very-secret');
     await user.click(screen.getByRole('button', { name: 'Sign in' }));
 

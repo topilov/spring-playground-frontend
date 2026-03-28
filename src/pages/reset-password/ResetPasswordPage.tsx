@@ -10,11 +10,10 @@ export function ResetPasswordPage() {
 
   return (
     <AuthPageShell
-      subtitle="Set a new password and return to operator access."
+      subtitle="Set a new password and return to the account workspace."
       utility={
-        <p className="status-banner">
-          Use the link from your inbox. If it expires, request a fresh reset from
-          sign in.
+        <p className="status-banner" role="status">
+          Use the reset link from your inbox. If it expires, request another one from sign in.
         </p>
       }
       title="Reset password"

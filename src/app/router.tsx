@@ -21,42 +21,55 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 export const routes: RouteObject[] = [
   {
     path: routePaths.home,
-    element: <AppLayout />,
     children: [
       {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: routePaths.verifyEmail.slice(1),
-        element: <VerifyEmailPage />,
-      },
-      {
-        path: routePaths.verifyEmailChange.slice(1),
-        element: <VerifyEmailChangePage />,
-      },
-      {
-        element: <AnonymousOnlyRoute />,
+        element: <AppLayout shell="public" />,
         children: [
           {
-            path: routePaths.login.slice(1),
-            element: <LoginPage />,
+            index: true,
+            element: <HomePage />,
           },
           {
-            path: routePaths.loginTwoFactor.slice(1),
-            element: <TwoFactorLoginPage />,
+            path: routePaths.verifyEmail.slice(1),
+            element: <VerifyEmailPage />,
           },
           {
-            path: routePaths.register.slice(1),
-            element: <RegisterPage />,
+            element: <AnonymousOnlyRoute />,
+            children: [
+              {
+                path: routePaths.login.slice(1),
+                element: <LoginPage />,
+              },
+              {
+                path: routePaths.loginTwoFactor.slice(1),
+                element: <TwoFactorLoginPage />,
+              },
+              {
+                path: routePaths.register.slice(1),
+                element: <RegisterPage />,
+              },
+              {
+                path: routePaths.forgotPassword.slice(1),
+                element: <ForgotPasswordPage />,
+              },
+              {
+                path: routePaths.resetPassword.slice(1),
+                element: <ResetPasswordPage />,
+              },
+            ],
           },
           {
-            path: routePaths.forgotPassword.slice(1),
-            element: <ForgotPasswordPage />,
+            path: '*',
+            element: <NotFoundPage />,
           },
+        ],
+      },
+      {
+        element: <AppLayout shell="session" />,
+        children: [
           {
-            path: routePaths.resetPassword.slice(1),
-            element: <ResetPasswordPage />,
+            path: routePaths.verifyEmailChange.slice(1),
+            element: <VerifyEmailChangePage />,
           },
         ],
       },
@@ -64,26 +77,27 @@ export const routes: RouteObject[] = [
         element: <ProtectedRoute />,
         children: [
           {
-            path: routePaths.profile.slice(1),
-            element: <ProfilePage />,
-          },
-          {
-            path: routePaths.settingsAccount.slice(1),
-            element: <AccountSettingsPage />,
-          },
-          {
-            path: routePaths.settingsSecurity.slice(1),
-            element: <SecuritySettingsPage />,
-          },
-          {
-            path: routePaths.settingsTelegram.slice(1),
-            element: <TelegramSettingsPage />,
+            element: <AppLayout shell="app" />,
+            children: [
+              {
+                path: routePaths.profile.slice(1),
+                element: <ProfilePage />,
+              },
+              {
+                path: routePaths.settingsAccount.slice(1),
+                element: <AccountSettingsPage />,
+              },
+              {
+                path: routePaths.settingsSecurity.slice(1),
+                element: <SecuritySettingsPage />,
+              },
+              {
+                path: routePaths.settingsTelegram.slice(1),
+                element: <TelegramSettingsPage />,
+              },
+            ],
           },
         ],
-      },
-      {
-        path: '*',
-        element: <NotFoundPage />,
       },
     ],
   },

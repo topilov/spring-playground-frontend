@@ -18,14 +18,18 @@ type VerificationStatus = 'idle' | 'ready' | 'submitting' | 'verified' | 'failed
 
 function getShellSubtitle(status: VerificationStatus, hasToken: boolean) {
   if (status === 'verified') {
-    return 'Email change confirmed. Return to settings or continue with the refreshed account.';
+    return 'Email change confirmed. Return to account settings when you are ready.';
+  }
+
+  if (status === 'submitting') {
+    return 'Checking the email-change link before refreshing account settings.';
   }
 
   if (hasToken) {
-    return 'Finish the email change confirmation from the one-time link.';
+    return 'Confirm the new email address before returning to account settings.';
   }
 
-  return 'Open the email-change link from your new inbox to complete the update.';
+  return 'Open the verification link from the new email inbox to complete the update.';
 }
 
 export function VerifyEmailChangePage() {
@@ -94,9 +98,21 @@ export function VerifyEmailChangePage() {
       subtitle={getShellSubtitle(verificationStatus, Boolean(token))}
       utility={
         <div className="stack">
+          {verificationStatus === 'ready' ? (
+            <p className="status-banner" role="status">
+              Confirm the email-change link to refresh the account email.
+            </p>
+          ) : null}
+
+          {verificationStatus === 'submitting' ? (
+            <p className="status-banner" role="status">
+              Checking email-change link…
+            </p>
+          ) : null}
+
           {verificationStatus === 'verified' ? (
             <p className="status-banner status-success" role="status">
-              Email change verified. Your account email is now updated.
+              Email change verified.
             </p>
           ) : null}
 
@@ -108,7 +124,7 @@ export function VerifyEmailChangePage() {
 
           {verificationStatus === 'idle' ? (
             <p className="status-banner" role="status">
-              This verification link is missing or incomplete.
+              The email-change link is missing or incomplete.
             </p>
           ) : null}
         </div>
@@ -117,7 +133,7 @@ export function VerifyEmailChangePage() {
     >
       <div className="stack">
         <p className="page-description">
-          Use the verification link from the new email address to finish updating your account.
+          Use the link from the new email inbox to finish updating the account address.
         </p>
 
         {token ? (
@@ -134,7 +150,7 @@ export function VerifyEmailChangePage() {
               onClick={() => void handleVerification()}
               type="button"
             >
-              {isSubmitting ? 'Verifying email change...' : 'Verify email change'}
+              {isSubmitting ? 'Verifying email change…' : 'Verify email change'}
             </button>
           </div>
         ) : null}

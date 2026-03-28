@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as authSessionModule from '../features/auth/session/useAuthSession';
 import { routes } from './router';
 import { AuthPageShell } from '../shared/ui/AuthPageShell';
+import { PageHeader } from '../shared/ui/PageHeader';
 
 function renderRoute(initialEntry: string) {
   const queryClient = new QueryClient({
@@ -43,7 +44,7 @@ describe('app routes', () => {
     vi.restoreAllMocks();
   });
 
-  it('redirects anonymous visitors from the root route to login', async () => {
+  it('renders the public home surface for anonymous visitors on the root route', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'anonymous',
       errorMessage: null,
@@ -54,16 +55,39 @@ describe('app routes', () => {
 
     const { router } = renderRoute('/');
 
-    await waitFor(() => {
-      expect(router.state.location.pathname).toBe('/login');
+    await screen.findByRole('heading', { name: 'Spring Playground' });
+
+    expect(router.state.location.pathname).toBe('/');
+    expect(
+      screen.getByText(
+        'Identity workspace for profile access, sign-in checks, and account recovery.'
+      )
+    ).toBeTruthy();
+    expect(screen.getByText('Passkeys')).toBeTruthy();
+    expect(screen.getByText('Two-factor')).toBeTruthy();
+    expect(screen.getByText('Telegram')).toBeTruthy();
+
+    const authContent = screen.getByRole('region', { name: 'Authentication content' });
+    expect(within(authContent).getByRole('link', { name: 'Sign in' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Create account' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Forgot password' })).toBeTruthy();
+  });
+
+  it('preserves the loading state on the root route while session status is pending', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'loading',
+      errorMessage: null,
+      isAuthenticated: false,
+      profile: null,
+      refreshSession: vi.fn(async () => null),
     });
 
-    const authIntro = screen.getByRole('region', { name: 'Sign in' });
+    const { router } = renderRoute('/');
 
-    expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
-    expect(
-      within(authIntro).getByText('Use your account details or a registered passkey.')
-    ).toBeTruthy();
+    await screen.findByRole('heading', { name: 'Checking session' });
+
+    expect(router.state.location.pathname).toBe('/');
+    expect(screen.getByText('Loading your workspace entry.')).toBeTruthy();
   });
 
   it('redirects authenticated visitors from the root route to profile', async () => {
@@ -188,9 +212,10 @@ describe('app routes', () => {
     expect(getRoleNames(primaryNav, 'button')).toEqual([]);
     expect(getRoleNames(utilityNav, 'link')).toEqual(['Create account']);
     expect(getRoleNames(utilityNav, 'button')).toEqual([]);
+    expect(screen.queryByRole('navigation', { name: 'Workspace' })).toBeNull();
   });
 
-  it('shows an authenticated header with account actions and a utility sign out action', async () => {
+  it('shows the authenticated shell with persistent workspace navigation and sidebar sign out action', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'authenticated',
       errorMessage: null,
@@ -209,16 +234,21 @@ describe('app routes', () => {
 
     renderRoute('/profile');
 
-    const primaryNav = await screen.findByRole('navigation', { name: 'Primary' });
-    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
+    await screen.findByRole('navigation', { name: 'Workspace' });
 
-    expect(getRoleNames(primaryNav, 'link')).toEqual(['Profile', 'Settings']);
-    expect(getRoleNames(primaryNav, 'button')).toEqual([]);
-    expect(getRoleNames(utilityNav, 'link')).toEqual([]);
-    expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
+    const workspaceNav = screen.getByRole('navigation', { name: 'Workspace' });
+    expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull();
+    expect(getRoleNames(workspaceNav, 'link')).toEqual([
+      'Profile',
+      'Account',
+      'Security',
+      'Telegram',
+    ]);
+    expect(getRoleNames(workspaceNav, 'button')).toEqual([]);
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeTruthy();
   });
 
-  it('renders the account settings route with account and security tabs', async () => {
+  it('keeps settings routes in the workspace sidebar without rendering a second settings navigation', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'authenticated',
       errorMessage: null,
@@ -237,14 +267,82 @@ describe('app routes', () => {
 
     renderRoute('/settings/account');
 
+    await screen.findByRole('heading', { name: 'Account' });
+
+    const workspaceNav = screen.getByRole('navigation', { name: 'Workspace' });
+    expect(screen.queryByRole('navigation', { name: 'Settings sections' })).toBeNull();
+    expect(
+      within(workspaceNav).getByRole('link', { name: 'Account' }).getAttribute('aria-current')
+    ).toBe(
+      'page'
+    );
+    expect(screen.getByRole('heading', { name: 'Username' })).toBeTruthy();
+  });
+
+  it('keeps authenticated shell navigation on verify-email-change for signed-in users', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    const { router } = renderRoute('/verify-email-change');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/verify-email-change');
+    });
+
+    const workspaceNav = await screen.findByRole('navigation', { name: 'Workspace' });
+    expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Verify email change' })).toBeTruthy();
+    expect(getRoleNames(workspaceNav, 'link')).toEqual([
+      'Profile',
+      'Account',
+      'Security',
+      'Telegram',
+    ]);
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeTruthy();
+  });
+
+  it('renders the account settings route inside the shared workspace navigation', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/settings/account');
+
+    const workspaceNav = await screen.findByRole('navigation', { name: 'Workspace' });
+
     expect(await screen.findByRole('heading', { name: 'Account' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Account' }).getAttribute('href')).toBe(
+    expect(within(workspaceNav).getByRole('link', { name: 'Account' }).getAttribute('href')).toBe(
       '/settings/account'
     );
-    expect(screen.getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
+    expect(within(workspaceNav).getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
       '/settings/security'
     );
-    expect(screen.getByRole('link', { name: 'Telegram' }).getAttribute('href')).toBe(
+    expect(within(workspaceNav).getByRole('link', { name: 'Telegram' }).getAttribute('href')).toBe(
       '/settings/telegram'
     );
   });
@@ -263,13 +361,31 @@ describe('app routes', () => {
 
     const authIntro = screen.getByRole('region', { name: 'Sign in' });
     const authContent = screen.getByRole('region', { name: 'Authentication content' });
+    const supportRail = screen.getByLabelText('Sign in support');
 
     expect(within(authIntro).getByRole('heading', { name: 'Sign in' })).toBeTruthy();
     expect(within(authIntro).getByText('Use the utility action for secondary help.')).toBeTruthy();
     expect(authIntro.parentElement).toBe(authContent.parentElement);
+    expect(supportRail.tagName).toBe('ASIDE');
+    expect(supportRail.getAttribute('aria-live')).toBeNull();
     expect(screen.getByRole('button', { name: 'Use passkey' })).toBeTruthy();
     expect(within(authContent).getByText('Primary content')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();
+  });
+
+  it('renders page header actions as named groups and only adds a status group when present', () => {
+    render(
+      <PageHeader
+        actions={<button type="button">Refresh</button>}
+        description="Manage sign-in methods and account access posture."
+        title="Security"
+      />
+    );
+
+    const actionsGroup = screen.getByRole('group', { name: 'Security actions' });
+
+    expect(screen.queryByRole('group', { name: 'Security status' })).toBeNull();
+    expect(within(actionsGroup).getByRole('button', { name: 'Refresh' })).toBeTruthy();
   });
 
   it('collapses the auth shell cleanly when no primary content is present', () => {
@@ -322,6 +438,12 @@ describe('app routes', () => {
     });
 
     expect(screen.getByRole('heading', { name: 'Security' })).toBeTruthy();
+    expect(screen.queryByRole('group', { name: 'Security status' })).toBeNull();
+    expect(
+      screen.getByText(
+        'Passwords, verification methods, and device trust for the current account.'
+      )
+    ).toBeTruthy();
   });
 
   it('renders the protected telegram settings route for authenticated users', async () => {

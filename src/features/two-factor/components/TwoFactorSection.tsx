@@ -104,7 +104,7 @@ export function TwoFactorSection() {
   };
 
   return (
-    <section className="two-factor-panel stack">
+    <section className="two-factor-panel page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Two-factor authentication</h2>
@@ -128,7 +128,7 @@ export function TwoFactorSection() {
 
       {statusQuery.isLoading ? (
         <div className="passkey-status">
-          <p className="page-description">Loading two-factor status...</p>
+          <p className="page-description">Loading two-factor status…</p>
         </div>
       ) : null}
 
@@ -167,12 +167,12 @@ export function TwoFactorSection() {
           </p>
           <div className="inline-actions">
             <button
-              className="button button-primary"
+              className="button button-primary form-action-button"
               disabled={startSetupMutation.isPending}
               onClick={handleStartSetup}
               type="button"
             >
-              {startSetupMutation.isPending ? 'Starting setup...' : 'Start setup'}
+              {startSetupMutation.isPending ? 'Starting setup…' : 'Start setup'}
             </button>
           </div>
         </div>
@@ -214,12 +214,12 @@ export function TwoFactorSection() {
 
             <div className="inline-actions">
               <button
-                className="button button-primary"
+                className="button button-primary form-action-button"
                 disabled={confirmSetupMutation.isPending}
                 type="submit"
               >
                 {confirmSetupMutation.isPending
-                  ? 'Enabling two-factor authentication...'
+                  ? 'Enabling two-factor authentication…'
                   : 'Enable two-factor authentication'}
               </button>
             </div>
@@ -230,23 +230,23 @@ export function TwoFactorSection() {
       {isEnabled ? (
         <div className="inline-actions">
           <button
-            className="button button-secondary"
+            className="button button-secondary form-action-button"
             disabled={regenerateBackupCodesMutation.isPending}
             onClick={handleRegenerateBackupCodes}
             type="button"
           >
             {regenerateBackupCodesMutation.isPending
-              ? 'Regenerating backup codes...'
+              ? 'Regenerating backup codes…'
               : 'Regenerate backup codes'}
           </button>
           <button
-            className="button button-secondary button-danger"
+            className="button button-secondary button-danger form-action-button"
             disabled={disableTwoFactorMutation.isPending}
             onClick={handleDisableTwoFactor}
             type="button"
           >
             {disableTwoFactorMutation.isPending
-              ? 'Disabling two-factor authentication...'
+              ? 'Disabling two-factor authentication…'
               : 'Disable two-factor authentication'}
           </button>
         </div>

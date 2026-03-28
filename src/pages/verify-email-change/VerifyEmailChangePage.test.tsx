@@ -81,22 +81,34 @@ describe('VerifyEmailChangePage', () => {
     expect(screen.getByTestId('turnstile-widget')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Verify email change' })).toBeTruthy();
     expect(
-      screen.getByText('Finish the email change confirmation from the one-time link.')
+      screen.getByText('Confirm the new email address before returning to account settings.')
     ).toBeTruthy();
   });
 
   it('verifies the token after explicit confirmation and refreshes the session', async () => {
     const user = userEvent.setup();
-
-    verifyCurrentEmailChangeMock.mockResolvedValue({
-      id: 1,
-      userId: 1,
-      username: 'demo',
-      email: 'next@example.com',
-      role: 'USER',
-      displayName: 'Demo User',
-      bio: 'Hello',
+    let resolveVerification!: (value: {
+      id: number;
+      userId: number;
+      username: string;
+      email: string;
+      role: string;
+      displayName: string;
+      bio: string;
+    }) => void;
+    const verificationPromise = new Promise<{
+      id: number;
+      userId: number;
+      username: string;
+      email: string;
+      role: string;
+      displayName: string;
+      bio: string;
+    }>((resolve) => {
+      resolveVerification = resolve;
     });
+
+    verifyCurrentEmailChangeMock.mockImplementation(() => verificationPromise);
 
     renderPage('/verify-email-change?token=email-change-token-success');
 
@@ -108,13 +120,23 @@ describe('VerifyEmailChangePage', () => {
         captchaToken: 'captcha-token',
       });
     });
+    expect(await screen.findByText('Checking email-change link…')).toBeTruthy();
+
+    resolveVerification({
+      id: 1,
+      userId: 1,
+      username: 'demo',
+      email: 'next@example.com',
+      role: 'USER',
+      displayName: 'Demo User',
+      bio: 'Hello',
+    });
+
     await waitFor(() => {
       expect(refreshSession).toHaveBeenCalledTimes(1);
     });
 
-    expect(
-      await screen.findByText('Email change verified. Your account email is now updated.')
-    ).toBeTruthy();
+    expect(await screen.findByText('Email change verified.')).toBeTruthy();
   });
 
   it('preserves plus signs in the token from the email link', async () => {
@@ -183,10 +205,10 @@ describe('VerifyEmailChangePage', () => {
   it('shows an idle state when no token is present', () => {
     renderPage('/verify-email-change');
 
-    expect(screen.getByText('This verification link is missing or incomplete.')).toBeTruthy();
+    expect(screen.getByText('The email-change link is missing or incomplete.')).toBeTruthy();
     expect(
       screen.getByText(
-        'Open the email-change link from your new inbox to complete the update.'
+        'Open the verification link from the new email inbox to complete the update.'
       )
     ).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Verify email change' })).toBeNull();

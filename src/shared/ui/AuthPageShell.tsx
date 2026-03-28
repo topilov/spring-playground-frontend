@@ -21,6 +21,9 @@ export function AuthPageShell({
 
   return (
     <section className="auth-page">
+      <a className="skip-link" href="#auth-main-content">
+        Skip to content
+      </a>
       <article className="auth-card">
         <div className={hasContent ? 'auth-layout' : 'auth-layout auth-layout-solo'}>
           <section
@@ -34,19 +37,27 @@ export function AuthPageShell({
             </div>
 
             {utility ? (
-              <div aria-live="polite" className="auth-utility">
+              <aside aria-label={`${title} support`} className="auth-support">
                 {utility}
-              </div>
+              </aside>
             ) : null}
           </section>
           {hasContent ? (
-            <section aria-label="Authentication content" className="auth-content stack">
+            <section
+              aria-label="Authentication content"
+              className="auth-content stack"
+              id="auth-main-content"
+            >
               {children}
             </section>
           ) : null}
         </div>
 
-        {footer ? <footer className="auth-footer">{footer}</footer> : null}
+        {footer ? (
+          <footer className="auth-footer">
+            <div className="auth-footer-inner">{footer}</div>
+          </footer>
+        ) : null}
       </article>
     </section>
   );

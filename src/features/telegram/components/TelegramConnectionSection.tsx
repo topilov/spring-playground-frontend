@@ -44,7 +44,7 @@ export function TelegramConnectionSection({
   const nextStep = connectionState.pendingAuth?.nextStep ?? null;
 
   return (
-    <section className="workspace-band workspace-band-primary stack">
+    <section className="page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Connection</h2>
@@ -83,12 +83,12 @@ export function TelegramConnectionSection({
 
           <div className="inline-actions">
             <button
-              className="button button-secondary button-danger"
+              className="button button-secondary button-danger form-action-button"
               disabled={isDisconnecting}
               onClick={onDisconnect}
               type="button"
             >
-              {isDisconnecting ? 'Disconnecting...' : 'Disconnect Telegram'}
+              {isDisconnecting ? 'Disconnecting…' : 'Disconnect Telegram'}
             </button>
           </div>
         </div>
@@ -102,13 +102,14 @@ export function TelegramConnectionSection({
               autoComplete="tel"
               onChange={(event) => onPhoneNumberChange(event.target.value)}
               placeholder="+15551234567"
+              spellCheck={false}
               value={phoneNumber}
             />
           </label>
 
           <div className="inline-actions">
-            <button className="button button-primary" disabled={isStarting} type="submit">
-              {isStarting ? 'Starting connection...' : 'Connect Telegram'}
+            <button className="button button-primary form-action-button" disabled={isStarting} type="submit">
+              {isStarting ? 'Starting connection…' : 'Connect Telegram'}
             </button>
           </div>
         </form>
@@ -123,17 +124,18 @@ export function TelegramConnectionSection({
               inputMode="numeric"
               onChange={(event) => onCodeChange(event.target.value)}
               placeholder="12345"
+              spellCheck={false}
               value={code}
             />
           </label>
 
           <div className="inline-actions">
             <button
-              className="button button-primary"
+              className="button button-primary form-action-button"
               disabled={isConfirmingCode}
               type="submit"
             >
-              {isConfirmingCode ? 'Confirming code...' : 'Confirm code'}
+              {isConfirmingCode ? 'Confirming code…' : 'Confirm code'}
             </button>
           </div>
         </form>
@@ -153,11 +155,11 @@ export function TelegramConnectionSection({
 
           <div className="inline-actions">
             <button
-              className="button button-primary"
+              className="button button-primary form-action-button"
               disabled={isConfirmingPassword}
               type="submit"
             >
-              {isConfirmingPassword ? 'Confirming password...' : 'Confirm password'}
+              {isConfirmingPassword ? 'Confirming password…' : 'Confirm password'}
             </button>
           </div>
         </form>

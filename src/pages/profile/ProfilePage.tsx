@@ -76,7 +76,7 @@ export function ProfilePage() {
           onClick={handleRefresh}
           type="button"
         >
-          {isRefreshing ? 'Refreshing...' : 'Try again'}
+          {isRefreshing ? 'Refreshing…' : 'Try again'}
         </button>
       </AuthPageShell>
     );
@@ -87,95 +87,78 @@ export function ProfilePage() {
       <PageHeader
         actions={
           <div className="inline-actions">
-            <AppLink className="button button-secondary" to={routePaths.settingsSecurity}>
-              Security
-            </AppLink>
             <button
-              className="button button-secondary"
+              aria-label="Refresh"
+              className="button button-secondary button-icon"
               disabled={isRefreshing}
               onClick={handleRefresh}
               type="button"
             >
-              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+              <svg aria-hidden="true" className="button-icon-mark" viewBox="0 0 24 24">
+                <path d="M21 2v6h-6" />
+                <path d="M3 12a9 9 0 0 1 15.3-6.36L21 8" />
+                <path d="M3 22v-6h6" />
+                <path d="M21 12a9 9 0 0 1-15.3 6.36L3 16" />
+              </svg>
             </button>
           </div>
         }
-        description={profile.displayName}
-        eyebrow="Account"
+        description="Reference view for the signed-in identity and account record."
+        eyebrow="Overview"
         status={
           refreshError ? (
             <p className="status-banner status-error" role="alert">
               {refreshError}
             </p>
-          ) : (
-            <p className="status-banner" role="status">
-              Session-backed operator details refresh on demand.
-            </p>
-          )
+          ) : undefined
         }
         title="Profile"
       />
 
-      <div className="workspace-shell workspace-shell-split">
-        <section className="workspace-band workspace-band-primary stack">
-          <div className="workspace-band-header">
-            <div className="section-heading">
-              <h2>Identity</h2>
-              <p className="page-description">
-                Primary account identity and operator-facing contact details.
-              </p>
-            </div>
-            <p className="workspace-note">
-              Signed in as <strong>{profile.displayName}</strong>
+      <section className="page-card stack">
+        <div className="workspace-band-header">
+          <div className="section-heading">
+            <h2>Account information</h2>
+            <p className="page-description">
+              Reference details for the current session, support follow-up, and account edits.
             </p>
           </div>
+          <p className="workspace-note">
+            Signed in as <strong>{profile.displayName}</strong>
+          </p>
+        </div>
 
-          <dl className="detail-rows">
-            <div className="detail-row">
-              <dt>Display name</dt>
-              <dd>{profile.displayName}</dd>
-            </div>
-            <div className="detail-row">
-              <dt>Username</dt>
-              <dd>{profile.username}</dd>
-            </div>
-            <div className="detail-row">
-              <dt>Email</dt>
-              <dd>{profile.email}</dd>
-            </div>
-            <div className="detail-row">
-              <dt>Role</dt>
-              <dd>{profile.role}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <aside className="workspace-column stack">
-          <section className="workspace-band stack">
-            <div className="section-heading">
-              <h2>Account records</h2>
-              <p className="page-description">
-                Stable identifiers and profile notes for support or audit follow-up.
-              </p>
-            </div>
-
-            <dl className="detail-rows">
-              <div className="detail-row">
-                <dt>User ID</dt>
-                <dd>{profile.userId}</dd>
-              </div>
-              <div className="detail-row">
-                <dt>Profile ID</dt>
-                <dd>{profile.id}</dd>
-              </div>
-              <div className="detail-row detail-row-wide">
-                <dt>Bio</dt>
-                <dd>{profile.bio || 'No bio added.'}</dd>
-              </div>
-            </dl>
-          </section>
-        </aside>
-      </div>
+        <dl className="detail-rows">
+          <div className="detail-row">
+            <dt>Display name</dt>
+            <dd>{profile.displayName}</dd>
+          </div>
+          <div className="detail-row">
+            <dt>Username</dt>
+            <dd>{profile.username}</dd>
+          </div>
+          <div className="detail-row">
+            <dt>Email</dt>
+            <dd>{profile.email}</dd>
+          </div>
+          <div className="detail-row">
+            <dt>Role</dt>
+            <dd>{profile.role}</dd>
+          </div>
+          <div className="detail-row">
+            <dt>User ID</dt>
+            <dd>{profile.userId}</dd>
+          </div>
+          <div className="detail-row">
+            <dt>Profile ID</dt>
+            <dd>{profile.id}</dd>
+          </div>
+          <div className="detail-row detail-row-wide">
+            <dt>Bio</dt>
+            <dd>{profile.bio || 'No bio added.'}</dd>
+          </div>
+        </dl>
+      </section>
     </section>
   );
 }

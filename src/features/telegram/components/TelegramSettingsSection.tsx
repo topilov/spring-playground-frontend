@@ -303,21 +303,27 @@ export function TelegramSettingsSection() {
       return;
     }
 
-    await navigator.clipboard.writeText(rawToken);
-    setCopyStatus('Token copied.');
+    try {
+      await navigator.clipboard.writeText(rawToken);
+      setTokenError('');
+      setCopyStatus('Token copied.');
+    } catch {
+      setCopyStatus('');
+      setTokenError('Copy the token manually if your browser blocks clipboard access.');
+    }
   };
 
   if (settingsQuery.isLoading) {
     return (
-      <section className="workspace-band stack">
-        <p className="page-description">Loading Telegram settings...</p>
+      <section className="page-card stack">
+        <p className="page-description">Loading Telegram settings…</p>
       </section>
     );
   }
 
   if (settingsQuery.isError || !settings || !connectionState) {
     return (
-      <section className="workspace-band stack">
+      <section className="page-card stack">
         <p className="status-banner status-error" role="alert">
           {getTelegramErrorMessage(
             settingsQuery.error,

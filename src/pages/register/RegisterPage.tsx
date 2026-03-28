@@ -1,23 +1,14 @@
 import { RegisterForm } from '../../features/auth/components/RegisterForm';
-import { AppLink } from '../../shared/routing/AppLink';
-import { routePaths } from '../../shared/routing/paths';
 import { AuthPageShell } from '../../shared/ui/AuthPageShell';
 
 export function RegisterPage() {
   return (
     <AuthPageShell
-      footer={
-        <div className="auth-links">
-          <AppLink className="text-link" to={routePaths.login}>
-            Sign in
-          </AppLink>
-        </div>
-      }
-      subtitle="Create an operator account and verify it before first access."
+      subtitle="Create the account you will use for profile access, sign-in checks, and recovery."
       utility={
-        <p className="status-banner">
-          Use an address you can verify now. Sign-in remains locked until email
-          verification completes.
+        <p className="status-banner" role="status">
+          Use an address you can verify now. Sign-in stays paused until email verification is
+          complete.
         </p>
       }
       title="Create account"
