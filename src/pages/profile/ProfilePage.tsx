@@ -87,8 +87,8 @@ export function ProfilePage() {
       <PageHeader
         actions={
           <div className="inline-actions">
-            <AppLink className="button button-secondary" to={routePaths.settingsSecurity}>
-              Security
+            <AppLink className="button button-secondary" to={routePaths.settingsAccount}>
+              Account
             </AppLink>
             <button
               className="button button-secondary"
@@ -100,8 +100,8 @@ export function ProfilePage() {
             </button>
           </div>
         }
-        description={profile.displayName}
-        eyebrow="Account"
+        description="Reference view for the signed-in identity and account record."
+        eyebrow="Overview"
         status={
           refreshError ? (
             <p className="status-banner status-error" role="alert">
@@ -109,7 +109,7 @@ export function ProfilePage() {
             </p>
           ) : (
             <p className="status-banner" role="status">
-              Session-backed operator details refresh on demand.
+              Session-backed profile details refresh on demand.
             </p>
           )
         }
@@ -120,9 +120,9 @@ export function ProfilePage() {
         <section className="workspace-band workspace-band-primary stack">
           <div className="workspace-band-header">
             <div className="section-heading">
-              <h2>Identity</h2>
+              <h2>Identity snapshot</h2>
               <p className="page-description">
-                Primary account identity and operator-facing contact details.
+                Reference details for the current session, support follow-up, and account edits.
               </p>
             </div>
             <p className="workspace-note">
@@ -155,7 +155,7 @@ export function ProfilePage() {
             <div className="section-heading">
               <h2>Account records</h2>
               <p className="page-description">
-                Stable identifiers and profile notes for support or audit follow-up.
+                Stable identifiers and profile notes kept separate from editable account fields.
               </p>
             </div>
 

@@ -2,14 +2,13 @@ import { PasswordChangeSection } from '../../features/profile/components/Passwor
 import { PasskeySection } from '../../features/passkeys/components/PasskeySection';
 import { TwoFactorSection } from '../../features/two-factor/components/TwoFactorSection';
 import { PageHeader } from '../../shared/ui/PageHeader';
-import { SettingsTabs } from './SettingsTabs';
 
 export function SecuritySettingsPage() {
   return (
     <section className="page-grid">
       <PageHeader
-        description="Manage sign-in methods and account access posture."
-        eyebrow="Settings"
+        description="Passwords, verification methods, and device trust for the current account."
+        eyebrow="Access"
         status={
           <p className="status-banner" role="status">
             Passkey and two-factor changes apply to the current operator account immediately.
@@ -18,10 +17,8 @@ export function SecuritySettingsPage() {
         title="Security"
       />
 
-      <SettingsTabs active="security" />
-
       <div className="workspace-shell workspace-shell-split">
-        <section className="stack">
+        <section className="workspace-column stack">
           <PasswordChangeSection />
           <TwoFactorSection />
           <PasskeySection />

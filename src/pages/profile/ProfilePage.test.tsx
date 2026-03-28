@@ -48,14 +48,18 @@ describe('ProfilePage', () => {
     renderProfilePage();
 
     expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
+    expect(
+      screen.getByText('Reference view for the signed-in identity and account record.')
+    ).toBeTruthy();
     expect(screen.getAllByText('Signal Room Operator').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('signal-room')).toBeTruthy();
     expect(screen.getByText('signal-room@example.com')).toBeTruthy();
     expect(screen.getByText('Keeps the workspace in sync.')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Security' }).getAttribute('href')).toBe(
-      '/settings/security'
+    expect(screen.getByRole('link', { name: 'Account' }).getAttribute('href')).toBe(
+      '/settings/account'
     );
     expect(screen.getByRole('button', { name: 'Refresh' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Account records' })).toBeTruthy();
   });
 
   it('shows the loading shell while the session is pending', () => {

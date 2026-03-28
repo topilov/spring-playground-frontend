@@ -112,8 +112,7 @@ textarea {
 .shell-main > *,
 .page-header,
 .auth-card,
-.workspace-band,
-.section-tabs {
+.workspace-band {
   animation: reveal-up 240ms var(--motion-ease);
 }
 
@@ -178,7 +177,6 @@ textarea {
 .button,
 .field input,
 .field textarea,
-.section-tab,
 .detail-item {
   transition:
     transform var(--motion-duration) var(--motion-ease),
@@ -250,8 +248,7 @@ textarea {
 }
 
 .header-link,
-.button,
-.section-tab {
+.button {
   display: inline-flex;
   min-height: 2.5rem;
   padding: 0.64rem 0.96rem;
@@ -276,7 +273,6 @@ textarea {
 
 .header-link:hover,
 .button:hover,
-.section-tab:hover,
 .detail-item:hover {
   border-color: rgba(79, 111, 177, 0.18);
   background: rgba(255, 255, 255, 0.92);
@@ -285,8 +281,7 @@ textarea {
   box-shadow: var(--shadow-sm);
 }
 
-.header-link-active,
-.section-tab-active {
+.header-link-active {
   border-color: rgba(79, 111, 177, 0.18);
   background: var(--accent-soft);
   color: var(--accent-strong);
@@ -330,8 +325,7 @@ textarea {
 .button:focus-visible,
 .text-link:focus-visible,
 .field input:focus-visible,
-.field textarea:focus-visible,
-.section-tab:focus-visible {
+.field textarea:focus-visible {
   outline: none;
   border-color: rgba(79, 111, 177, 0.28);
   box-shadow:
@@ -755,22 +749,6 @@ textarea {
   border-radius: var(--radius-sm);
 }
 
-.section-tabs {
-  display: inline-flex;
-  gap: 0.35rem;
-  width: fit-content;
-  padding: 0.3rem;
-  border: 1px solid rgba(70, 79, 92, 0.08);
-  border-radius: 999px;
-  background: rgba(255, 252, 247, 0.74);
-}
-
-.section-tab {
-  min-height: 2.25rem;
-  padding: 0.5rem 0.88rem;
-  border-radius: 999px;
-}
-
 .passkey-add-form {
   display: grid;
   gap: var(--space-4);
@@ -910,10 +888,6 @@ textarea {
   .auth-content {
     padding: var(--space-4);
   }
-
-  .section-tabs {
-    width: 100%;
-  }
 }
 
 @media (max-width: 640px) {
@@ -927,8 +901,7 @@ textarea {
   }
 
   .header-link,
-  .button,
-  .section-tab {
+  .button {
     width: 100%;
   }
 

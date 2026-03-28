@@ -251,6 +251,37 @@ describe('app routes', () => {
     expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
   });
 
+  it('keeps settings routes in the workspace sidebar without rendering a second settings navigation', async () => {
+    vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
+      status: 'authenticated',
+      errorMessage: null,
+      isAuthenticated: true,
+      profile: {
+        id: 1,
+        userId: 1,
+        username: 'demo',
+        email: 'demo@example.com',
+        role: 'USER',
+        displayName: 'Demo User',
+        bio: 'Hello',
+      },
+      refreshSession: vi.fn(async () => null),
+    });
+
+    renderRoute('/settings/account');
+
+    await screen.findByRole('heading', { name: 'Account' });
+
+    const workspaceNav = screen.getByRole('navigation', { name: 'Workspace' });
+    expect(screen.queryByRole('navigation', { name: 'Settings sections' })).toBeNull();
+    expect(
+      within(workspaceNav).getByRole('link', { name: 'Account' }).getAttribute('aria-current')
+    ).toBe(
+      'page'
+    );
+    expect(screen.getByRole('heading', { name: 'Username' })).toBeTruthy();
+  });
+
   it('keeps authenticated shell navigation on verify-email-change for signed-in users', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'authenticated',
@@ -288,7 +319,7 @@ describe('app routes', () => {
     expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
   });
 
-  it('renders the account settings route with account and security tabs', async () => {
+  it('renders the account settings route inside the shared workspace navigation', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'authenticated',
       errorMessage: null,
@@ -415,7 +446,11 @@ describe('app routes', () => {
 
     expect(screen.getByRole('heading', { name: 'Security' })).toBeTruthy();
     expect(screen.getByRole('group', { name: 'Security status' })).toBeTruthy();
-    expect(screen.getByText('Manage sign-in methods and account access posture.')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Passwords, verification methods, and device trust for the current account.'
+      )
+    ).toBeTruthy();
   });
 
   it('renders the protected telegram settings route for authenticated users', async () => {
