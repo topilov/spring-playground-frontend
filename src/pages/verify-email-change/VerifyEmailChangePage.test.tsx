@@ -87,14 +87,28 @@ describe('VerifyEmailChangePage', () => {
 
   it('verifies the token after explicit confirmation and refreshes the session', async () => {
     const user = userEvent.setup();
-    let resolveVerification: ((value: unknown) => void) | null = null;
+    let resolveVerification!: (value: {
+      id: number;
+      userId: number;
+      username: string;
+      email: string;
+      role: string;
+      displayName: string;
+      bio: string;
+    }) => void;
+    const verificationPromise = new Promise<{
+      id: number;
+      userId: number;
+      username: string;
+      email: string;
+      role: string;
+      displayName: string;
+      bio: string;
+    }>((resolve) => {
+      resolveVerification = resolve;
+    });
 
-    verifyCurrentEmailChangeMock.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveVerification = resolve;
-        })
-    );
+    verifyCurrentEmailChangeMock.mockImplementation(() => verificationPromise);
 
     renderPage('/verify-email-change?token=email-change-token-success');
 
@@ -108,7 +122,7 @@ describe('VerifyEmailChangePage', () => {
     });
     expect(await screen.findByText('Checking email-change link...')).toBeTruthy();
 
-    resolveVerification?.({
+    resolveVerification({
       id: 1,
       userId: 1,
       username: 'demo',
