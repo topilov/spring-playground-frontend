@@ -21,7 +21,7 @@ export function TelegramCurrentStateSection({
   const appliedEmojiStatusDocumentId = getAppliedEmojiStatusDocumentId(settings);
 
   return (
-    <section className="workspace-band stack">
+    <section className="page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Current state</h2>

@@ -7,11 +7,6 @@ export function TelegramSettingsPage() {
       <PageHeader
         description="Telegram connection flow, focus sync, and automation access for this account."
         eyebrow="Integration"
-        status={
-          <p className="status-banner" role="status">
-            Telegram sync stays aligned with backend connection and focus state.
-          </p>
-        }
         title="Telegram"
       />
 

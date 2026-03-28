@@ -138,10 +138,11 @@ export function LoginForm() {
   return (
     <form className="stack" onSubmit={onSubmit}>
       <label className="field">
-        <span>Email or username</span>
+        <span>Login</span>
         <input
           autoComplete="username"
           placeholder="name@example.com"
+          spellCheck={false}
           {...form.register('usernameOrEmail')}
         />
         {form.formState.errors.usernameOrEmail ? (
@@ -177,7 +178,7 @@ export function LoginForm() {
         disabled={isSubmitting}
         type="submit"
       >
-        {form.formState.isSubmitting || loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+        {form.formState.isSubmitting || loginMutation.isPending ? 'Signing in…' : 'Sign in'}
       </button>
 
       <button
@@ -187,9 +188,18 @@ export function LoginForm() {
         type="button"
       >
         {passkeyLoginMutation.isPending
-          ? 'Checking passkeys...'
+          ? 'Checking passkeys…'
           : 'Sign in with passkey'}
       </button>
+
+      <div className="auth-links auth-links-balanced">
+        <AppLink className="text-link" to={routePaths.forgotPassword}>
+          Forgot password
+        </AppLink>
+        <AppLink className="text-link" to={routePaths.register}>
+          Create account
+        </AppLink>
+      </div>
 
       {form.formState.errors.root ? (
         <div className="stack">

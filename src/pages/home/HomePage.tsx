@@ -26,7 +26,7 @@ export function HomePage() {
       subtitle="Identity workspace for profile access, sign-in checks, and account recovery."
       utility={
         <div className="stack">
-          <p className="status-banner">
+          <p className="status-banner" role="status">
             Start from sign-in if the account already exists, or open a new one and verify it.
           </p>
           <dl className="detail-rows">
@@ -57,8 +57,8 @@ export function HomePage() {
         <AppLink className="button button-secondary button-full" to={routePaths.register}>
           Create account
         </AppLink>
-        <AppLink className="button button-secondary button-full" to={routePaths.forgotPassword}>
-          Recover account
+        <AppLink className="text-link" to={routePaths.forgotPassword}>
+          Forgot password
         </AppLink>
       </div>
     </AuthPageShell>

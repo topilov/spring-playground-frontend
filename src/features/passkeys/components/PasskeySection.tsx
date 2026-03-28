@@ -94,7 +94,7 @@ export function PasskeySection() {
   };
 
   return (
-    <section className="passkey-panel stack">
+    <section className="passkey-panel page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Passkeys</h2>
@@ -120,11 +120,11 @@ export function PasskeySection() {
         </label>
 
         <button
-          className="button button-primary"
+          className="button button-primary form-action-button"
           disabled={registerPasskeyMutation.isPending}
           type="submit"
         >
-          {registerPasskeyMutation.isPending ? 'Adding passkey...' : 'Add passkey'}
+          {registerPasskeyMutation.isPending ? 'Adding passkey…' : 'Add passkey'}
         </button>
       </form>
 
@@ -136,7 +136,7 @@ export function PasskeySection() {
 
       {passkeysQuery.isLoading ? (
         <div className="passkey-status">
-          <p className="page-description">Loading passkeys...</p>
+          <p className="page-description">Loading passkeys…</p>
         </div>
       ) : null}
 
@@ -177,7 +177,7 @@ export function PasskeySection() {
                   <div className="inline-actions">
                     <button
                       aria-label={`Rename ${passkey.name}`}
-                      className="button button-secondary"
+                      className="button button-secondary form-action-button"
                       onClick={() => {
                         setEditingId(passkey.id);
                         setEditingName(passkey.name);
@@ -189,7 +189,7 @@ export function PasskeySection() {
                     </button>
                     <button
                       aria-label={`Delete ${passkey.name}`}
-                      className="button button-secondary button-danger"
+                      className="button button-secondary button-danger form-action-button"
                       onClick={() => {
                         setConfirmDeleteId(passkey.id);
                         setEditingId(null);
@@ -232,7 +232,7 @@ export function PasskeySection() {
                     </label>
                     <div className="inline-actions">
                       <button
-                        className="button button-primary"
+                        className="button button-primary form-action-button"
                         disabled={renamePasskeyMutation.isPending}
                         onClick={() => handleRenamePasskey(passkey.id)}
                         type="button"
@@ -240,7 +240,7 @@ export function PasskeySection() {
                         Save
                       </button>
                       <button
-                        className="button button-secondary"
+                        className="button button-secondary form-action-button"
                         onClick={() => {
                           setEditingId(null);
                           setEditingName('');
@@ -260,7 +260,7 @@ export function PasskeySection() {
                     </p>
                     <div className="inline-actions">
                       <button
-                        className="button button-danger"
+                        className="button button-danger form-action-button"
                         disabled={deletePasskeyMutation.isPending}
                         onClick={() => handleDeletePasskey(passkey.id)}
                         type="button"
@@ -268,7 +268,7 @@ export function PasskeySection() {
                         Delete passkey
                       </button>
                       <button
-                        className="button button-secondary"
+                        className="button button-secondary form-action-button"
                         onClick={() => setConfirmDeleteId(null)}
                         type="button"
                       >

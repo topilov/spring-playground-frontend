@@ -68,6 +68,7 @@ export function RegisterForm() {
           <input
             autoComplete="username"
             placeholder="Choose a username"
+            spellCheck={false}
             {...form.register('username')}
           />
           {form.formState.errors.username ? (
@@ -82,6 +83,7 @@ export function RegisterForm() {
           <input
             autoComplete="email"
             placeholder="name@example.com"
+            spellCheck={false}
             type="email"
             {...form.register('email')}
           />
@@ -119,9 +121,15 @@ export function RegisterForm() {
           type="submit"
         >
           {form.formState.isSubmitting || registerMutation.isPending
-            ? 'Creating account...'
+            ? 'Creating account…'
             : 'Create account'}
         </button>
+
+        <div className="auth-links auth-links-center">
+          <AppLink className="text-link" to={routePaths.login}>
+            Sign in
+          </AppLink>
+        </div>
 
         {form.formState.errors.root ? (
           <p className="status-banner status-error" role="alert">
@@ -132,7 +140,7 @@ export function RegisterForm() {
 
       {successMessage ? (
         <div className="stack">
-          <p className="status-banner status-success">{successMessage}</p>
+          <p className="status-banner status-success" role="status">{successMessage}</p>
           <AppLink
             className="button button-secondary button-full"
             to={`${routePaths.verifyEmail}?email=${encodeURIComponent(successEmail)}`}

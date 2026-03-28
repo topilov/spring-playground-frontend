@@ -70,7 +70,7 @@ describe('app routes', () => {
     const authContent = screen.getByRole('region', { name: 'Authentication content' });
     expect(within(authContent).getByRole('link', { name: 'Sign in' })).toBeTruthy();
     expect(within(authContent).getByRole('link', { name: 'Create account' })).toBeTruthy();
-    expect(within(authContent).getByRole('link', { name: 'Recover account' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Forgot password' })).toBeTruthy();
   });
 
   it('preserves the loading state on the root route while session status is pending', async () => {
@@ -215,7 +215,7 @@ describe('app routes', () => {
     expect(screen.queryByRole('navigation', { name: 'Workspace' })).toBeNull();
   });
 
-  it('shows the authenticated shell with persistent workspace navigation and a utility sign out action', async () => {
+  it('shows the authenticated shell with persistent workspace navigation and sidebar sign out action', async () => {
     vi.spyOn(authSessionModule, 'useAuthSession').mockReturnValue({
       status: 'authenticated',
       errorMessage: null,
@@ -237,8 +237,6 @@ describe('app routes', () => {
     await screen.findByRole('navigation', { name: 'Workspace' });
 
     const workspaceNav = screen.getByRole('navigation', { name: 'Workspace' });
-    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
-
     expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull();
     expect(getRoleNames(workspaceNav, 'link')).toEqual([
       'Profile',
@@ -247,8 +245,7 @@ describe('app routes', () => {
       'Telegram',
     ]);
     expect(getRoleNames(workspaceNav, 'button')).toEqual([]);
-    expect(getRoleNames(utilityNav, 'link')).toEqual([]);
-    expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeTruthy();
   });
 
   it('keeps settings routes in the workspace sidebar without rendering a second settings navigation', async () => {
@@ -306,8 +303,6 @@ describe('app routes', () => {
     });
 
     const workspaceNav = await screen.findByRole('navigation', { name: 'Workspace' });
-    const utilityNav = screen.getByRole('navigation', { name: 'Utility' });
-
     expect(screen.queryByRole('navigation', { name: 'Primary' })).toBeNull();
     expect(screen.getByRole('heading', { name: 'Verify email change' })).toBeTruthy();
     expect(getRoleNames(workspaceNav, 'link')).toEqual([
@@ -316,7 +311,7 @@ describe('app routes', () => {
       'Security',
       'Telegram',
     ]);
-    expect(getRoleNames(utilityNav, 'button')).toEqual(['Sign out']);
+    expect(screen.getByRole('button', { name: 'Sign out' })).toBeTruthy();
   });
 
   it('renders the account settings route inside the shared workspace navigation', async () => {
@@ -378,20 +373,18 @@ describe('app routes', () => {
     expect(screen.getByRole('link', { name: 'Need help?' })).toBeTruthy();
   });
 
-  it('renders page header status and actions as named groups', () => {
+  it('renders page header actions as named groups and only adds a status group when present', () => {
     render(
       <PageHeader
         actions={<button type="button">Refresh</button>}
         description="Manage sign-in methods and account access posture."
-        status={<p role="status">Passkey and two-factor changes apply immediately.</p>}
         title="Security"
       />
     );
 
-    const statusGroup = screen.getByRole('group', { name: 'Security status' });
     const actionsGroup = screen.getByRole('group', { name: 'Security actions' });
 
-    expect(within(statusGroup).getByRole('status')).toBeTruthy();
+    expect(screen.queryByRole('group', { name: 'Security status' })).toBeNull();
     expect(within(actionsGroup).getByRole('button', { name: 'Refresh' })).toBeTruthy();
   });
 
@@ -445,7 +438,7 @@ describe('app routes', () => {
     });
 
     expect(screen.getByRole('heading', { name: 'Security' })).toBeTruthy();
-    expect(screen.getByRole('group', { name: 'Security status' })).toBeTruthy();
+    expect(screen.queryByRole('group', { name: 'Security status' })).toBeNull();
     expect(
       screen.getByText(
         'Passwords, verification methods, and device trust for the current account.'

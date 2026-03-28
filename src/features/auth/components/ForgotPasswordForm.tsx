@@ -8,6 +8,8 @@ import { TurnstileWidget } from '../../../shared/protection/turnstile/TurnstileW
 import { useTurnstileController } from '../../../shared/protection/turnstile/useTurnstileController';
 import { useProtectedAction } from '../../../shared/protection/useProtectedAction';
 import { appConfig } from '../../../shared/config/appConfig';
+import { AppLink } from '../../../shared/routing/AppLink';
+import { routePaths } from '../../../shared/routing/paths';
 import { useForgotPasswordMutation } from '../mutations';
 import {
   forgotPasswordFormSchema,
@@ -67,6 +69,7 @@ export function ForgotPasswordForm() {
           <input
             autoComplete="email"
             placeholder="name@example.com"
+            spellCheck={false}
             type="email"
             {...form.register('email')}
           />
@@ -89,9 +92,15 @@ export function ForgotPasswordForm() {
           type="submit"
         >
           {form.formState.isSubmitting || forgotPasswordMutation.isPending
-            ? 'Submitting...'
+            ? 'Submitting…'
             : 'Send reset link'}
         </button>
+
+        <div className="auth-links auth-links-center">
+          <AppLink className="text-link" to={routePaths.login}>
+            Back to sign in
+          </AppLink>
+        </div>
 
         {form.formState.errors.root ? (
           <p className="status-banner status-error" role="alert">
@@ -101,7 +110,7 @@ export function ForgotPasswordForm() {
       </form>
 
       {successMessage ? (
-        <p className="status-banner status-success">{successMessage}</p>
+        <p className="status-banner status-success" role="status">{successMessage}</p>
       ) : null}
     </>
   );

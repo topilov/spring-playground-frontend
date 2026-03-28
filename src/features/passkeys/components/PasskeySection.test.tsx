@@ -356,7 +356,7 @@ describe('PasskeySection', () => {
 
     renderSection();
 
-    expect(screen.getByText('Loading passkeys...')).toBeTruthy();
+    expect(screen.getByText('Loading passkeys…')).toBeTruthy();
     expect(screen.queryByRole('alert')).toBeNull();
     expect(screen.queryByText('No passkeys yet.')).toBeNull();
   });

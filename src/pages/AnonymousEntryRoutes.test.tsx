@@ -135,7 +135,7 @@ describe('anonymous entry routes', () => {
     const authContent = screen.getByRole('region', { name: 'Authentication content' });
     expect(within(authContent).getByRole('link', { name: 'Sign in' })).toBeTruthy();
     expect(within(authContent).getByRole('link', { name: 'Create account' })).toBeTruthy();
-    expect(within(authContent).getByRole('link', { name: 'Recover account' })).toBeTruthy();
+    expect(within(authContent).getByRole('link', { name: 'Forgot password' })).toBeTruthy();
   });
 
   it('renders the home route loading state while the session is being checked', () => {

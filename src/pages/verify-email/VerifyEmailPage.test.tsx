@@ -78,7 +78,7 @@ describe('VerifyEmailPage', () => {
 
     renderPage('/verify-email?token=verify-token');
 
-    expect(screen.getByText('Checking verification link...')).toBeTruthy();
+    expect(screen.getByText('Checking verification link…')).toBeTruthy();
     expect(
       screen.getByText('Complete the email check and return to sign-in when the link clears.')
     ).toBeTruthy();

@@ -139,7 +139,7 @@ export function VerifyEmailPage() {
         <div className="stack">
           {verificationStatus === 'verifying' ? (
             <p className="status-banner" role="status">
-              Checking verification link...
+              Checking verification link…
             </p>
           ) : null}
 
@@ -186,6 +186,7 @@ export function VerifyEmailPage() {
           <input
             autoComplete="email"
             placeholder="name@example.com"
+            spellCheck={false}
             type="email"
             {...form.register('email')}
           />
@@ -210,7 +211,7 @@ export function VerifyEmailPage() {
           type="submit"
         >
           {form.formState.isSubmitting || resendVerificationEmailMutation.isPending
-            ? 'Sending verification email...'
+            ? 'Sending verification email…'
             : 'Resend verification email'}
         </button>
       </form>

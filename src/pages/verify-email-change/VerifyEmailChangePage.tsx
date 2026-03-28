@@ -106,7 +106,7 @@ export function VerifyEmailChangePage() {
 
           {verificationStatus === 'submitting' ? (
             <p className="status-banner" role="status">
-              Checking email-change link...
+              Checking email-change link…
             </p>
           ) : null}
 
@@ -150,7 +150,7 @@ export function VerifyEmailChangePage() {
               onClick={() => void handleVerification()}
               type="button"
             >
-              {isSubmitting ? 'Verifying email change...' : 'Verify email change'}
+              {isSubmitting ? 'Verifying email change…' : 'Verify email change'}
             </button>
           </div>
         ) : null}

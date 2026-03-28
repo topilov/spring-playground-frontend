@@ -120,7 +120,7 @@ describe('VerifyEmailChangePage', () => {
         captchaToken: 'captcha-token',
       });
     });
-    expect(await screen.findByText('Checking email-change link...')).toBeTruthy();
+    expect(await screen.findByText('Checking email-change link…')).toBeTruthy();
 
     resolveVerification({
       id: 1,

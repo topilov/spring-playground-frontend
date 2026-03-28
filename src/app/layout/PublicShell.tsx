@@ -21,6 +21,9 @@ export function PublicShell({
 }: PublicShellProps) {
   return (
     <div className="app-shell app-shell-public">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <header className="app-header shell-header">
         <div className="shell-header-bar">
           <AppLink className="brand" to={routePaths.home}>
@@ -69,7 +72,7 @@ export function PublicShell({
         </div>
       </header>
 
-      <main className="app-main shell-main">
+      <main className="app-main shell-main" id="main-content">
         <div className="shell-stage shell-stage-public">{children}</div>
       </main>
     </div>

@@ -12,7 +12,7 @@ export function ResetPasswordPage() {
     <AuthPageShell
       subtitle="Set a new password and return to the account workspace."
       utility={
-        <p className="status-banner">
+        <p className="status-banner" role="status">
           Use the reset link from your inbox. If it expires, request another one from sign in.
         </p>
       }

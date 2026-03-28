@@ -11,7 +11,7 @@ interface TelegramAutomationTokenSectionProps {
   onCreate: () => void;
   onRegenerate: () => void;
   onRevoke: () => void;
-  onCopy: () => void;
+  onCopy: () => Promise<void>;
 }
 
 function formatDateTime(value: string | null): string {
@@ -39,7 +39,7 @@ export function TelegramAutomationTokenSection({
   onCopy,
 }: TelegramAutomationTokenSectionProps) {
   return (
-    <section className="workspace-band stack">
+    <section className="page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Automation token</h2>
@@ -76,28 +76,28 @@ export function TelegramAutomationTokenSection({
 
       <div className="inline-actions">
         {!automationToken.present ? (
-          <button className="button button-primary" disabled={isCreating} onClick={onCreate} type="button">
-            {isCreating ? 'Creating token...' : 'Create token'}
+          <button className="button button-primary form-action-button" disabled={isCreating} onClick={onCreate} type="button">
+            {isCreating ? 'Creating token…' : 'Create token'}
           </button>
         ) : null}
 
         {automationToken.present ? (
           <>
             <button
-              className="button button-primary"
+              className="button button-primary form-action-button"
               disabled={isRegenerating}
               onClick={onRegenerate}
               type="button"
             >
-              {isRegenerating ? 'Regenerating token...' : 'Regenerate token'}
+              {isRegenerating ? 'Regenerating token…' : 'Regenerate token'}
             </button>
             <button
-              className="button button-secondary button-danger"
+              className="button button-secondary button-danger form-action-button"
               disabled={isRevoking}
               onClick={onRevoke}
               type="button"
             >
-              {isRevoking ? 'Revoking token...' : 'Revoke token'}
+              {isRevoking ? 'Revoking token…' : 'Revoke token'}
             </button>
           </>
         ) : null}
@@ -113,7 +113,13 @@ export function TelegramAutomationTokenSection({
             This value is shown once after creation or regeneration.
           </p>
           <div className="inline-actions">
-            <button className="button button-secondary" onClick={onCopy} type="button">
+            <button
+              className="button button-secondary form-action-button"
+              onClick={() => {
+                void onCopy();
+              }}
+              type="button"
+            >
               Copy token
             </button>
             {copyStatus ? (

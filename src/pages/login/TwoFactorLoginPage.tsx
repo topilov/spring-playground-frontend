@@ -220,6 +220,7 @@ export function TwoFactorLoginPage() {
               inputMode="numeric"
               onChange={(event) => setCode(event.target.value)}
               placeholder="123456"
+              spellCheck={false}
               value={code}
             />
           </label>
@@ -231,7 +232,7 @@ export function TwoFactorLoginPage() {
           />
 
           <button className="button button-primary button-full" disabled={isSubmitting} type="submit">
-            {verifyTwoFactorLoginMutation.isPending ? 'Verifying code...' : 'Verify code'}
+            {verifyTwoFactorLoginMutation.isPending ? 'Verifying code…' : 'Verify code'}
           </button>
         </form>
       ) : null}
@@ -244,6 +245,7 @@ export function TwoFactorLoginPage() {
               autoCapitalize="characters"
               onChange={(event) => setBackupCode(event.target.value)}
               placeholder="ABCD-EFGH-JKLM"
+              spellCheck={false}
               value={backupCode}
             />
           </label>
@@ -256,7 +258,7 @@ export function TwoFactorLoginPage() {
 
           <button className="button button-primary button-full" disabled={isSubmitting} type="submit">
             {verifyTwoFactorBackupCodeMutation.isPending
-              ? 'Verifying backup code...'
+              ? 'Verifying backup code…'
               : 'Verify backup code'}
           </button>
         </form>

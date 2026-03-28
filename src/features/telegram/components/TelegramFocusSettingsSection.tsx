@@ -23,7 +23,7 @@ export function TelegramFocusSettingsSection({
   );
 
   return (
-    <section className="workspace-band stack">
+    <section className="page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Default status</h2>
@@ -52,13 +52,14 @@ export function TelegramFocusSettingsSection({
           <input
             onChange={(event) => setDefaultEmojiStatusDocumentId(event.target.value)}
             placeholder="7000"
+            spellCheck={false}
             value={defaultEmojiStatusDocumentId}
           />
         </label>
 
         <div className="inline-actions">
-          <button className="button button-primary" disabled={isSaving} type="submit">
-            {isSaving ? 'Saving default status...' : 'Save default status'}
+          <button className="button button-primary form-action-button" disabled={isSaving} type="submit">
+            {isSaving ? 'Saving default status…' : 'Save default status'}
           </button>
         </div>
       </form>

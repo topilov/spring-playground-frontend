@@ -1,5 +1,11 @@
 :root {
-  font-family: 'IBM Plex Sans', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-family:
+    'SF Pro Text',
+    'SF Pro Display',
+    'Helvetica Neue',
+    'Helvetica',
+    'Arial',
+    sans-serif;
   color: #20242b;
   background:
     radial-gradient(circle at top, rgba(101, 141, 214, 0.14), transparent 34%),
@@ -82,6 +88,23 @@ textarea {
   min-height: 100vh;
 }
 
+.skip-link {
+  position: absolute;
+  top: -10rem;
+  left: var(--space-4);
+  z-index: 20;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(79, 111, 177, 0.24);
+  border-radius: 0.9rem;
+  background: rgba(255, 252, 247, 0.98);
+  color: var(--accent-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.skip-link:focus-visible {
+  top: var(--space-4);
+}
+
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -91,6 +114,17 @@ textarea {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -164,7 +198,13 @@ textarea {
 }
 
 .brand-name {
-  font-family: 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif;
+  font-family:
+    'SF Pro Display',
+    'SF Pro Text',
+    'Helvetica Neue',
+    'Helvetica',
+    'Arial',
+    sans-serif;
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -243,8 +283,27 @@ textarea {
   justify-content: space-between;
 }
 
+.auth-links-inline {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.auth-links-balanced {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.auth-links-center {
+  width: 100%;
+  justify-content: center;
+}
+
 .auth-links-start {
   justify-content: flex-start;
+}
+
+.auth-footer .auth-links {
+  width: 100%;
 }
 
 .header-link,
@@ -356,6 +415,10 @@ textarea {
   padding-top: var(--space-6);
 }
 
+.app-shell-workspace .shell-main {
+  padding-top: 0;
+}
+
 .shell-stage {
   width: 100%;
 }
@@ -435,7 +498,13 @@ textarea {
 .passkey-entry h3,
 .passkey-empty-state h3 {
   margin: 0;
-  font-family: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+  font-family:
+    'SF Pro Display',
+    'SF Pro Text',
+    'Helvetica Neue',
+    'Helvetica',
+    'Arial',
+    sans-serif;
   letter-spacing: -0.03em;
   color: #171c24;
 }
@@ -485,12 +554,17 @@ textarea {
   border-top: 1px solid rgba(70, 79, 92, 0.1);
 }
 
+.auth-footer-inner {
+  width: min(100%, 26rem);
+  margin-left: auto;
+}
+
 .page-header-copy {
   gap: 0.5rem;
 }
 
 .page-header {
-  grid-template-columns: minmax(0, 1.3fr) minmax(16rem, 0.95fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(12rem, 0.75fr);
   gap: var(--space-5);
   align-items: end;
   padding-bottom: var(--space-4);
@@ -504,7 +578,7 @@ textarea {
 
 .page-header-status,
 .page-header-actions {
-  width: min(100%, 24rem);
+  width: min(100%, 20rem);
 }
 
 .page-header-status {
@@ -610,12 +684,96 @@ textarea {
 }
 
 .workspace-shell-split {
-  grid-template-columns: minmax(13rem, 0.34fr) minmax(0, 1fr);
+  grid-template-columns: minmax(15rem, 17rem) 1px minmax(0, 1fr);
+  column-gap: var(--space-5);
   align-items: start;
+}
+
+.workspace-shell-detail {
+  grid-template-columns: minmax(0, 1fr) minmax(11rem, 14rem);
+  align-items: start;
+}
+
+.workspace-sidebar {
+  position: sticky;
+  top: var(--space-4);
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  align-self: start;
+  padding-top: var(--space-4);
+}
+
+.workspace-divider {
+  align-self: stretch;
+  background: rgba(70, 79, 92, 0.1);
+}
+
+.workspace-nav {
+  gap: var(--space-2);
+}
+
+.workspace-nav-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.workspace-nav-link {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.1rem;
+  border: 1px solid transparent;
+  border-radius: 0.85rem;
+  color: var(--text-muted);
+  transition:
+    transform var(--motion-duration) var(--motion-ease),
+    background var(--motion-duration) ease,
+    border-color var(--motion-duration) ease,
+    color var(--motion-duration) ease,
+    box-shadow var(--motion-duration) ease;
+}
+
+.workspace-nav-link:hover {
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.workspace-nav-link-active {
+  background: rgba(79, 111, 177, 0.08);
+  color: var(--accent-strong);
+}
+
+.workspace-nav-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: currentColor;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workspace-nav-label {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.workspace-sidebar-footer {
+  padding-top: var(--space-2);
 }
 
 .workspace-column {
   gap: var(--space-5);
+}
+
+.workspace-content {
+  min-width: 0;
+  padding-top: var(--space-4);
 }
 
 .workspace-band {
@@ -635,16 +793,38 @@ textarea {
 
 .workspace-band-header {
   gap: var(--space-3);
-  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 14rem);
   align-items: start;
 }
 
 .workspace-note {
   margin: 0;
+  max-width: 14rem;
   padding: 0.75rem 0 0;
   border-top: 1px solid rgba(70, 79, 92, 0.08);
   color: var(--text-muted);
   font-size: 0.94rem;
+}
+
+.form-action-button {
+  width: fit-content;
+  min-width: 11.5rem;
+}
+
+.button-icon {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  padding-inline: 0;
+}
+
+.button-icon-mark {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .section-heading {
@@ -861,6 +1041,23 @@ textarea {
   .workspace-shell-split {
     grid-template-columns: 1fr;
   }
+
+  .workspace-shell-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-nav {
+    position: static;
+  }
+
+  .workspace-sidebar {
+    position: static;
+    padding-top: 0;
+  }
+
+  .workspace-divider {
+    display: none;
+  }
 }
 
 @media (max-width: 760px) {
@@ -887,6 +1084,15 @@ textarea {
 
   .auth-content {
     padding: var(--space-4);
+  }
+
+  .auth-footer-inner {
+    width: 100%;
+  }
+
+  .form-action-button {
+    width: 100%;
+    min-width: 0;
   }
 }
 

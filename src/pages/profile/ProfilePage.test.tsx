@@ -44,7 +44,7 @@ describe('ProfilePage', () => {
     refreshSession.mockImplementation(async () => null);
   });
 
-  it('renders authenticated profile details and profile actions', () => {
+  it('renders authenticated profile details and refresh action', () => {
     renderProfilePage();
 
     expect(screen.getByRole('heading', { name: 'Profile' })).toBeTruthy();
@@ -55,11 +55,8 @@ describe('ProfilePage', () => {
     expect(screen.getByText('signal-room')).toBeTruthy();
     expect(screen.getByText('signal-room@example.com')).toBeTruthy();
     expect(screen.getByText('Keeps the workspace in sync.')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Account' }).getAttribute('href')).toBe(
-      '/settings/account'
-    );
     expect(screen.getByRole('button', { name: 'Refresh' })).toBeTruthy();
-    expect(screen.getByRole('heading', { name: 'Account records' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Account information' })).toBeTruthy();
   });
 
   it('shows the loading shell while the session is pending', () => {

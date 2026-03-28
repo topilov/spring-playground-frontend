@@ -39,7 +39,7 @@ export function PasswordChangeSection() {
   });
 
   return (
-    <section className="workspace-band workspace-band-primary stack">
+    <section className="page-card stack">
       <div className="workspace-band-header">
         <div className="section-heading">
           <h2>Password</h2>
@@ -99,11 +99,11 @@ export function PasswordChangeSection() {
         </label>
 
         <button
-          className="button button-primary"
+          className="button button-primary form-action-button"
           disabled={form.formState.isSubmitting}
           type="submit"
         >
-          {form.formState.isSubmitting ? 'Saving password...' : 'Change password'}
+          {form.formState.isSubmitting ? 'Saving password…' : 'Change password'}
         </button>
 
         {successMessage ? (

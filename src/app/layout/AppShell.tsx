@@ -21,6 +21,9 @@ export function AppShell({
 }: AppShellProps) {
   return (
     <div className="app-shell app-shell-workspace">
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
       <header className="app-header shell-header">
         <div className="shell-header-bar">
           <AppLink className="brand" to={routePaths.home}>
@@ -43,24 +46,11 @@ export function AppShell({
             <div className="header-meta-spacer" aria-hidden="true" />
           )}
 
-          <div className="header-actions shell-actions">
-            <nav aria-label="Utility" className="inline-actions shell-nav">
-              <button
-                className="button button-secondary"
-                disabled={signingOut}
-                onClick={() => {
-                  void onLogout();
-                }}
-                type="button"
-              >
-                {signingOut ? 'Signing out...' : 'Sign out'}
-              </button>
-            </nav>
-          </div>
+          <div className="header-actions shell-actions" aria-hidden="true" />
         </div>
       </header>
 
-      <main className="app-main shell-main">
+      <main className="app-main shell-main" id="main-content">
         <div className="shell-stage shell-stage-workspace">
           {logoutError ? (
             <p className="status-banner status-error" role="alert">
@@ -69,8 +59,12 @@ export function AppShell({
           ) : null}
 
           <div className="workspace-shell workspace-shell-split">
-            <AuthenticatedSidebar />
-            <div className="workspace-column">{children}</div>
+            <AuthenticatedSidebar
+              onLogout={onLogout}
+              signingOut={signingOut}
+            />
+            <div aria-hidden="true" className="workspace-divider" />
+            <div className="workspace-column workspace-content">{children}</div>
           </div>
         </div>
       </main>

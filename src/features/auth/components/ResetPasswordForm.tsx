@@ -53,7 +53,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   if (isSuccess) {
     return (
       <div className="stack">
-        <p className="status-banner status-success">
+        <p className="status-banner status-success" role="status">
           Password updated.
         </p>
         <AppLink className="text-link" to={routePaths.login}>
@@ -96,6 +96,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <input
           autoComplete="new-password"
           placeholder="Create a new password"
+          spellCheck={false}
           type="password"
           {...form.register('newPassword')}
         />
@@ -111,6 +112,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <input
           autoComplete="new-password"
           placeholder="Repeat your new password"
+          spellCheck={false}
           type="password"
           {...form.register('confirmPassword')}
         />
@@ -133,7 +135,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         type="submit"
       >
         {form.formState.isSubmitting || resetPasswordMutation.isPending
-          ? 'Resetting...'
+          ? 'Resetting…'
           : 'Reset password'}
       </button>
 
